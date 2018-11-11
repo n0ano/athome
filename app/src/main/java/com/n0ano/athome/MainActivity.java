@@ -1,52 +1,247 @@
 package com.n0ano.athome;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.Point;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.n0ano.athome.Log;
+import com.n0ano.athome.Version;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+public class MainActivity extends AppCompatActivity
+{
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+private static final int OPT_SETTINGS =     1001;
+
+private String server;
+
+private String url;
+
+int degree = 0;
+
+@Override
+protected void onCreate(Bundle state)
+{
+
+    super.onCreate(state);
+    Log.d("MainActivity: onCreate");
+
+    restore_state();
+
+    final ImageView iv = findViewById(R.id.test_image);
+    new Thread(new Runnable() {
+        public void run() {
+            for (;;) {
+                if (++degree > 360)
+                    degree = 0;
+                rotate(iv, degree);
+                SystemClock.sleep(100);
             }
-        });
-    }
+        }
+    }).start();
+}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+@Override
+protected void onStart()
+{
+
+    super.onStart();
+    Log.d("MainActivity: onStart");
+}
+
+@Override
+protected void onRestart()
+{
+
+    super.onRestart();
+    Log.d("MainActivity: onRestart");
+}
+
+@Override
+protected void onResume()
+{
+
+    super.onResume();
+    Log.d("MainActivity: onResume");
+}
+
+@Override
+protected void onPause()
+{
+
+    super.onPause();
+    Log.d("MainActivity: onPause");
+}
+
+@Override
+protected void onStop()
+{
+
+    super.onStop();
+    Log.d("MainActivity: onStop");
+}
+
+@Override
+protected void onDestroy()
+{
+
+    super.onDestroy();
+    Log.d("MainActivity: onDestroy");
+}
+
+@Override
+public void onBackPressed()
+{
+
+    super.onBackPressed();
+    Log.d("MainActivity: onBackPressed");
+}
+
+@Override
+protected void onSaveInstanceState(Bundle state)
+{
+
+    super.onSaveInstanceState(state);
+
+    //
+    //  Save state needed on the next onCreate, e.g.
+    //      state.putString("KEY", "value");
+    Log.d("MainActivity: onSaveInstanceState");
+}
+
+@Override
+public boolean onCreateOptionsMenu(Menu menu)
+{
+
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.menu_main, menu);
+    return true;
+}
+
+@Override
+public boolean onOptionsItemSelected(MenuItem item)
+{
+
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+
+    switch (item.getItemId()) {
+
+    case R.id.action_settings:
+        settings_dialog();
+        return true;
+
+    case R.id.action_about:
+        about_dialog();
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    return super.onOptionsItemSelected(item);
+}
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+private void settings_dialog()
+{
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_settings);
+
+    final EditText et = (EditText) dialog.findViewById(R.id.opt_server);
+    et.setText(server);
+
+    Button cancel = (Button) dialog.findViewById(R.id.opt_cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
         }
+    });
 
-        return super.onOptionsItemSelected(item);
-    }
+    Button ok = (Button) dialog.findViewById(R.id.opt_ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            server = et.getText().toString();
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+private void about_dialog()
+{
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_about);
+
+    final TextView et = (TextView) dialog.findViewById(R.id.about_version);
+    et.setText("Version: " + Version.VER_MAJOR + "." + Version.VER_MINOR + Version.VER_DEBUG);
+
+    Button ok = (Button) dialog.findViewById(R.id.about_ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+private void save_state()
+{
+
+    Preferences pref = new Preferences(this);
+    //
+    //  Save persistent state needed on next invocation, e.g.
+    //      pref.put_string("Server", server);
+    //
+}
+
+public void restore_state()
+{
+
+    Preferences pref = new Preferences(this);
+    //
+    //  Restore persistent state, e.g.
+    //      server = pref.get_string("Server", "default_value");
+    //
+
+    setContentView(R.layout.activity_main);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+}
+
+private void rotate(final ImageView iv, final int r)
+{
+
+    runOnUiThread(new Runnable() {
+        public void run() {
+            iv.setRotation(r);
+        }
+    });
+}
+
 }
