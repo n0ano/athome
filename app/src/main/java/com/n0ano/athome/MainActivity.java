@@ -47,19 +47,11 @@ protected void onCreate(Bundle state)
     super.onCreate(state);
     Log.d("MainActivity: onCreate");
 
-    restore_state();
+    setContentView(R.layout.activity_main);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-    final ImageView iv = findViewById(R.id.test_image);
-    new Thread(new Runnable() {
-        public void run() {
-            for (;;) {
-                if (++degree > 360)
-                    degree = 0;
-                rotate(iv, degree);
-                SystemClock.sleep(100);
-            }
-        }
-    }).start();
+    doit();
 }
 
 @Override
@@ -210,38 +202,19 @@ private void about_dialog()
     dialog.show();
 }
 
-private void save_state()
+private void doit()
 {
 
-    Preferences pref = new Preferences(this);
-    //
-    //  Save persistent state needed on next invocation, e.g.
-    //      pref.put_string("Server", server);
-    //
-}
-
-public void restore_state()
-{
-
-    Preferences pref = new Preferences(this);
-    //
-    //  Restore persistent state, e.g.
-    //      server = pref.get_string("Server", "default_value");
-    //
-
-    setContentView(R.layout.activity_main);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-}
-
-private void rotate(final ImageView iv, final int r)
-{
-
-    runOnUiThread(new Runnable() {
+    final Weather weather = new Weather("KCOBOULD238", this);
+    new Thread(new Runnable() {
         public void run() {
-            iv.setRotation(r);
+            for (;;) {
+                weather.get_data();
+                weather.show_data();
+                SystemClock.sleep(Common.DATA_DELAY * 1000);
+            }
         }
-    });
+    }).start();
 }
 
 }

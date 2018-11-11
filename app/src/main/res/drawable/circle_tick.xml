@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- circle calculator at http://complexdan.com/svg-circleellipse-to-path-converter/ -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportHeight="50"
+    android:viewportWidth="50">
+
+    <path
+        android:strokeColor="#ffffffff"
+        android:strokeWidth="2"
+        android:pathData="
+        M5,25a20,20 0 1,0 40,0a20,20 0 1,0 -40,0 Z
+        M25,1 l0,12"/>
+</vector>
