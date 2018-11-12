@@ -54,6 +54,7 @@ private void init_data()
     data_under.put("winddir", "winddir");
     data_under.put("windspeedmph", "windspeed");
     data_under.put("dailyrainin", "rain");
+    data_under.put("baromin", "barometer");
 
     data_ecobee.put("temp", "in_temp");
 }
@@ -97,6 +98,7 @@ public void get_data()
         while ((line = inp.readLine()) != null) {
             proc_under(line);
         }
+        in_rdr.close();
     } catch (Exception e) {
         Log.d("get file failed - " + e);
         return;
@@ -124,6 +126,9 @@ public void show_data()
 
             tv = (TextView) act.findViewById(R.id.weather_rain);
             tv.setText(data.get("rain") + " in");
+
+            tv = (TextView) act.findViewById(R.id.weather_barometer);
+            tv.setText(data.get("barometer") + " in");
         }
     });
 }

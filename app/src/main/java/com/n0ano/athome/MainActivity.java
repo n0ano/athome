@@ -206,11 +206,17 @@ private void doit()
 {
 
     final Weather weather = new Weather("KCOBOULD238", this);
+    final Egauge egauge = new Egauge("http://n0ano-eg/", this);
     new Thread(new Runnable() {
         public void run() {
             for (;;) {
+
                 weather.get_data();
                 weather.show_data();
+
+                egauge.get_data();
+                egauge.show_data();
+
                 SystemClock.sleep(Common.DATA_DELAY * 1000);
             }
         }

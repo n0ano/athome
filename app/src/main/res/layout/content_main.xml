@@ -18,12 +18,7 @@
         android:paddingLeft="10dp"
         >
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_horizontal"
-            android:text="AtHome" />
+        <include layout="@layout/egauge" />
 
         <include layout="@layout/weather" />
 

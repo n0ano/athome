@@ -133,8 +133,8 @@
                 android:gravity="center_horizontal"
                 android:layout_alignTop="@id/weather_dir"
                 android:layout_alignLeft="@id/weather_dir"
-                android:layout_marginTop="36dp"
-                android:layout_marginLeft="40dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="34dp"
                 android:textSize="24sp"
                 android:hint="00.0"
                 android:textColorHint="#00ffffff"
@@ -151,7 +151,32 @@
                 android:textSize="14sp"
                 android:text="mph" />
 
+            <ImageView
+                android:id="@+id/weather_bar_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@id/weather_dir"
+                android:paddingTop="20dp"
+                android:paddingRight="10dp"
+                android:src="@drawable/barometer" />
+
+            <TextView
+                android:id="@+id/weather_barometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/weather_bar_dir"
+                android:layout_below="@id/weather_bar_dir"
+                android:paddingRight="10dp"
+                android:textSize="18sp"
+                android:text="0.0 in" />
+
             </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
         </LinearLayout>
 
