@@ -7,7 +7,7 @@ public class Common {
 
 public final static int DATA_DELAY = 10;
 
-public final static String WEATHER_URL =
-        "https://stationdata.wunderground.com/cgi-bin/stationlookup";
+public final static String JSON_SUF = "\":\"";
+public final static String XML_SUF  = " val=\"";
 
 }

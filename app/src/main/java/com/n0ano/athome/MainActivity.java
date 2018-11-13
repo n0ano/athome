@@ -29,6 +29,11 @@ import android.widget.TextView;
 import com.n0ano.athome.Log;
 import com.n0ano.athome.Version;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity
 {
 
@@ -202,11 +207,126 @@ private void about_dialog()
     dialog.show();
 }
 
+private String param(String search, String resp)
+{
+
+    int start = resp.indexOf(search);
+    if (start >= 0) {
+        start += search.length();
+        int end = resp.indexOf("\"", start);
+        return resp.substring(start, end);
+    }
+    return "";
+}
+
+public String xml_get(String name, String resp)
+{
+
+    return param("<" + name + Common.XML_SUF, resp);
+}
+
+public String xml_get(String name, String resp, String suf)
+{
+
+    return param("<" + name + suf, resp);
+}
+
+public String json_get(String name, String resp)
+{
+
+    return param ("\"" + name + Common.JSON_SUF, resp);
+}
+
+public String json_get(String name, String resp, String suf)
+{
+
+    return param ("\"" + name + suf, resp);
+}
+
+/*
+ *  call an HTTP(S) uri to get a response.  Note that this will return
+ *      a string with the `entire` response.  If the API returns a lot
+ *      of data you might be better off using the open_url/read_url/close_url
+ *      interface available right below this one.
+ */
+public String call_api(String type, String uri, String params, String auth)
+{
+    HttpURLConnection con = null;
+    String res = "";
+
+Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth);
+    if (!params.equals(""))
+        uri = uri + "?" + params;
+    try {
+        URL url = new URL(uri);
+        con = (HttpURLConnection) url.openConnection();
+        if (type.equals("POST"))
+            con.setDoOutput(true);
+        if (!auth.equals(""))
+            con.setRequestProperty("Authorization", auth);
+        InputStreamReader in = new InputStreamReader(con.getInputStream());
+        BufferedReader inp = new BufferedReader (in);
+        StringBuilder response = new StringBuilder();
+        for (String line; (line = inp.readLine()) != null; )
+            response.append(line).append('\n');
+        res = response.toString();
+    } catch (Exception e) {
+        Log.d("read failed - " + e);
+    } finally {
+        if (con != null)
+            con.disconnect();
+    }
+    return res;
+}
+
+public BufferedReader open_url(String url, String auth)
+{
+    URL server;
+    InputStreamReader in_rdr;
+    BufferedReader inp;
+
+    try {
+        Log.d("get data from " + url);
+        server = new URL(url);
+        HttpURLConnection url_con = (HttpURLConnection) server.openConnection();
+        in_rdr = new InputStreamReader(url_con.getInputStream());
+        inp = new BufferedReader (in_rdr);
+    } catch (Exception e) {
+        Log.d("open_url failed - " + e);
+        return null;
+    }
+    return inp;
+}
+
+public String read_url(BufferedReader inp)
+{
+    String line = null;
+
+    try {
+        line = inp.readLine();
+    } catch (Exception e) {
+        Log.d("read_url failed - " + e);
+        return null;
+    }
+    return line;
+}
+
+public void close_url(BufferedReader inp)
+{
+
+    try {
+        inp.close();
+    } catch (Exception e) {
+        Log.d("close_url failed - " + e);
+    }
+}
+
 private void doit()
 {
 
     final Weather weather = new Weather("KCOBOULD238", this);
     final Egauge egauge = new Egauge("http://n0ano-eg/", this);
+    final X10 x10 = new X10(this);
     new Thread(new Runnable() {
         public void run() {
             for (;;) {
@@ -216,6 +336,9 @@ private void doit()
 
                 egauge.get_data();
                 egauge.show_data();
+
+                x10.get_data();
+                x10.show_data();
 
                 SystemClock.sleep(Common.DATA_DELAY * 1000);
             }

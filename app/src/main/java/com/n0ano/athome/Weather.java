@@ -7,8 +7,10 @@ import android.widget.TextView;
 import com.n0ano.athome.Log;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,6 +22,16 @@ import java.util.Set;
 //
 public class Weather {
 
+public final static String WUNDER_URL = "https://stationdata.wunderground.com";
+public final static String WUNDER_API = "/cgi-bin/stationlookup";
+public final static String WUNDER_STATION = "station=";
+public final static String WUNDER_FMT = "&units=english&v=2.0&format=xml";
+
+public final static String ECO_URL = "https://api.ecobee.com";
+public final static String ECO_REFRESH = "/token";
+public final static String ECO_DATA = "/1/thermostat";
+public final static String ECO_DATA_FMT = "?format=json&body=\\{\"selection\":\\{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeRuntime\":true\\}\\}";
+
 String station;
 MainActivity act;
 
@@ -27,7 +39,7 @@ Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_under = new HashMap<String, String>();
 Map<String, String> data_ecobee = new HashMap<String, String>();
 
-// Preferences: class constructor
+// Weather: class constructor
 //
 //   act - activity that instantiated the class
 //
@@ -59,50 +71,42 @@ private void init_data()
     data_ecobee.put("temp", "in_temp");
 }
 
-private void proc_under(String line)
+private void get_info(String resp)
 {
-    String search = "";
-    String key = "";
-    String val = "";
+    String key;
+    String val;
 
     Set keys = data_under.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        search = "<" + key + " val=\"";
-        if (line.startsWith(search)) {
+        val = act.xml_get(key, resp);
+        if (!val.isEmpty()) {
             key = data_under.get(key);
-            line = line.substring(search.length());
-            val = line.substring(0, line.indexOf("\""));
             data.put(key, val);
-            return;
         }
     }
 }
 
+private void get_wunder()
+{
+
+    String resp = act.call_api("GET",
+                               WUNDER_URL + WUNDER_API,
+                               WUNDER_STATION + station + WUNDER_FMT,
+                               "");
+    get_info(resp);
+}
+
+private void get_ecobee()
+{
+
+}
+
 public void get_data()
 {
-    String url;
-    String line;
-    URL server;
-    InputStreamReader in_rdr;
-    BufferedReader inp;
 
-    try {
-        url = Common.WEATHER_URL
-                    + "?station=" + station
-                    + "&units=english&v=2.0&format=xml";
-        Log.d("get data from " + url);
-        server = new URL(url);
-        in_rdr = new InputStreamReader(server.openStream());
-        inp = new BufferedReader (in_rdr);
-        while ((line = inp.readLine()) != null) {
-            proc_under(line);
-        }
-        in_rdr.close();
-    } catch (Exception e) {
-        Log.d("get file failed - " + e);
-        return;
-    }
+    get_wunder();
+    get_ecobee();
 }
 
 public void show_data()

@@ -22,6 +22,10 @@ MainActivity act;
 int use_watt;
 int gen_watt;
 
+// Egauge: class constructor
+//
+//   act - activity that instantiated the class
+//
 public Egauge(String eg_server, MainActivity act)
 {
 
@@ -29,50 +33,33 @@ public Egauge(String eg_server, MainActivity act)
 	this.act = act;
 }
 
-private int watt(String line)
+private int get_value(String name, String resp)
 {
+    int w = 0;
 
-    line = line.substring(line.indexOf("\"i\":") + 4);
-    line = line.substring(0, line.indexOf("."));
-    return Integer.parseInt(line);
-}
-
-private void proc_line(String line)
-{
-    int val;
-    int end;
-
-    if (!line.contains("\"cname\":"))
-        return;
-    if (line.contains("\"use\""))
-            use_watt = watt(line);
-    else if (line.contains("\"gen\""))
-            gen_watt = watt(line);
+    int end = resp.indexOf(",\"cname\":\"" + name);
+    if (end >= 0) {
+        while (resp.charAt(--end) != '.')
+            if (end <= 0)
+                return 0;
+        int start = end;
+        while (resp.charAt(--start) != ':')
+            if (start <= 0)
+                return 0;
+        w = Integer.parseInt(resp.substring(start + 1, end));
+    }
+    return w;
 }
 
 public void get_data()
 {
-    String url;
-    String line;
-    URL server;
-    InputStreamReader in_rdr;
-    BufferedReader inp;
 
-    try {
-        url = eg_server + "cgi-bin/egauge-show"
-                        + "?json&I&a&m&Y=0,60";
-        Log.d("get data from " + url);
-        server = new URL(url);
-        in_rdr = new InputStreamReader(server.openStream());
-        inp = new BufferedReader (in_rdr);
-        while ((line = inp.readLine()) != null)
-            proc_line(line);
-Log.d("use - " + use_watt + ", gen - " + gen_watt);
-        in_rdr.close();
-    } catch (Exception e) {
-        Log.d("get file failed - " + e);
-        return;
-    }
+    String resp = act.call_api("GET",
+                               eg_server + "cgi-bin/egauge-show",
+                               "json&I&a&m&Y=0,60",
+                               "");
+    use_watt = get_value("use", resp);
+    gen_watt = get_value("gen", resp);
 }
 
 private void set_arrow(ImageView iv, int watt, int left, int right)

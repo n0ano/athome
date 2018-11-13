@@ -22,6 +22,8 @@
 
         <include layout="@layout/weather" />
 
+        <include layout="@layout/x10" />
+
         </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
