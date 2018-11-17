@@ -4,9 +4,21 @@
     tools:context="com.n0ano.athome.MainActivity">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_egauge"
         android:orderInCategory="100"
-        android:title="Settings"
+        android:title="eGauge"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_wunder"
+        android:orderInCategory="100"
+        android:title="Weather Underground"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_ecobee"
+        android:orderInCategory="100"
+        android:title="ecoBee"
         app:showAsAction="never" />
 
     <item

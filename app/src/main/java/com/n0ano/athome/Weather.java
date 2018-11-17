@@ -25,14 +25,13 @@ public class Weather {
 public final static String WUNDER_URL = "https://stationdata.wunderground.com";
 public final static String WUNDER_API = "/cgi-bin/stationlookup";
 public final static String WUNDER_STATION = "station=";
-public final static String WUNDER_FMT = "&units=english&v=2.0&format=xml";
+public final static String WUNDER_QUERY = "&units=english&v=2.0&format=xml";
 
 public final static String ECO_URL = "https://api.ecobee.com";
 public final static String ECO_REFRESH = "/token";
 public final static String ECO_DATA = "/1/thermostat";
-public final static String ECO_DATA_FMT = "?format=json&body=\\{\"selection\":\\{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeRuntime\":true\\}\\}";
+public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeRuntime\":true}}";
 
-String station;
 MainActivity act;
 
 Map<String, String> data = new HashMap<String, String>();
@@ -43,10 +42,9 @@ Map<String, String> data_ecobee = new HashMap<String, String>();
 //
 //   act - activity that instantiated the class
 //
-public Weather(String station, MainActivity act)
+public Weather(MainActivity act)
 {
 
-    this.station = station;
 	this.act = act;
     init_data();
 }
@@ -68,10 +66,10 @@ private void init_data()
     data_under.put("dailyrainin", "rain");
     data_under.put("baromin", "barometer");
 
-    data_ecobee.put("temp", "in_temp");
+    data_ecobee.put("actualTemperature", "in_temp");
 }
 
-private void get_info(String resp)
+private void get_info_xml(String resp)
 {
     String key;
     String val;
@@ -79,11 +77,24 @@ private void get_info(String resp)
     Set keys = data_under.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = act.xml_get(key, resp);
+        val = Common.xml_get(key, resp, 1);
         if (!val.isEmpty()) {
             key = data_under.get(key);
             data.put(key, val);
         }
+    }
+}
+
+private void get_info_json(String resp)
+{
+    String key;
+    int val;
+
+    Set keys = data_ecobee.keySet();
+    for (Iterator itr = keys.iterator(); itr.hasNext();) {
+        key = (String)itr.next();
+        val = Common.json_get_int(key, resp, 2);
+        data.put(data_ecobee.get(key), String.format("%.1f", (float)val/10));
     }
 }
 
@@ -92,19 +103,47 @@ private void get_wunder()
 
     String resp = act.call_api("GET",
                                WUNDER_URL + WUNDER_API,
-                               WUNDER_STATION + station + WUNDER_FMT,
+                               WUNDER_STATION + act.wunder_id + WUNDER_QUERY,
                                "");
-    get_info(resp);
+    if (resp.isEmpty() || resp.contains("<conds></conds>"))
+        Log.d("get_wunder: no data for station " + act.wunder_id);
+    else
+        get_info_xml(resp);
 }
 
 private void get_ecobee()
 {
+    String resp;
+
+    resp = act.call_api("GET",
+                               ECO_URL + ECO_DATA,
+                               ECO_QUERY,
+                               "Bearer " + act.ecobee_access);
+//Log.d("ecobee:" + resp);
+    int code = Common.json_get_int("code", resp, 1);
+    if (resp.isEmpty() || code != 0) {
+        resp = act.call_api("POST",
+                            ECO_URL + ECO_REFRESH,
+                            "grant_type=refresh_token&code=" + act.ecobee_refresh +
+                                "&client_id=" + act.ecobee_api,
+                            "");
+        act.ecobee_access = Common.json_get("access_token", resp, 1);
+        act.ecobee_refresh = Common.json_get("refresh_token", resp, 1);
+        Preferences pref = new Preferences(act);
+        pref.put_string("ecobee_access", act.ecobee_access);
+        pref.put_string("ecobee_refresh", act.ecobee_refresh);
+Log.d("get_ecobee access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+    } else {
+        get_info_json(resp);
+    }
 
 }
 
 public void get_data()
 {
 
+    data.put("in_temp", "--");
+    data.put("out_temp", "--");
     get_wunder();
     get_ecobee();
 }

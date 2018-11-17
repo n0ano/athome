@@ -145,7 +145,7 @@ public void get_data()
                                X10_URL + X10_API,
                                X10_GET,
                                "");
-    on_off(act.json_get("state", resp));
+    on_off(Common.json_get("state", resp, 1));
 }
 
 public void show_data()

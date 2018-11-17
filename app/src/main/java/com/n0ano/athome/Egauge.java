@@ -16,7 +16,9 @@ import java.net.URL;
 //
 public class Egauge {
 
-private String eg_server;
+public final static String EGAUGE_API = "/cgi-bin/egauge-show";
+public final static String EGAUGE_QUERY = "json&I&a&m&Y=0,60";
+
 MainActivity act;
 
 int use_watt;
@@ -26,10 +28,9 @@ int gen_watt;
 //
 //   act - activity that instantiated the class
 //
-public Egauge(String eg_server, MainActivity act)
+public Egauge(MainActivity act)
 {
 
-    this.eg_server = eg_server;
 	this.act = act;
 }
 
@@ -55,8 +56,8 @@ public void get_data()
 {
 
     String resp = act.call_api("GET",
-                               eg_server + "cgi-bin/egauge-show",
-                               "json&I&a&m&Y=0,60",
+                               act.egauge_url + EGAUGE_API,
+                               EGAUGE_QUERY,
                                "");
     use_watt = get_value("use", resp);
     gen_watt = get_value("gen", resp);

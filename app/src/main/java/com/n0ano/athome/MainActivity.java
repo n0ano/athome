@@ -38,8 +38,16 @@ public class MainActivity extends AppCompatActivity
 {
 
 private static final int OPT_SETTINGS =     1001;
+private static final int OPT_WUNDER =       1001;
+private static final int OPT_ECOBEE =       1001;
 
-private String server;
+public String egauge_url;
+
+public String wunder_id;
+
+public String ecobee_api;
+public String ecobee_refresh;
+public String ecobee_access;
 
 private String url;
 
@@ -56,8 +64,6 @@ protected void onCreate(Bundle state)
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-    doit();
 }
 
 @Override
@@ -82,6 +88,11 @@ protected void onResume()
 
     super.onResume();
     Log.d("MainActivity: onResume");
+
+//test_string();
+
+    restore_state();
+    doit();
 }
 
 @Override
@@ -147,8 +158,16 @@ public boolean onOptionsItemSelected(MenuItem item)
 
     switch (item.getItemId()) {
 
-    case R.id.action_settings:
-        settings_dialog();
+    case R.id.action_egauge:
+        egauge_dialog();
+        return true;
+
+    case R.id.action_wunder:
+        wunder_dialog();
+        return true;
+
+    case R.id.action_ecobee:
+        ecobee_dialog();
         return true;
 
     case R.id.action_about:
@@ -159,16 +178,17 @@ public boolean onOptionsItemSelected(MenuItem item)
     return super.onOptionsItemSelected(item);
 }
 
-private void settings_dialog()
+private void egauge_dialog()
 {
+    final Preferences pref = new Preferences(this);
 
     final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
-    dialog.setContentView(R.layout.bar_settings);
+    dialog.setContentView(R.layout.bar_egauge);
 
-    final EditText et = (EditText) dialog.findViewById(R.id.opt_server);
-    et.setText(server);
+    final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
+    et.setText(egauge_url);
 
-    Button cancel = (Button) dialog.findViewById(R.id.opt_cancel);
+    Button cancel = (Button) dialog.findViewById(R.id.egauge_cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -176,11 +196,84 @@ private void settings_dialog()
         }
     });
 
-    Button ok = (Button) dialog.findViewById(R.id.opt_ok);
+    Button ok = (Button) dialog.findViewById(R.id.egauge_ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            server = et.getText().toString();
+            egauge_url = et.getText().toString();
+            pref.put_string("egauge_url", egauge_url);
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+private void wunder_dialog()
+{
+    final Preferences pref = new Preferences(this);
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_wunder);
+
+    final EditText et = (EditText) dialog.findViewById(R.id.wunder_id);
+    et.setText(wunder_id);
+
+    Button cancel = (Button) dialog.findViewById(R.id.wunder_cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.wunder_ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            wunder_id = et.getText().toString();
+            pref.put_string("wunder_id", wunder_id);
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+private void ecobee_dialog()
+{
+    final Preferences pref = new Preferences(this);
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_ecobee);
+
+    final EditText api_tv = (EditText) dialog.findViewById(R.id.ecobee_api);
+    api_tv.setText(ecobee_api);
+
+    final EditText access_tv = (EditText) dialog.findViewById(R.id.ecobee_access);
+    access_tv.setText(ecobee_access);
+
+    final EditText refresh_tv = (EditText) dialog.findViewById(R.id.ecobee_refresh);
+    refresh_tv.setText(ecobee_refresh);
+
+    Button cancel = (Button) dialog.findViewById(R.id.ecobee_cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ecobee_ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ecobee_api = api_tv.getText().toString();
+            ecobee_access = access_tv.getText().toString();
+            ecobee_refresh = refresh_tv.getText().toString();
+            pref.put_string("ecobee_api", ecobee_api);
+            pref.put_string("ecobee_access", ecobee_access);
+            pref.put_string("ecobee_refresh", ecobee_refresh);
             dialog.dismiss();
         }
     });
@@ -208,41 +301,55 @@ private void about_dialog()
     dialog.show();
 }
 
-private String param(String search, String resp)
+private void restore_state()
 {
 
-    int start = resp.indexOf(search);
-    if (start >= 0) {
-        start += search.length();
-        int end = resp.indexOf("\"", start);
-        return resp.substring(start, end);
-    }
-    return "";
+    Preferences pref = new Preferences(this);
+
+    egauge_url = pref.get_string("egauge_url", "");
+    wunder_id = pref.get_string("wunder_id", "");
+    ecobee_api = pref.get_string("ecobee_api", "");
+    ecobee_access = pref.get_string("ecobee_access", "");
+    ecobee_refresh = pref.get_string("ecobee_refresh", "");
 }
 
-public String xml_get(String name, String resp)
+private void test_string()
 {
 
-    return param("<" + name + Common.XML_SUF, resp);
+    String xml =
+"<conds><KCOBOULD238>\n" +
+"<page val=\"one\"></page>\n" +
+"<totalPages val=\"10\"></totalPages>\n" +
+"<pageSize val=\"2\"></pageSise>\n" +
+"<page val=\"two\"></page>\n" +
+"<totalPages val=\"20\"></totalPages>\n" +
+"<pageSize val=\"1234\"></pageSise>\n" +
+"</conds>";
+    String json =
+"{\n" +
+"  \"folio\": {\n" +
+"    \"page\": \"one\",\n" +
+"    \"totalPages\": 10,\n" +
+"    \"pageSize\": 2\n" +
+"  },\n" +
+"  \"folio\": {\n" +
+"    \"page\": \"two\",\n" +
+"    \"totalPages\": 20,\n" +
+"    \"pageSize\": 1234\n" +
+"  }\n" +
+"}";
+    Log.d("xml - " + xml);
+    Log.d("json - " + json);
+
+    Log.d("xml page(one) = " + Common.xml_get("page", xml, 1));
+    Log.d("xml page(two) = " + Common.xml_get("page", xml, 2));
+    Log.d("xml totalPages(10) = " + Common.xml_get("totalPages", xml, 1));
+
+    Log.d("json page(one) = " + Common.json_get("page", json, 1));
+    Log.d("json page(two) = " + Common.json_get("page", json, 2));
+    Log.d("json totalPages(10) = " + Common.json_get_int("totalPages", json, 1));
 }
 
-public String xml_get(String name, String resp, String suf)
-{
-
-    return param("<" + name + suf, resp);
-}
-
-public String json_get(String name, String resp)
-{
-
-    return param ("\"" + name + Common.JSON_SUF, resp);
-}
-
-public String json_get(String name, String resp, String suf)
-{
-
-    return param ("\"" + name + suf, resp);
-}
 
 /*
  *  call an HTTP(S) uri to get a response.  Note that this will return
@@ -273,6 +380,7 @@ Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth);
         res = response.toString();
     } catch (Exception e) {
         Log.d("read failed - " + e);
+        res = "";
     } finally {
         if (con != null)
             con.disconnect();
@@ -325,8 +433,8 @@ public void close_url(BufferedReader inp)
 private void doit()
 {
 
-    final Weather weather = new Weather("KCOBOULD238", this);
-    final Egauge egauge = new Egauge("http://n0ano-eg/", this);
+    final Weather weather = new Weather(this);
+    final Egauge egauge = new Egauge( this);
     final X10 x10 = new X10(this);
     new Thread(new Runnable() {
         public void run() {

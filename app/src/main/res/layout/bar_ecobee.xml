@@ -18,7 +18,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Settings"
+			android:text="Weather Underground"
             android:textSize="20dp"
             android:textColor="@color/dialog_fore"
 			/>
@@ -36,12 +36,70 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Server: "
+			android:text="Api Key: "
             android:textColor="@color/dialog_fore"
 			/>
 
 		<EditText
-			android:id="@+id/opt_server"
+			android:id="@+id/ecobee_api"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Access Token: "
+            android:textColor="@color/dialog_fore"
+			/>
+
+		<EditText
+			android:id="@+id/ecobee_access"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Refresh Token: "
+            android:textColor="@color/dialog_fore"
+			/>
+
+		<EditText
+			android:id="@+id/ecobee_refresh"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:text=""
@@ -64,7 +122,7 @@
 		>
 
 		<Button
-			android:id="@+id/opt_cancel"
+			android:id="@+id/ecobee_cancel"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:paddingRight="30dp"
@@ -74,7 +132,7 @@
 			/>
 
 		<Button
-			android:id="@+id/opt_ok"
+			android:id="@+id/ecobee_ok"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ok"
