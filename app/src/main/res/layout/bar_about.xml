@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical"
-	>
+	android:orientation="vertical" >
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -12,34 +11,64 @@
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-		>
+        android:paddingBottom="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="About"
+			android:text="AtHome"
             android:textSize="20dp"
-            android:textColor="@color/dialog_fore"
-			/>
-        </LinearLayout>
-
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+            android:textColor="@color/dialog_fore" />
 
 		<TextView
 			android:id="@+id/about_version"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Server: "
-            android:textColor="@color/dialog_fore"
-			/>
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+			android:text=""
+            android:textColor="@color/dialog_fore" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+			android:text="Copyrights:"
+            android:textColor="@color/dialog_fore" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+			android:text="Project Copyright Don Dugger"
+            android:textColor="@color/dialog_fore" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+			android:text="Grid icon: power line by Hayden Kerrisk from the Noun Project"
+            android:textColor="@color/dialog_fore" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+			android:text="House icon: House by Mahmure Alp from the Noun Project"
+            android:textColor="@color/dialog_fore" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+			android:text="Panel icon: solar by Ralf Schmitzer from the Noun Project" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+			android:text="Thermometer icon: Temperature by Bakunetsu Kaito from the Noun Project"
+            android:textColor="@color/dialog_fore" />
 
 		</LinearLayout>
 
@@ -50,8 +79,7 @@
 		android:layout_height="wrap_content"
 		android:paddingRight="30dp"
 		android:paddingTop="20dp"
-		android:paddingBottom="20dp"
-		>
+		android:paddingBottom="20dp" >
 
 		<Button
 			android:id="@+id/about_ok"
@@ -59,8 +87,7 @@
 			android:layout_height="wrap_content"
 			android:text="Ok"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-			/>
+            android:background="@color/dialog_back" />
 
 		</LinearLayout>
 
