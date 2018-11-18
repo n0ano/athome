@@ -53,6 +53,10 @@ private String url;
 
 int degree = 0;
 
+Weather weather;
+Egauge egauge;
+X10 x10;
+
 public Parse parse = new Parse();
 
 @Override
@@ -326,6 +330,10 @@ private void test_parse()
 "<page val=\"two\"></page>\n" +
 "<totalPages val=\"20\"></totalPages>\n" +
 "<pageSize val=\"1234\"></pageSise>\n" +
+"<maxtemp val=\"59.0\"></maxtemp>\n" +
+"<maxtemp_time val=\"06:15PM\"></maxtemp_time>\n" +
+"<mintemp val=\"39.9\"></mintemp>\n" +
+"<mintemp_time val=\"02:35PM\"></mintemp_time>\n" +
 "</conds>";
     String json =
 "{\n" +
@@ -352,6 +360,10 @@ private void test_parse()
     Log.d("xml totalPages(1:10) = " + parse.xml_get("totalPages", xml));
     Log.d("xml pageSize(1:2) = " + parse.xml_get("pageSize", xml));
     Log.d("xml pageSize(2:1234) = " + parse.xml_get("pageSize", xml, 2));
+    Log.d("xml max(1:59.0) = " + parse.xml_get("maxtemp", xml, 1));
+    Log.d("xml min(1:39.9) = " + parse.xml_get("mintemp", xml, 1));
+    Log.d("xml max_time(1:06:15PM) = " + parse.xml_get("maxtemp_time", xml, 1));
+    Log.d("xml min_time(1:02:35PM) = " + parse.xml_get("mintemp_time", xml, 1));
 
     Log.d("json xyzzy() = " + parse.json_get("xyzzy", json, 1));
     Log.d("json page(1:one) = " + parse.json_get("page", json));
@@ -443,12 +455,24 @@ public void close_url(BufferedReader inp)
     }
 }
 
+public void go_temp_detail(View v)
+{
+
+    weather.go_temp_detail(v);
+}
+
 private void doit()
 {
 
     final Weather weather = new Weather(this);
+    this.weather = weather;
+
     final Egauge egauge = new Egauge( this);
+    this.egauge = egauge;
+
     final X10 x10 = new X10(this);
+    this.x10 = x10;
+
     new Thread(new Runnable() {
         public void run() {
             for (;;) {

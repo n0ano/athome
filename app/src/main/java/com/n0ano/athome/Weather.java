@@ -1,6 +1,10 @@
 package com.n0ano.athome;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,7 +39,7 @@ public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selec
 MainActivity act;
 
 Map<String, String> data = new HashMap<String, String>();
-Map<String, String> data_under = new HashMap<String, String>();
+Map<String, String> data_wunder = new HashMap<String, String>();
 Map<String, String> data_ecobee = new HashMap<String, String>();
 
 Parse parse;
@@ -59,17 +63,23 @@ public Weather(MainActivity act)
 private void init_data()
 {
 
-    data.put("in_temp", "70");
-    data.put("out_temp", "70");
+    data.put("in_temp", "--");
+    data.put("out_temp", "--");
     data.put("winddir", "0");
 
-    data_under.put("tempf", "out_temp");
-    data_under.put("winddir", "winddir");
-    data_under.put("windspeedmph", "windspeed");
-    data_under.put("dailyrainin", "rain");
-    data_under.put("baromin", "barometer");
+    data_wunder.put("tempf", "out_temp");
+    data_wunder.put("maxtemp", "out_max");
+    data_wunder.put("maxtemp_time", "out_max_time");
+    data_wunder.put("mintemp", "out_min");
+    data_wunder.put("mintemp_time", "out_min_time");
+    data_wunder.put("winddir", "winddir");
+    data_wunder.put("windspeedmph", "windspeed");
+    data_wunder.put("dailyrainin", "rain");
+    data_wunder.put("baromin", "barometer");
+    data_wunder.put("humidity", "out_humid");
 
-    data_ecobee.put("actualTemperature", "in_temp");
+    data_ecobee.put("%1,actualTemperature", "in_temp");
+    data_ecobee.put("actualHumidity", "in_humid");
 }
 
 private void get_info_xml(String resp)
@@ -77,27 +87,26 @@ private void get_info_xml(String resp)
     String key;
     String val;
 
-    Set keys = data_under.keySet();
+    Set keys = data_wunder.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
         val = parse.xml_get(key, resp, 1);
-        if (!val.isEmpty()) {
-            key = data_under.get(key);
-            data.put(key, val);
-        }
+        key = data_wunder.get(key);
+        data.put(key, (val != null) ? val : "");
     }
 }
 
 private void get_info_json(String resp)
 {
     String key;
-    int val;
+    String val;
 
     Set keys = data_ecobee.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = Integer.parseInt(parse.json_get(key, resp, 2));
-        data.put(data_ecobee.get(key), String.format("%.1f", (float)val/10));
+        val = parse.json_get(key, resp, 2);
+        key = data_ecobee.get(key);
+        data.put(key, val);
     }
 }
 
@@ -108,6 +117,7 @@ private void get_wunder()
                                WUNDER_URL + WUNDER_API,
                                WUNDER_STATION + act.wunder_id + WUNDER_QUERY,
                                "");
+//Log.d("under:" + resp);
     if (resp.isEmpty() || resp.contains("<conds></conds>"))
         Log.d("get_wunder: no data for station " + act.wunder_id);
     else
@@ -124,7 +134,7 @@ private void get_ecobee()
                                "Bearer " + act.ecobee_access);
 //Log.d("ecobee:" + resp);
     String code = parse.json_get("code", resp, 1);
-    if (resp.isEmpty() || !code.equals("0")) {
+    if (code == null || !code.equals("0")) {
         resp = act.call_api("POST",
                             ECO_URL + ECO_REFRESH,
                             "grant_type=refresh_token&code=" + act.ecobee_refresh +
@@ -140,6 +150,43 @@ Log.d("get_ecobee access/refresh - " + act.ecobee_access + "/" + act.ecobee_refr
         get_info_json(resp);
     }
 
+}
+
+private void detail_dialog()
+{
+
+    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.detail);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.detail_max);
+    tv.setText(data.get("out_max"));
+
+    tv = (TextView) dialog.findViewById(R.id.detail_min);
+    tv.setText(data.get("out_min"));
+
+    tv = (TextView) dialog.findViewById(R.id.detail_max_time);
+    tv.setText(data.get("out_max_time"));
+
+    tv = (TextView) dialog.findViewById(R.id.detail_min_time);
+    tv.setText(data.get("out_min_time"));
+
+    Button ok = (Button) dialog.findViewById(R.id.detail_ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+public void go_temp_detail(View v)
+{
+
+    int id = v.getId();
+Log.d("get temp detail for - " + ((id == R.id.weather_out_icon) ? "weather underground" : "ecoBee"));
+    detail_dialog();
 }
 
 public void get_data()

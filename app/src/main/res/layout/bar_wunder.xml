@@ -36,6 +36,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text="Station ID: "
             android:textColor="@color/dialog_fore"
 			/>
@@ -44,6 +45,7 @@
 			android:id="@+id/wunder_id"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text=""
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"

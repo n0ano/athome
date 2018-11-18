@@ -36,6 +36,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text="Api Key: "
             android:textColor="@color/dialog_fore"
 			/>
@@ -44,6 +45,7 @@
 			android:id="@+id/ecobee_api"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text=""
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
@@ -65,6 +67,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text="Access Token: "
             android:textColor="@color/dialog_fore"
 			/>
@@ -73,6 +76,7 @@
 			android:id="@+id/ecobee_access"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text=""
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
@@ -94,6 +98,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text="Refresh Token: "
             android:textColor="@color/dialog_fore"
 			/>
@@ -102,6 +107,7 @@
 			android:id="@+id/ecobee_refresh"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+            android:textSize="14sp"
 			android:text=""
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"

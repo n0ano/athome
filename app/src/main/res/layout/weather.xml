@@ -38,7 +38,8 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:paddingTop="10dp"
-                    android:src="@drawable/outside" />
+                    android:src="@drawable/outside"
+                    android:onClick="go_temp_detail" />
 
                 <TextView
                     android:id="@+id/weather_out_temp"
@@ -77,7 +78,8 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:paddingTop="10dp"
-                    android:src="@drawable/inside" />
+                    android:src="@drawable/inside"
+                    android:onClick="go_temp_detail" />
 
                 <TextView
                     android:id="@+id/weather_in_temp"

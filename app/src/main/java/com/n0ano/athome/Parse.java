@@ -5,6 +5,16 @@ package com.n0ano.athome;
 //
 public class Parse {
 
+private String stoi(int precision, String val)
+{
+
+    if (precision > 0) {
+        int l = val.length();
+        return val.substring(0, l - precision) + "." + val.substring(l - precision);
+    } else
+        return val;
+}
+
 public int xml_get_next(String search, int start, String resp)
 {
 
@@ -37,14 +47,19 @@ private String xml_backup(int end, String resp)
 public String xml_get(String name, String resp, int which)
 {
     int end = 0;
+    int precision = 0;
 
+    if (name.charAt(0) == '%') {
+        precision = name.charAt(1) - '0';
+        name = name.substring(3);
+    }
     String search = "<" + name;
     while (which-- > 0) {
         end = xml_get_next(search, end, resp);
         if (end < 0)
             return null;
     }
-    return xml_backup(end, resp);
+    return stoi(precision, xml_backup(end, resp));
 }
 
 public String xml_get(String name, String resp)
@@ -110,14 +125,19 @@ private String json_backup(int end, String resp)
 public String json_get(String name, String resp, int which)
 {
     int end = 0;
+    int precision = 0;
 
+    if (name.charAt(0) == '%') {
+        precision = name.charAt(1) - '0';
+        name = name.substring(3);
+    }
     String search = "\"" + name + "\"";
     while (which-- > 0) {
         end = json_get_next(search, end, resp);
         if (end < 0)
             return null;
     }
-    return json_backup(end, resp);
+    return stoi(precision, json_backup(end, resp));
 }
 
 public String json_get(String name, String resp)
