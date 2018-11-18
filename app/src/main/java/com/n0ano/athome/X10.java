@@ -122,6 +122,7 @@ private void on_off(String line)
     int onoff;
 
     if (!line.isEmpty()) {
+Log.d("X10:" + line);
         for (i = 1; i < max_devices; i++) {
             X10Device dev = x10_devices[i];
             onoff = ((line.charAt(16 - i) == '0') ? 0 : 1);
@@ -145,7 +146,7 @@ public void get_data()
                                X10_URL + X10_API,
                                X10_GET,
                                "");
-    on_off(Common.json_get("state", resp, 1));
+    on_off(act.parse.json_get("state", resp, 1));
 }
 
 public void show_data()

@@ -38,6 +38,8 @@ Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_under = new HashMap<String, String>();
 Map<String, String> data_ecobee = new HashMap<String, String>();
 
+Parse parse;
+
 // Weather: class constructor
 //
 //   act - activity that instantiated the class
@@ -46,6 +48,7 @@ public Weather(MainActivity act)
 {
 
 	this.act = act;
+    parse = act.parse;
     init_data();
 }
 
@@ -77,7 +80,7 @@ private void get_info_xml(String resp)
     Set keys = data_under.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = Common.xml_get(key, resp, 1);
+        val = parse.xml_get(key, resp, 1);
         if (!val.isEmpty()) {
             key = data_under.get(key);
             data.put(key, val);
@@ -93,7 +96,7 @@ private void get_info_json(String resp)
     Set keys = data_ecobee.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = Common.json_get_int(key, resp, 2);
+        val = Integer.parseInt(parse.json_get(key, resp, 2));
         data.put(data_ecobee.get(key), String.format("%.1f", (float)val/10));
     }
 }
@@ -120,15 +123,15 @@ private void get_ecobee()
                                ECO_QUERY,
                                "Bearer " + act.ecobee_access);
 //Log.d("ecobee:" + resp);
-    int code = Common.json_get_int("code", resp, 1);
-    if (resp.isEmpty() || code != 0) {
+    String code = parse.json_get("code", resp, 1);
+    if (resp.isEmpty() || !code.equals("0")) {
         resp = act.call_api("POST",
                             ECO_URL + ECO_REFRESH,
                             "grant_type=refresh_token&code=" + act.ecobee_refresh +
                                 "&client_id=" + act.ecobee_api,
                             "");
-        act.ecobee_access = Common.json_get("access_token", resp, 1);
-        act.ecobee_refresh = Common.json_get("refresh_token", resp, 1);
+        act.ecobee_access = parse.json_get("access_token", resp, 1);
+        act.ecobee_refresh = parse.json_get("refresh_token", resp, 1);
         Preferences pref = new Preferences(act);
         pref.put_string("ecobee_access", act.ecobee_access);
         pref.put_string("ecobee_refresh", act.ecobee_refresh);

@@ -53,6 +53,8 @@ private String url;
 
 int degree = 0;
 
+public Parse parse = new Parse();
+
 @Override
 protected void onCreate(Bundle state)
 {
@@ -89,7 +91,7 @@ protected void onResume()
     super.onResume();
     Log.d("MainActivity: onResume");
 
-//test_string();
+//test_parse();
 
     restore_state();
     doit();
@@ -313,7 +315,7 @@ private void restore_state()
     ecobee_refresh = pref.get_string("ecobee_refresh", "");
 }
 
-private void test_string()
+private void test_parse()
 {
 
     String xml =
@@ -335,19 +337,30 @@ private void test_string()
 "  \"folio\": {\n" +
 "    \"page\": \"two\",\n" +
 "    \"totalPages\": 20,\n" +
-"    \"pageSize\": 1234\n" +
+"    \"pageSize\": \"1234\"\n" +
+"    \"state\":\"0000000000011001\",\n" +
+"    \"result\":\"OK\"\n" +
 "  }\n" +
 "}";
     Log.d("xml - " + xml);
     Log.d("json - " + json);
 
-    Log.d("xml page(one) = " + Common.xml_get("page", xml, 1));
-    Log.d("xml page(two) = " + Common.xml_get("page", xml, 2));
-    Log.d("xml totalPages(10) = " + Common.xml_get("totalPages", xml, 1));
+    Log.d("xml xyzzy() = " + parse.xml_get("xyzzy", xml, 1));
+    Log.d("xml page(1:one) = " + parse.xml_get("page", xml));
+    Log.d("xml page(2:two) = " + parse.xml_get("page", xml, 2));
+    Log.d("xml page(3:) = " + parse.xml_get("page", xml, 3));
+    Log.d("xml totalPages(1:10) = " + parse.xml_get("totalPages", xml));
+    Log.d("xml pageSize(1:2) = " + parse.xml_get("pageSize", xml));
+    Log.d("xml pageSize(2:1234) = " + parse.xml_get("pageSize", xml, 2));
 
-    Log.d("json page(one) = " + Common.json_get("page", json, 1));
-    Log.d("json page(two) = " + Common.json_get("page", json, 2));
-    Log.d("json totalPages(10) = " + Common.json_get_int("totalPages", json, 1));
+    Log.d("json xyzzy() = " + parse.json_get("xyzzy", json, 1));
+    Log.d("json page(1:one) = " + parse.json_get("page", json));
+    Log.d("json page(2:two) = " + parse.json_get("page", json, 2));
+    Log.d("json page(3:) = " + parse.json_get("page", json, 3));
+    Log.d("json totalPages(1:10) = " + parse.json_get("totalPages", json));
+    Log.d("json pageSize(1:2) = " + parse.json_get("pageSize", json));
+    Log.d("json pageSize(2:1234) = " + parse.json_get("pageSize", json, 2));
+    Log.d("json state(1:0000000000011001) = " + parse.json_get("state", json));
 }
 
 
