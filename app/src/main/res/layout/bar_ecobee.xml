@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical"
-	>
+	android:orientation="vertical" >
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -12,16 +11,15 @@
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-		>
+        android:paddingBottom="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Weather Underground"
+			android:text="ecoBee"
             android:textSize="20dp"
-            android:textColor="@color/dialog_fore"
-			/>
+            android:textColor="@color/dialog_fore" />
+
         </LinearLayout>
 
 	<LinearLayout
@@ -30,16 +28,14 @@
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+        android:paddingRight="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text="Api Key: "
-            android:textColor="@color/dialog_fore"
-			/>
+            android:textColor="@color/dialog_fore" />
 
 		<EditText
 			android:id="@+id/ecobee_api"
@@ -50,8 +46,35 @@
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
 			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor"
-			/>
+            android:textCursorDrawable="@drawable/edit_cursor" />
+
+            </LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Auth Token: "
+            android:textColor="@color/dialog_fore" />
+
+		<EditText
+			android:id="@+id/ecobee_auth"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor" />
 
 		</LinearLayout>
 
@@ -61,16 +84,14 @@
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+        android:paddingRight="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text="Access Token: "
-            android:textColor="@color/dialog_fore"
-			/>
+            android:textColor="@color/dialog_fore" />
 
 		<EditText
 			android:id="@+id/ecobee_access"
@@ -81,8 +102,7 @@
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
 			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor"
-			/>
+            android:textCursorDrawable="@drawable/edit_cursor" />
 
 		</LinearLayout>
 
@@ -92,16 +112,14 @@
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+        android:paddingRight="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text="Refresh Token: "
-            android:textColor="@color/dialog_fore"
-			/>
+            android:textColor="@color/dialog_fore" />
 
 		<EditText
 			android:id="@+id/ecobee_refresh"
@@ -112,10 +130,50 @@
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
 			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor"
-			/>
+            android:textCursorDrawable="@drawable/edit_cursor" />
 
 		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Which thermostat: "
+            android:textColor="@color/dialog_fore" />
+
+		<Spinner
+			android:id="@+id/ecobee_which"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:gravity="center"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingTop="20dp"
+		android:paddingBottom="20dp" >
+
+        <Button
+            android:id="@+id/ecobee_reauth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="30dp"
+            android:text="Reauthorize APP"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+
+        </LinearLayout>
 
 	<LinearLayout
 		android:gravity="right"
@@ -124,8 +182,7 @@
 		android:layout_height="wrap_content"
 		android:paddingRight="30dp"
 		android:paddingTop="20dp"
-		android:paddingBottom="20dp"
-		>
+		android:paddingBottom="20dp" >
 
 		<Button
 			android:id="@+id/ecobee_cancel"
@@ -134,8 +191,7 @@
 			android:paddingRight="30dp"
 			android:text="Cancel"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-			/>
+            android:background="@color/dialog_back" />
 
 		<Button
 			android:id="@+id/ecobee_ok"
@@ -143,8 +199,7 @@
 			android:layout_height="wrap_content"
 			android:text="Ok"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-			/>
+            android:background="@color/dialog_back" />
 
 		</LinearLayout>
 

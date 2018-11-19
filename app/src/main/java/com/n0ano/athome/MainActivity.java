@@ -2,7 +2,9 @@ package com.n0ano.athome;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
@@ -46,8 +48,13 @@ public String egauge_url;
 public String wunder_id;
 
 public String ecobee_api;
+public String ecobee_auth;
 public String ecobee_refresh;
 public String ecobee_access;
+public int ecobee_which;
+private int ecobee_swhich;
+public String ecobee_name;
+public String[] ecobee_thermos = {"one", "two"};
 
 private String url;
 
@@ -256,11 +263,44 @@ private void ecobee_dialog()
     final EditText api_tv = (EditText) dialog.findViewById(R.id.ecobee_api);
     api_tv.setText(ecobee_api);
 
+    final EditText auth_tv = (EditText) dialog.findViewById(R.id.ecobee_auth);
+    auth_tv.setText(ecobee_auth);
+
     final EditText access_tv = (EditText) dialog.findViewById(R.id.ecobee_access);
     access_tv.setText(ecobee_access);
 
     final EditText refresh_tv = (EditText) dialog.findViewById(R.id.ecobee_refresh);
     refresh_tv.setText(ecobee_refresh);
+
+    final Spinner sv = (Spinner) dialog.findViewById(R.id.ecobee_which);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.ecobee_spinner, ecobee_thermos);
+    adapter.setDropDownViewResource(R.layout.ecobee_spinner);
+    sv.setAdapter(adapter);
+    ecobee_swhich = ecobee_which;
+    if (ecobee_which >= 0)
+        sv.setSelection(ecobee_swhich = ecobee_which);
+    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            ecobee_swhich = position;
+            //Log.d("which item - " + (String) parent.getItemAtPosition(position));
+        }
+        
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // TODO Auto-generated method stub
+        }
+
+    });
+
+    Button reauth = (Button) dialog.findViewById(R.id.ecobee_reauth);
+    reauth.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Common.ECOBEE_REAUTH));
+            startActivity(intent);
+        }
+    });
 
     Button cancel = (Button) dialog.findViewById(R.id.ecobee_cancel);
     cancel.setOnClickListener(new OnClickListener() {
@@ -275,11 +315,18 @@ private void ecobee_dialog()
         @Override
         public void onClick(View v) {
             ecobee_api = api_tv.getText().toString();
+            ecobee_auth = auth_tv.getText().toString();
             ecobee_access = access_tv.getText().toString();
             ecobee_refresh = refresh_tv.getText().toString();
+            ecobee_which = ecobee_swhich;
+            if (ecobee_which >= 0)
+                ecobee_name = ecobee_thermos[ecobee_which];
             pref.put_string("ecobee_api", ecobee_api);
+            pref.put_string("ecobee_auth", ecobee_auth);
             pref.put_string("ecobee_access", ecobee_access);
             pref.put_string("ecobee_refresh", ecobee_refresh);
+            pref.put_int("ecobee_which", ecobee_which);
+            pref.put_string("ecobee_name", ecobee_name);
             dialog.dismiss();
         }
     });
@@ -315,8 +362,12 @@ private void restore_state()
     egauge_url = pref.get_string("egauge_url", "");
     wunder_id = pref.get_string("wunder_id", "");
     ecobee_api = pref.get_string("ecobee_api", "");
+    ecobee_auth = pref.get_string("ecobee_auth", "");
     ecobee_access = pref.get_string("ecobee_access", "");
     ecobee_refresh = pref.get_string("ecobee_refresh", "");
+    ecobee_which = pref.get_int("ecobee_which", -1);
+    ecobee_name = pref.get_string("ecobee_name", "");
+    ecobee_thermos = new String[0];
 }
 
 private void test_parse()

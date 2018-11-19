@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -37,6 +38,8 @@ public final static String ECO_DATA = "/1/thermostat";
 public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeRuntime\":true}}";
 
 MainActivity act;
+
+private static int ecobee_thermos_checked;
 
 Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_wunder = new HashMap<String, String>();
@@ -80,9 +83,11 @@ private void init_data()
 
     data_ecobee.put("%1,actualTemperature", "in_temp");
     data_ecobee.put("actualHumidity", "in_humid");
+
+    ecobee_thermos_checked = 0;
 }
 
-private void get_info_xml(String resp)
+private void get_info_wunder(String resp)
 {
     String key;
     String val;
@@ -96,15 +101,33 @@ private void get_info_xml(String resp)
     }
 }
 
-private void get_info_json(String resp)
+private void get_eco_thermos(String resp)
+{
+    String name;
+    ArrayList<String> thermos = new ArrayList<String>();
+
+    if (ecobee_thermos_checked++ != 0)
+        return;
+    int idx = 0;
+    while ((name = parse.json_get("name", resp, ++idx)) != null) {
+Log.d("thermostat name - " + name);
+        thermos.add(name);
+    }
+    act.ecobee_thermos = new String[--idx];
+    for (int i = 0; i < idx; ++i)
+        act.ecobee_thermos[i] = thermos.get(i);
+}
+
+private void get_info_ecobee(String resp)
 {
     String key;
     String val;
 
+    get_eco_thermos(resp);
     Set keys = data_ecobee.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = parse.json_get(key, resp, 2);
+        val = parse.json_get(key, resp, act.ecobee_which + 1);
         key = data_ecobee.get(key);
         data.put(key, val);
     }
@@ -121,7 +144,48 @@ private void get_wunder()
     if (resp.isEmpty() || resp.contains("<conds></conds>"))
         Log.d("get_wunder: no data for station " + act.wunder_id);
     else
-        get_info_xml(resp);
+        get_info_wunder(resp);
+}
+
+private void ecobee_auth()
+{
+    String resp;
+    String token;
+
+    resp = act.call_api("POST",
+                        ECO_URL + ECO_REFRESH,
+                        "grant_type=ecobeePin&code=" + act.ecobee_auth +
+                            "&client_id=" + act.ecobee_api,
+                        "");
+    if ((token = parse.json_get("access_token", resp, 1)) == null)
+        return;
+    act.ecobee_access = parse.json_get("access_token", resp, 1);
+    act.ecobee_refresh = parse.json_get("refresh_token", resp, 1);
+    Preferences pref = new Preferences(act);
+    pref.put_string("ecobee_access", act.ecobee_access);
+    pref.put_string("ecobee_refresh", act.ecobee_refresh);
+Log.d("ecoBee auth access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+}
+
+private boolean ecobee_refresh()
+{
+    String resp;
+    String token;
+
+    resp = act.call_api("POST",
+                        ECO_URL + ECO_REFRESH,
+                        "grant_type=refresh_token&code=" + act.ecobee_refresh +
+                            "&client_id=" + act.ecobee_api,
+                        "");
+    if ((token = parse.json_get("access_token", resp, 1)) == null)
+        return false;
+    act.ecobee_access = parse.json_get("access_token", resp, 1);
+    act.ecobee_refresh = parse.json_get("refresh_token", resp, 1);
+    Preferences pref = new Preferences(act);
+    pref.put_string("ecobee_access", act.ecobee_access);
+    pref.put_string("ecobee_refresh", act.ecobee_refresh);
+Log.d("ecoBee refresh access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+    return true;
 }
 
 private void get_ecobee()
@@ -135,19 +199,10 @@ private void get_ecobee()
 //Log.d("ecobee:" + resp);
     String code = parse.json_get("code", resp, 1);
     if (code == null || !code.equals("0")) {
-        resp = act.call_api("POST",
-                            ECO_URL + ECO_REFRESH,
-                            "grant_type=refresh_token&code=" + act.ecobee_refresh +
-                                "&client_id=" + act.ecobee_api,
-                            "");
-        act.ecobee_access = parse.json_get("access_token", resp, 1);
-        act.ecobee_refresh = parse.json_get("refresh_token", resp, 1);
-        Preferences pref = new Preferences(act);
-        pref.put_string("ecobee_access", act.ecobee_access);
-        pref.put_string("ecobee_refresh", act.ecobee_refresh);
-Log.d("get_ecobee access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+        if (!ecobee_refresh())
+            ecobee_auth();
     } else {
-        get_info_json(resp);
+        get_info_ecobee(resp);
     }
 
 }
