@@ -67,6 +67,7 @@ private void init_data()
     x10_devices[max_devices++] = new X10Device("Office Fountain", "d7", View.inflate(act, R.layout.x10_outlet, null));
     x10_devices[max_devices++] = new X10Device("Office Acquarium", "d8", View.inflate(act, R.layout.x10_outlet, null));
     TableLayout tl = (TableLayout) act.findViewById(R.id.x10_table);
+    tl.removeAllViews();
     TableRow tr = null;
     TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
     params.setMargins(0, 40, 0, 0); /* left, top, right, bottom */
