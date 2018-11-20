@@ -125,9 +125,12 @@ private void get_info_ecobee(String resp)
 
     get_eco_thermos(resp);
     Set keys = data_ecobee.keySet();
+    int which = act.ecobee_which + 1;
+    if (which < 1)
+        which = 1;
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = parse.json_get(key, resp, act.ecobee_which + 1);
+        val = parse.json_get(key, resp, which);
         key = data_ecobee.get(key);
         data.put(key, val);
     }

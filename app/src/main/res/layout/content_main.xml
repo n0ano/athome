@@ -9,21 +9,28 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <LinearLayout
-        android:id="@+id/main"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        >
+    <ScrollView
+        android:id="@+id/text_scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
 
-        <include layout="@layout/egauge" />
+        <LinearLayout
+            android:id="@+id/main"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp" >
 
-        <include layout="@layout/weather" />
+            <include layout="@layout/egauge" />
 
-        <include layout="@layout/x10" />
+            <include layout="@layout/weather" />
 
-        </LinearLayout>
+            <include layout="@layout/x10" />
+
+            </LinearLayout>
+
+        </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

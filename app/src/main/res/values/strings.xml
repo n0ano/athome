@@ -2,4 +2,72 @@
     <string name="app_name">AtHome</string>
     <string name="action_settings">Settings</string>
     <string name="ok">Ok</string>
+    <string name="ecobee_auth">
+<![CDATA[
+ecoBee provides a rather baroque process
+for validating that an application is
+allowed to access the data from your
+intelligent thermostat.
+As it turns out,
+the easiest way to do this is to utilize
+the ecoBee web portal.
+This popup will try to make that
+process as easy as possible for you.
+<p>
+Note that the portal promotes a slight misconception.
+It talks about creating a new app and
+authorizing that app.
+Calling this an
+<b>app</b>
+is actually a
+misnomer.
+Rather than creating a new app
+what we are really doing is authorizing
+<i>this</i>
+app to access
+<i>your</i>
+data.
+<p>
+Anyway,
+once you press the <b>START</b>
+button on this page
+the authorizion process will
+proceed as follows:
+<p>-
+Pressing the <b>Start</b>
+button will spawn a browser that
+goes to the ecoBee web portal.
+<p>-
+Follow the instructions on
+that page to create
+a new <i>app</i>.
+<p>-
+The new app will create a new
+<b>API Key</b>.
+<p>-
+Continue following the instructions
+on the page to obtain a new
+<b>Pin</b> and <b>Authorization Code</b>.
+(Don\'t forget to use the ecoBee
+web portal to use the Pin to
+validate the Authorization Code.)
+<p>-
+Switch back and forth between the
+browser and the AtHome app so that
+you can cut and paste the
+<b>Api Key</b> from the browser into
+the AtHome <b>Api Key</b> field and
+also cut and paste the
+<b>Authorization Code</b> from the browser
+into the AtHome <b>Auth Token</b> field.
+<p>-
+All done.
+Once you click
+<b>OK</b>
+on the <b>ecoBee</b>
+popup the AtHome app will
+finish the authorization process
+and it should now be able to access
+your thermostat data.
+]]></string>
 </resources>

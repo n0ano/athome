@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical" >
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp" >
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="ecoBee Authorization Process"
+            android:textSize="20dp"
+            android:textColor="@color/dialog_fore" />
+
+        </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/text_scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/ecobee_ra_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:textSize="14sp"
+            android:text=""
+            android:textColor="@color/dialog_fore" />
+
+        </ScrollView>
+
+	<LinearLayout
+		android:gravity="right"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingRight="30dp"
+		android:paddingTop="20dp"
+		android:paddingBottom="20dp" >
+
+		<Button
+			android:id="@+id/ecobee_ra_cancel"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingRight="30dp"
+			android:text="Cancel"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+
+		<Button
+			android:id="@+id/ecobee_ra_start"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="start"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+
+		</LinearLayout>
+
+</LinearLayout>

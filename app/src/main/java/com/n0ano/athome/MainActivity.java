@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -38,10 +39,6 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
 {
-
-private static final int OPT_SETTINGS =     1001;
-private static final int OPT_WUNDER =       1001;
-private static final int OPT_ECOBEE =       1001;
 
 public String egauge_url;
 
@@ -253,6 +250,36 @@ private void wunder_dialog()
     dialog.show();
 }
 
+private void ecobee_ra_auth()
+{
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_reauth);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.ecobee_ra_text);
+    tv.setText(Html.fromHtml(getString(R.string.ecobee_auth)));
+
+    Button cancel = (Button) dialog.findViewById(R.id.ecobee_ra_cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ecobee_ra_start);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Common.ECOBEE_REAUTH));
+            startActivity(intent);
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
 private void ecobee_dialog()
 {
     final Preferences pref = new Preferences(this);
@@ -297,8 +324,7 @@ private void ecobee_dialog()
     reauth.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Common.ECOBEE_REAUTH));
-            startActivity(intent);
+            ecobee_ra_auth();
         }
     });
 
