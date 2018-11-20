@@ -26,6 +26,7 @@ public class X10Device {
 private String name;
 private String code;
 private View view;
+private boolean hold;
 
 private ImageView icon;
 private TextView tv_name;
@@ -42,49 +43,78 @@ public X10Device(String name, String code, View view)
     tv_name = view.findViewById(R.id.outlet_name);
     tv_name.setText(name);
     state = 0;
+    hold = false;
 }
 
-public String get_name() {
+public String get_name()
+{
 
     return name;
 }
 
-public void set_name(String name) {
+public void set_name(String name)
+{
 
     this.name = name;
 }
 
-public String get_code() {
+public String get_code()
+{
 
     return code;
 }
 
-public void set_code(String code) {
+public void set_code(String code)
+{
 
     this.code = code;
 }
 
-public View get_view() {
+public View get_view()
+{
 
     return view;
 }
 
-public void set_view(View view) {
+public void set_view(View view)
+{
 
     this.view = view;
 }
 
-public int get_state() {
-
-    return state;
-}
-
-public void set_state(int state)
+public boolean get_hold()
 {
 
+    return this.hold;
+}
+
+public void set_hold(boolean hold)
+{
+
+    this.hold = hold;
+}
+
+public int get_state()
+{
+
+    return this.state;
+}
+
+public void set_state(final int state, MainActivity act)
+{
+    final int draw;
+
     this.state = state;
-    icon.setImageResource((state == 0) ? R.drawable.outlet_off : R.drawable.outlet_on);
-Log.d(name + " set state to " + state);
+Log.d(name + " set state to " + ((state == 0) ? "off, " : "on, ") + (hold ? "holding" : "normal"));
+    if (hold)
+        draw = (state == 0) ? R.drawable.outlet_off_red : R.drawable.outlet_on_red;
+    else
+        draw = (state == 0) ? R.drawable.outlet_off : R.drawable.outlet_on;
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            icon.setImageResource(draw);
+        }
+    });
 }
 
 }

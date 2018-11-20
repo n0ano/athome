@@ -247,18 +247,20 @@ Log.d("get temp detail for - " + ((id == R.id.weather_out_icon) ? "weather under
     detail_dialog();
 }
 
-public void get_data()
+public void update()
 {
 
+    //
+    //  Get the data
+    //
     data.put("in_temp", "--");
     data.put("out_temp", "--");
     get_wunder();
     get_ecobee();
-}
 
-public void show_data()
-{
-
+    //
+    //  Display it
+    //
     act.runOnUiThread(new Runnable() {
         public void run() {
             TextView tv;

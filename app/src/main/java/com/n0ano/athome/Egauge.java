@@ -52,17 +52,6 @@ private int get_value(String name, String resp)
     return w;
 }
 
-public void get_data()
-{
-
-    String resp = act.call_api("GET",
-                               act.egauge_url + EGAUGE_API,
-                               EGAUGE_QUERY,
-                               "");
-    use_watt = get_value("use", resp);
-    gen_watt = get_value("gen", resp);
-}
-
 private void set_arrow(ImageView iv, int watt, int left, int right)
 {
 
@@ -84,9 +73,22 @@ private String k_watts(int w)
     }
 }
 
-public void show_data()
+public void update()
 {
 
+    //
+    // Get the data
+    //
+    String resp = act.call_api("GET",
+                               act.egauge_url + EGAUGE_API,
+                               EGAUGE_QUERY,
+                               "");
+    use_watt = get_value("use", resp);
+    gen_watt = get_value("gen", resp);
+
+    //
+    //  Display it
+    //
     act.runOnUiThread(new Runnable() {
         public void run() {
             TextView tv;

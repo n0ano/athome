@@ -3,8 +3,10 @@ package com.n0ano.athome;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
@@ -532,6 +534,37 @@ public void close_url(BufferedReader inp)
     }
 }
 
+private int get_battery()
+{
+    String chg;
+
+    IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    Intent bs = this.registerReceiver(null, ifilter);
+
+    int level = bs.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+    int scale = bs.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+    return (level * 100) / scale;
+}
+
+private void battery()
+{
+
+    if (x10.x10_power == 0)
+        return;
+
+    int chg = get_battery();
+    if (chg < Common.BATTERY_LOW)
+        x10.power(1);
+    else if (chg > Common.BATTERY_HIGH)
+        x10.power(0);
+}
+
+private void chores()
+{
+
+    battery();
+}
+
 public void go_temp_detail(View v)
 {
 
@@ -553,15 +586,13 @@ private void doit()
     new Thread(new Runnable() {
         public void run() {
             for (;;) {
+                chores();
 
-                weather.get_data();
-                weather.show_data();
+                weather.update();
 
-                egauge.get_data();
-                egauge.show_data();
+                egauge.update();
 
-                x10.get_data();
-                x10.show_data();
+                x10.update();
 
                 SystemClock.sleep(Common.DATA_DELAY * 1000);
             }

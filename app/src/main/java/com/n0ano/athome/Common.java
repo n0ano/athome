@@ -7,6 +7,9 @@ public class Common {
 
 public final static int DATA_DELAY = 10;
 
+public final static int BATTERY_LOW  = 20;
+public final static int BATTERY_HIGH = 90;
+
 public final static String ECOBEE_REAUTH = "https://www.ecobee.com/home/developer/api/examples/ex1.shtml";
 
 }

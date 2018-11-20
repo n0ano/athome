@@ -38,6 +38,7 @@ final static String X10_STATE_MAP = " \"state\":\"";
 MainActivity act;
 
 int max_devices;
+int x10_power = 5;
 String state_map;
 
 X10Device[] x10_devices = new X10Device[MAX_DEVICES];
@@ -87,6 +88,15 @@ private void init_data()
                 go_control(v);
             }
         });
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View v) {
+                Log.d("long click");
+                X10Device dev = (X10Device) v.getTag();
+                dev.set_hold(!dev.get_hold());
+                dev.set_state(dev.get_state(), act);
+                return true;
+            }
+        });
         tr.addView(v);
     }
     if (tr != null)
@@ -99,7 +109,7 @@ private void go_control(View v)
 
     final X10Device dev = (X10Device) v.getTag();
     int state = dev.get_state() ^ 1;
-    dev.set_state(state);
+    dev.set_state(state, act);
     final String onoff = (state == 0) ? "off" : "on";
     new Thread(new Runnable() {
         public void run() {
@@ -112,9 +122,12 @@ private void go_control(View v)
            
 }
 
-private void set_outlet(X10Device dev)
+public void power(int state)
 {
 
+    X10Device dev = x10_devices[x10_power];
+    if (!dev.get_hold())
+        dev.set_state(state, act);
 }
 
 private void on_off(String line)
@@ -123,36 +136,26 @@ private void on_off(String line)
     int onoff;
 
     if (!line.isEmpty()) {
-Log.d("X10:" + line);
         for (i = 1; i < max_devices; i++) {
             X10Device dev = x10_devices[i];
             onoff = ((line.charAt(16 - i) == '0') ? 0 : 1);
-            if (dev.get_state() != onoff) {
-                final int state = onoff;
-                final X10Device x10_dev = dev;
-                act.runOnUiThread(new Runnable() {
-                    public void run() {
-                        x10_dev.set_state(state);
-                    }
-                });
-            }
+            if (dev.get_state() != onoff)
+                dev.set_state(onoff, act);
         }
     }
 }
 
-public void get_data()
+public void update()
 {
 
+    //
+    //  Get the data and display any changes
+    //
     String resp = act.call_api("GET",
                                X10_URL + X10_API,
                                X10_GET,
                                "");
     on_off(act.parse.json_get("state", resp, 1));
-}
-
-public void show_data()
-{
-
 }
 
 }
