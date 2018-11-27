@@ -63,6 +63,8 @@ Weather weather;
 Egauge egauge;
 X10 x10;
 
+boolean running;
+
 public Parse parse = new Parse();
 
 @Override
@@ -112,6 +114,7 @@ protected void onPause()
 {
 
     super.onPause();
+    this.running = false;
     Log.d("MainActivity: onPause");
 }
 
@@ -571,6 +574,12 @@ public void go_temp_detail(View v)
     weather.go_temp_detail(v);
 }
 
+private boolean working()
+{
+
+    return this.running;
+}
+
 private void doit()
 {
 
@@ -582,10 +591,12 @@ private void doit()
 
     final X10 x10 = new X10(this);
     this.x10 = x10;
+    this.running = true;
 
     new Thread(new Runnable() {
         public void run() {
-            for (;;) {
+            while (working()) {
+
                 chores();
 
                 weather.update();

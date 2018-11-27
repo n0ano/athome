@@ -127,7 +127,8 @@ public void power(int state)
 
     X10Device dev = x10_devices[x10_power];
     if (!dev.get_hold())
-        dev.set_state(state, act);
+        if (dev.get_state() != state)
+            dev.set_state(state, act);
 }
 
 private void on_off(String line)
