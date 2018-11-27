@@ -27,6 +27,8 @@ import java.util.Set;
 //
 public class Weather {
 
+private final static int PERIOD = 60;   // weather only changes once a minute
+
 public final static String WUNDER_URL = "https://stationdata.wunderground.com";
 public final static String WUNDER_API = "/cgi-bin/stationlookup";
 public final static String WUNDER_STATION = "station=";
@@ -38,6 +40,8 @@ public final static String ECO_DATA = "/1/thermostat";
 public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeRuntime\":true}}";
 
 MainActivity act;
+
+private int period = 0;        // Weather only changes once a minute
 
 private static int ecobee_thermos_checked;
 
@@ -249,6 +253,11 @@ Log.d("get temp detail for - " + ((id == R.id.weather_out_icon) ? "weather under
 
 public void update()
 {
+
+    // Called once a second
+    if (--period > 0)
+        return;
+    period = PERIOD;
 
     //
     //  Get the data

@@ -594,7 +594,7 @@ private void doit()
 
                 x10.update();
 
-                SystemClock.sleep(Common.DATA_DELAY * 1000);
+                SystemClock.sleep(1000);
             }
         }
     }).start();

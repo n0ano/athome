@@ -16,10 +16,14 @@ import java.net.URL;
 //
 public class Egauge {
 
+private final static int PERIOD = 10;   // check eGauge every 10 seconds
+
 public final static String EGAUGE_API = "/cgi-bin/egauge-show";
 public final static String EGAUGE_QUERY = "json&I&a&m&Y=0,60";
 
 MainActivity act;
+
+int period = 0;
 
 int use_watt;
 int gen_watt;
@@ -75,6 +79,11 @@ private String k_watts(int w)
 
 public void update()
 {
+
+    // Called once a second
+    if (--period > 0)
+        return;
+    period = PERIOD;
 
     //
     // Get the data
