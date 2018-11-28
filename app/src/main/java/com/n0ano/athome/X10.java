@@ -32,49 +32,66 @@ final static String X10_URL = "http://n0ano.com";
 final static String X10_API = "/cgi-bin/athome/x10device";
 final static String X10_GET = "get";
 final static String X10_SET = "set";
+final static String X10_LIST = "list";
 
 final static String X10_STATE_MAP = " \"state\":\"";
 
 MainActivity act;
 
-int max_devices;
-int x10_power = 5;
-String state_map;
+int x10_power = -1;
+String state_map = "0000000000000000";
 
-X10Device[] x10_devices = new X10Device[MAX_DEVICES];
+X10Adapter x10_adapter;
 
 // X10: class constructor
 //
 //   act - activity that instantiated the class
 //
-public X10(MainActivity act)
+public X10(final MainActivity act)
 {
 
 	this.act = act;
-    init_data();
+
+    x10_adapter = new X10Adapter(act);
+    new Thread(new Runnable() {
+        public void run() {
+            final String resp = act.call_api("GET",
+                                       X10_URL + X10_API,
+                                       X10_LIST,
+                                       "");
+            act.runOnUiThread(new Runnable() {
+                public void run() {
+                    init_data(resp);
+                }
+            });
+        }
+    }).start();
 }
 
-private void init_data()
+private void init_data(String resp)
 {
     int i;
+    String name;
 
-    max_devices = 1;
-    x10_devices[max_devices++] = new X10Device("Crystal lamp", "d1", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("Driveway/Xmas", "d2", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("Patio Lights", "d3", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("Patio Fountain", "d4", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("AtHome Display", "d5", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("Don's Office", "d6", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("Office Fountain", "d7", View.inflate(act, R.layout.x10_outlet, null));
-    x10_devices[max_devices++] = new X10Device("Office Acquarium", "d8", View.inflate(act, R.layout.x10_outlet, null));
+    String hcode = act.parse.json_get("code", resp, 1);
+    x10_adapter.clear();
+    i = 0;
+    while ((name = act.parse.json_get("name", resp, ++i)) != null) {
+        x10_adapter.add_device(i - 1,
+                               new X10Device(name,
+                                             hcode + i,
+                                             View.inflate(act, R.layout.x10_outlet, null)));
+    }
+    set_power(act.x10_battery);
     TableLayout tl = (TableLayout) act.findViewById(R.id.x10_table);
     tl.removeAllViews();
     TableRow tr = null;
     TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
     params.setMargins(0, 40, 0, 0); /* left, top, right, bottom */
     int row = 3;
-    for (i = 1; i < max_devices; i++) {
-        X10Device dev = x10_devices[i];
+    int max_devices = x10_adapter.getCount();
+    for (i = 0; i < max_devices; i++) {
+        X10Device dev = x10_adapter.getItem(i);
         if (++row > 3) {
             row = 1;
             if (tr != null)
@@ -90,7 +107,6 @@ private void init_data()
         });
         v.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
-                Log.d("long click");
                 X10Device dev = (X10Device) v.getTag();
                 dev.set_hold(!dev.get_hold());
                 dev.set_state(dev.get_state(), act);
@@ -108,9 +124,9 @@ private void go_control(View v)
 {
 
     final X10Device dev = (X10Device) v.getTag();
-    int state = dev.get_state() ^ 1;
+    boolean state = dev.get_state() ? false : true;
     dev.set_state(state, act);
-    final String onoff = (state == 0) ? "off" : "on";
+    final String onoff = state ? "on" : "off";
     new Thread(new Runnable() {
         public void run() {
             act.call_api("GET",
@@ -122,28 +138,74 @@ private void go_control(View v)
            
 }
 
-public void power(int state)
+public void set_power(String name)
 {
 
-    X10Device dev = x10_devices[x10_power];
+    x10_power = -1;
+    if (name.isEmpty())
+        return;
+
+    int max = x10_adapter.getCount();
+    for (int i = 0; i < max; i++)
+        if (x10_adapter.getItem(i).get_name().equals(name)) {
+            x10_power = i;
+            return;
+        }
+}
+
+public void set_power(int i)
+{
+
+    x10_power = i;
+    act.x10_battery = x10_adapter.getItem(i).get_name();
+    return;
+}
+
+public void power(boolean state)
+{
+
+    if (x10_power < 0)
+        return;
+
+    X10Device dev = x10_adapter.getItem(x10_power);
     if (!dev.get_hold())
         if (dev.get_state() != state)
             dev.set_state(state, act);
 }
 
+private void battery()
+{
+
+    if (x10_power < 0)
+        return;
+
+    int chg = act.get_battery();
+    if (chg < Common.BATTERY_LOW)
+        power(true);
+    else if (chg > Common.BATTERY_HIGH)
+        power(false);
+}
+
 private void on_off(String line)
 {
     int i;
-    int onoff;
+    boolean then;
+    boolean now;
 
-    if (!line.isEmpty()) {
-        for (i = 1; i < max_devices; i++) {
-            X10Device dev = x10_devices[i];
-            onoff = ((line.charAt(16 - i) == '0') ? 0 : 1);
-            if (dev.get_state() != onoff)
-                dev.set_state(onoff, act);
+    if (!line.equals(state_map)) {
+        int max_devices = x10_adapter.getCount();
+        if (!line.isEmpty()) {
+            for (i = 0; i < max_devices; i++) {
+                X10Device dev = x10_adapter.getItem(i);
+                then = ((state_map.charAt(15 - i) == '0') ? false : true);
+                now = ((line.charAt(15 - i) == '0') ? false : true);
+                if ((then != now) && (dev.get_state() != now))
+                    dev.set_state(now, act);
+            }
         }
     }
+    state_map = line;
+    battery();
 }
 
 public void update()

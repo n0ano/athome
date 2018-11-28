@@ -53,7 +53,7 @@ public String ecobee_access;
 public int ecobee_which;
 private int ecobee_swhich;
 public String ecobee_name;
-public String[] ecobee_thermos = {"one", "two"};
+public String[] ecobee_thermos;
 
 private String url;
 
@@ -62,6 +62,8 @@ int degree = 0;
 Weather weather;
 Egauge egauge;
 X10 x10;
+int x10_position;
+String x10_battery = "";
 
 boolean running;
 
@@ -185,6 +187,10 @@ public boolean onOptionsItemSelected(MenuItem item)
         ecobee_dialog();
         return true;
 
+    case R.id.action_x10:
+        x10_dialog();
+        return true;
+
     case R.id.action_about:
         about_dialog();
         return true;
@@ -305,8 +311,8 @@ private void ecobee_dialog()
     refresh_tv.setText(ecobee_refresh);
 
     final Spinner sv = (Spinner) dialog.findViewById(R.id.ecobee_which);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.ecobee_spinner, ecobee_thermos);
-    adapter.setDropDownViewResource(R.layout.ecobee_spinner);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.text_spinner, ecobee_thermos);
+    adapter.setDropDownViewResource(R.layout.text_spinner);
     sv.setAdapter(adapter);
     ecobee_swhich = ecobee_which;
     if (ecobee_which >= 0)
@@ -365,6 +371,59 @@ private void ecobee_dialog()
     dialog.show();
 }
 
+private void x10_dialog()
+{
+    int i;
+    final Preferences pref = new Preferences(this);
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_x10);
+
+    int max = x10.x10_adapter.getCount();
+    String[] names = new String[max];
+    for (i = 0; i < max; i++)
+        names[i] = x10.x10_adapter.getItem(i).get_name();
+    final Spinner sv = (Spinner) dialog.findViewById(R.id.x10_battery);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.text_spinner, names);
+    adapter.setDropDownViewResource(R.layout.text_spinner);
+    sv.setAdapter(adapter);
+    if (x10.x10_power >= 0)
+        sv.setSelection(x10.x10_power);
+    x10_position = -1;
+    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            x10_position = position;
+        }
+        
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // TODO Auto-generated method stub
+        }
+
+    });
+
+    Button cancel = (Button) dialog.findViewById(R.id.x10_cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.x10_ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            x10.set_power(x10_position);
+            pref.put_string("x10_battery", x10_battery);
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
 private void about_dialog()
 {
 
@@ -391,7 +450,9 @@ private void restore_state()
     Preferences pref = new Preferences(this);
 
     egauge_url = pref.get_string("egauge_url", "");
+
     wunder_id = pref.get_string("wunder_id", "");
+
     ecobee_api = pref.get_string("ecobee_api", "");
     ecobee_auth = pref.get_string("ecobee_auth", "");
     ecobee_access = pref.get_string("ecobee_access", "");
@@ -399,6 +460,8 @@ private void restore_state()
     ecobee_which = pref.get_int("ecobee_which", -1);
     ecobee_name = pref.get_string("ecobee_name", "");
     ecobee_thermos = new String[0];
+
+    x10_battery = pref.get_string("x10_battery", "");
 }
 
 private void test_parse()
@@ -537,7 +600,7 @@ public void close_url(BufferedReader inp)
     }
 }
 
-private int get_battery()
+public int get_battery()
 {
     String chg;
 
@@ -547,25 +610,6 @@ private int get_battery()
     int level = bs.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
     int scale = bs.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
     return (level * 100) / scale;
-}
-
-private void battery()
-{
-
-    if (x10.x10_power == 0)
-        return;
-
-    int chg = get_battery();
-    if (chg < Common.BATTERY_LOW)
-        x10.power(1);
-    else if (chg > Common.BATTERY_HIGH)
-        x10.power(0);
-}
-
-private void chores()
-{
-
-    battery();
 }
 
 public void go_temp_detail(View v)
@@ -591,13 +635,12 @@ private void doit()
 
     final X10 x10 = new X10(this);
     this.x10 = x10;
+
     this.running = true;
 
     new Thread(new Runnable() {
         public void run() {
             while (working()) {
-
-                chores();
 
                 weather.update();
 

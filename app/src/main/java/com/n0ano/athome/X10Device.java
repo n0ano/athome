@@ -25,13 +25,12 @@ public class X10Device {
 
 private String name;
 private String code;
-private View view;
+private boolean state;
 private boolean hold;
+private View view;
 
 private ImageView icon;
 private TextView tv_name;
-
-private int state;
 
 public X10Device(String name, String code, View view)
 {
@@ -42,8 +41,9 @@ public X10Device(String name, String code, View view)
     icon = view.findViewById(R.id.outlet);
     tv_name = view.findViewById(R.id.outlet_name);
     tv_name.setText(name);
-    state = 0;
-    hold = false;
+
+    this.state = false;
+    this.hold = false;
 }
 
 public String get_name()
@@ -94,22 +94,22 @@ public void set_hold(boolean hold)
     this.hold = hold;
 }
 
-public int get_state()
+public boolean get_state()
 {
 
     return this.state;
 }
 
-public void set_state(final int state, MainActivity act)
+public void set_state(final boolean state, MainActivity act)
 {
     final int draw;
 
     this.state = state;
-Log.d(name + " set state to " + ((state == 0) ? "off, " : "on, ") + (hold ? "holding" : "normal"));
+Log.d(name + " set state to " + (state ? "on, " : "off, ") + (hold ? "holding" : "normal"));
     if (hold)
-        draw = (state == 0) ? R.drawable.outlet_off_red : R.drawable.outlet_on_red;
+        draw = state ? R.drawable.outlet_on_red : R.drawable.outlet_off_red;
     else
-        draw = (state == 0) ? R.drawable.outlet_off : R.drawable.outlet_on;
+        draw = state ? R.drawable.outlet_on : R.drawable.outlet_off;
     act.runOnUiThread(new Runnable() {
         public void run() {
             icon.setImageResource(draw);
