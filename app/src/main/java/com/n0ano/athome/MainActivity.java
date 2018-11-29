@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -58,6 +59,8 @@ public String[] ecobee_thermos;
 private String url;
 
 int degree = 0;
+
+int debug = 0;
 
 Weather weather;
 Egauge egauge;
@@ -426,6 +429,7 @@ private void x10_dialog()
 
 private void about_dialog()
 {
+    final Preferences pref = new Preferences(this);
 
     final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
     dialog.setContentView(R.layout.bar_about);
@@ -433,10 +437,15 @@ private void about_dialog()
     final TextView et = (TextView) dialog.findViewById(R.id.about_version);
     et.setText("Version: " + Version.VER_MAJOR + "." + Version.VER_MINOR + Version.VER_DEBUG);
 
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.about_debug);
+    cb.setChecked(debug != 0);
+
     Button ok = (Button) dialog.findViewById(R.id.about_ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            debug = (cb.isChecked() ? 1 : 0);
+            pref.put_int("debug", debug);
             dialog.dismiss();
         }
     });
@@ -462,6 +471,8 @@ private void restore_state()
     ecobee_thermos = new String[0];
 
     x10_battery = pref.get_string("x10_battery", "");
+
+    debug = pref.get_int("debug", 0);
 }
 
 private void test_parse()
@@ -532,7 +543,8 @@ public String call_api(String type, String uri, String params, String auth)
     HttpURLConnection con = null;
     String res = "";
 
-Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth);
+    if (debug > 0)
+        Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth);
     if (!params.equals(""))
         uri = uri + "?" + params;
     try {

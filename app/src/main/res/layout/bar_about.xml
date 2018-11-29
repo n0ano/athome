@@ -73,6 +73,29 @@
 		</LinearLayout>
 
 	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <CheckBox
+            android:id="@+id/about_debug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/dialog_fore" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=" Debugging prints"
+            android:textColor="@color/dialog_fore" />
+
+		</LinearLayout>
+
+	<LinearLayout
 		android:gravity="right"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
