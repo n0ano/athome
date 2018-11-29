@@ -173,17 +173,24 @@ public void power(boolean state)
             dev.set_state(state, act);
 }
 
-private void battery()
+private void battery(String map)
 {
 
     if (x10_power < 0)
         return;
 
+    boolean state = get_state(x10_power, map);
     int chg = act.get_battery();
-    if (chg < Common.BATTERY_LOW)
+    if (chg < Common.BATTERY_LOW && !state)
         power(true);
-    else if (chg > Common.BATTERY_HIGH)
+    else if (chg > Common.BATTERY_HIGH && state)
         power(false);
+}
+
+private boolean get_state(int idx, String map)
+{
+
+    return ((map.charAt(15 - idx) == '0') ? false : true);
 }
 
 private void on_off(String line)
@@ -197,15 +204,15 @@ private void on_off(String line)
         if (!line.isEmpty()) {
             for (i = 0; i < max_devices; i++) {
                 X10Device dev = x10_adapter.getItem(i);
-                then = ((state_map.charAt(15 - i) == '0') ? false : true);
-                now = ((line.charAt(15 - i) == '0') ? false : true);
+                then = get_state(i, state_map);
+                now = get_state(i, line);
                 if ((then != now) && (dev.get_state() != now))
                     dev.set_state(now, act);
             }
         }
     }
     state_map = line;
-    battery();
+    battery(state_map);
 }
 
 public void update()

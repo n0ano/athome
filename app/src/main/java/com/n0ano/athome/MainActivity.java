@@ -383,16 +383,16 @@ private void x10_dialog()
     dialog.setContentView(R.layout.bar_x10);
 
     int max = x10.x10_adapter.getCount();
-    String[] names = new String[max];
+    String[] names = new String[max + 1];
+    names[0] = "- none -";
     for (i = 0; i < max; i++)
-        names[i] = x10.x10_adapter.getItem(i).get_name();
+        names[i + 1] = x10.x10_adapter.getItem(i).get_name();
     final Spinner sv = (Spinner) dialog.findViewById(R.id.x10_battery);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.text_spinner, names);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     sv.setAdapter(adapter);
-    if (x10.x10_power >= 0)
-        sv.setSelection(x10.x10_power);
-    x10_position = -1;
+    x10_position = 0;
+    sv.setSelection(x10.x10_power + 1);
     sv.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -418,7 +418,11 @@ private void x10_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            x10.set_power(x10_position);
+            if (x10_position <= 0)
+                x10_battery = "";
+            else
+                x10_battery = x10.x10_adapter.getItem(x10_position - 1).get_name();
+            x10.set_power(x10_battery);
             pref.put_string("x10_battery", x10_battery);
             dialog.dismiss();
         }
