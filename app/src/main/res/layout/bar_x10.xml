@@ -59,7 +59,7 @@
 		>
 
 		<Button
-			android:id="@+id/x10_cancel"
+			android:id="@+id/cancel"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:paddingRight="30dp"
@@ -69,7 +69,7 @@
 			/>
 
 		<Button
-			android:id="@+id/x10_ok"
+			android:id="@+id/ok"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ok"

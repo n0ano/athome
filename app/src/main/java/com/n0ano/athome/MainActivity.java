@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,7 +49,6 @@ public String egauge_url;
 public String wunder_id;
 
 public String ecobee_api;
-public String ecobee_auth;
 public String ecobee_refresh;
 public String ecobee_access;
 public int ecobee_which;
@@ -212,7 +212,7 @@ private void egauge_dialog()
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
     et.setText(egauge_url);
 
-    Button cancel = (Button) dialog.findViewById(R.id.egauge_cancel);
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -220,7 +220,7 @@ private void egauge_dialog()
         }
     });
 
-    Button ok = (Button) dialog.findViewById(R.id.egauge_ok);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -243,7 +243,7 @@ private void wunder_dialog()
     final EditText et = (EditText) dialog.findViewById(R.id.wunder_id);
     et.setText(wunder_id);
 
-    Button cancel = (Button) dialog.findViewById(R.id.wunder_cancel);
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -251,7 +251,7 @@ private void wunder_dialog()
         }
     });
 
-    Button ok = (Button) dialog.findViewById(R.id.wunder_ok);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -264,16 +264,16 @@ private void wunder_dialog()
     dialog.show();
 }
 
-private void ecobee_ra_auth()
+private void ecobee_how()
 {
 
     final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
-    dialog.setContentView(R.layout.bar_reauth);
+    dialog.setContentView(R.layout.bar_ecobee_how);
 
     TextView tv = (TextView) dialog.findViewById(R.id.ecobee_ra_text);
     tv.setText(Html.fromHtml(getString(R.string.ecobee_auth)));
 
-    Button cancel = (Button) dialog.findViewById(R.id.ecobee_ra_cancel);
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -281,13 +281,68 @@ private void ecobee_ra_auth()
         }
     });
 
-    Button ok = (Button) dialog.findViewById(R.id.ecobee_ra_start);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Common.ECOBEE_REAUTH));
             startActivity(intent);
             dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+private void ecobee_dopin(final String api)
+{
+
+
+    new Thread(new Runnable() {
+        public void run() {
+            final String pin = weather.ecobee_get_pin(api);
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    ecobee_doauth(api, pin);
+                }
+            });
+        }
+    }).start();
+}
+
+private void ecobee_doauth(final String api, final String pin)
+{
+    final Preferences pref = new Preferences(this);
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_ecobee_auth);
+
+    final TextView api_tv = (TextView) dialog.findViewById(R.id.ecobee_api);
+    api_tv.setText(api);
+
+    final TextView pin_tv = (TextView) dialog.findViewById(R.id.ecobee_pin);
+    pin_tv.setText(pin);
+
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+            ecobee_api = api;
+            pref.put_string("ecobee_api", ecobee_api);
+            new Thread(new Runnable() {
+                public void run() {
+                    weather.ecobee_authorize(ecobee_api);
+                }
+            }).start();
         }
     });
 
@@ -303,9 +358,6 @@ private void ecobee_dialog()
 
     final EditText api_tv = (EditText) dialog.findViewById(R.id.ecobee_api);
     api_tv.setText(ecobee_api);
-
-    final EditText auth_tv = (EditText) dialog.findViewById(R.id.ecobee_auth);
-    auth_tv.setText(ecobee_auth);
 
     final EditText access_tv = (EditText) dialog.findViewById(R.id.ecobee_access);
     access_tv.setText(ecobee_access);
@@ -334,15 +386,25 @@ private void ecobee_dialog()
 
     });
 
-    Button reauth = (Button) dialog.findViewById(R.id.ecobee_reauth);
-    reauth.setOnClickListener(new OnClickListener() {
+    Button bv_how = (Button) dialog.findViewById(R.id.ecobee_how);
+    bv_how.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            ecobee_ra_auth();
+            ecobee_how();
         }
     });
 
-    Button cancel = (Button) dialog.findViewById(R.id.ecobee_cancel);
+    Button bv_auth = (Button) dialog.findViewById(R.id.ecobee_dopin);
+    bv_auth.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String api = api_tv.getText().toString();
+            dialog.dismiss();
+            ecobee_dopin(api);
+        }
+    });
+
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -350,19 +412,17 @@ private void ecobee_dialog()
         }
     });
 
-    Button ok = (Button) dialog.findViewById(R.id.ecobee_ok);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
             ecobee_api = api_tv.getText().toString();
-            ecobee_auth = auth_tv.getText().toString();
             ecobee_access = access_tv.getText().toString();
             ecobee_refresh = refresh_tv.getText().toString();
             ecobee_which = ecobee_swhich;
             if (ecobee_which >= 0)
                 ecobee_name = ecobee_thermos[ecobee_which];
             pref.put_string("ecobee_api", ecobee_api);
-            pref.put_string("ecobee_auth", ecobee_auth);
             pref.put_string("ecobee_access", ecobee_access);
             pref.put_string("ecobee_refresh", ecobee_refresh);
             pref.put_int("ecobee_which", ecobee_which);
@@ -406,7 +466,7 @@ private void x10_dialog()
 
     });
 
-    Button cancel = (Button) dialog.findViewById(R.id.x10_cancel);
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -414,7 +474,7 @@ private void x10_dialog()
         }
     });
 
-    Button ok = (Button) dialog.findViewById(R.id.x10_ok);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -444,7 +504,7 @@ private void about_dialog()
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.about_debug);
     cb.setChecked(debug != 0);
 
-    Button ok = (Button) dialog.findViewById(R.id.about_ok);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -457,6 +517,13 @@ private void about_dialog()
     dialog.show();
 }
 
+private void ecobee_get(Dialog dialog, String api)
+{
+
+Log.d("ecobee_get() api - " + api);
+    return;
+}
+
 private void restore_state()
 {
 
@@ -467,7 +534,6 @@ private void restore_state()
     wunder_id = pref.get_string("wunder_id", "");
 
     ecobee_api = pref.get_string("ecobee_api", "");
-    ecobee_auth = pref.get_string("ecobee_auth", "");
     ecobee_access = pref.get_string("ecobee_access", "");
     ecobee_refresh = pref.get_string("ecobee_refresh", "");
     ecobee_which = pref.get_int("ecobee_which", -1);

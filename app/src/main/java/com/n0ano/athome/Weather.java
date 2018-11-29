@@ -35,6 +35,7 @@ public final static String WUNDER_STATION = "station=";
 public final static String WUNDER_QUERY = "&units=english&v=2.0&format=xml";
 
 public final static String ECO_URL = "https://api.ecobee.com";
+public final static String ECO_AUTHORIZE = "/authorize";
 public final static String ECO_REFRESH = "/token";
 public final static String ECO_DATA = "/1/thermostat";
 public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeRuntime\":true}}";
@@ -44,6 +45,7 @@ MainActivity act;
 private int period = 0;        // Weather only changes once a minute
 
 private static int ecobee_thermos_checked;
+private String ecobee_auth_token = "";
 
 Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_wunder = new HashMap<String, String>();
@@ -154,15 +156,36 @@ private void get_wunder()
         get_info_wunder(resp);
 }
 
-private void ecobee_auth()
+//  The api token can be used to create a new PIN
+//
+//  Note: this routine makes asynchronous HTTP requests
+//    so it better not run on the UI thread
+//
+public String ecobee_get_pin(String api)
+{
+    String resp;
+
+    resp = act.call_api("GET",
+                               ECO_URL + ECO_AUTHORIZE,
+                               "response_type=ecobeePin&client_id=" + api +
+                                   "&scope=smartWrite",
+                               "");
+    ecobee_auth_token = parse.json_get("code", resp, 1);
+    String pin = parse.json_get("ecobeePin", resp, 1);
+Log.d("ecobee get pin for api - " + api + " = " + pin + "/" + ecobee_auth_token);
+    return pin;
+}
+
+private void ecobee_token(String type, String code, String api)
 {
     String resp;
     String token;
 
     resp = act.call_api("POST",
                         ECO_URL + ECO_REFRESH,
-                        "grant_type=ecobeePin&code=" + act.ecobee_auth +
-                            "&client_id=" + act.ecobee_api,
+                        "grant_type=" + type +
+                            "&code=" + code +
+                            "&client_id=" + api,
                         "");
     if ((token = parse.json_get("access_token", resp, 1)) == null)
         return;
@@ -171,31 +194,30 @@ private void ecobee_auth()
     Preferences pref = new Preferences(act);
     pref.put_string("ecobee_access", act.ecobee_access);
     pref.put_string("ecobee_refresh", act.ecobee_refresh);
-Log.d("ecoBee auth access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+Log.d("ecoBee tokens access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+    return;
 }
 
-private boolean ecobee_refresh()
+//  The token has been validated by the user so
+//    it's legal to use the auth token to get
+//    access and refresh tokens
+//
+//  Note: this routine makes asynchronous HTTP requests
+//    so it better not run on the UI thread
+//
+public void ecobee_authorize(String api)
 {
-    String resp;
-    String token;
 
-    resp = act.call_api("POST",
-                        ECO_URL + ECO_REFRESH,
-                        "grant_type=refresh_token&code=" + act.ecobee_refresh +
-                            "&client_id=" + act.ecobee_api,
-                        "");
-    if ((token = parse.json_get("access_token", resp, 1)) == null)
-        return false;
-    act.ecobee_access = parse.json_get("access_token", resp, 1);
-    act.ecobee_refresh = parse.json_get("refresh_token", resp, 1);
-    Preferences pref = new Preferences(act);
-    pref.put_string("ecobee_access", act.ecobee_access);
-    pref.put_string("ecobee_refresh", act.ecobee_refresh);
-Log.d("ecoBee refresh access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
-    return true;
+    ecobee_token("ecobeePin", ecobee_auth_token, api);
 }
 
-private void get_ecobee()
+private void ecobee_refresh()
+{
+
+    ecobee_token("refresh_token", act.ecobee_refresh, act.ecobee_api);
+}
+
+private String ecobee_query()
 {
     String resp;
 
@@ -203,15 +225,23 @@ private void get_ecobee()
                                ECO_URL + ECO_DATA,
                                ECO_QUERY,
                                "Bearer " + act.ecobee_access);
-//Log.d("ecobee:" + resp);
     String code = parse.json_get("code", resp, 1);
-    if (code == null || !code.equals("0")) {
-        if (!ecobee_refresh())
-            ecobee_auth();
-    } else {
-        get_info_ecobee(resp);
-    }
+    if (code == null || !code.equals("0"))
+        return null;
+    else
+        return resp;
+}
 
+private void get_ecobee()
+{
+    String resp;
+
+    if ((resp = ecobee_query()) == null) {
+        ecobee_refresh();
+        if ((resp = ecobee_query()) == null)
+            return;
+    }
+    get_info_ecobee(resp);
 }
 
 private void detail_dialog()

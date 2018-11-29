@@ -50,7 +50,7 @@
 		android:paddingBottom="20dp" >
 
 		<Button
-			android:id="@+id/ecobee_ra_cancel"
+			android:id="@+id/cancel"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:paddingRight="30dp"
@@ -59,7 +59,7 @@
             android:background="@color/dialog_back" />
 
 		<Button
-			android:id="@+id/ecobee_ra_start"
+			android:id="@+id/ok"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="start"

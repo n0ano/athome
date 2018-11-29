@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical"
-	>
+	android:orientation="vertical" >
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -12,16 +11,15 @@
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-		>
+        android:paddingBottom="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Weather Underground"
+			android:text="ecoBee Authorization"
             android:textSize="20dp"
-            android:textColor="@color/dialog_fore"
-			/>
+            android:textColor="@color/dialog_fore" />
+
         </LinearLayout>
 
 	<LinearLayout
@@ -30,28 +28,51 @@
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+        android:paddingRight="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
-			android:text="Station ID: "
-            android:textColor="@color/dialog_fore"
-			/>
+			android:text="Api Key: "
+            android:textColor="@color/dialog_fore" />
 
-		<EditText
-			android:id="@+id/wunder_id"
-			android:layout_width="match_parent"
+		<TextView
+			android:id="@+id/ecobee_api"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text=""
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
-			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor"
-			/>
+			android:paddingLeft="5dp" />
+
+            </LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Pin: "
+            android:textColor="@color/dialog_fore" />
+
+		<TextView
+			android:id="@+id/ecobee_pin"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="____"
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp" />
 
 		</LinearLayout>
 
@@ -62,8 +83,7 @@
 		android:layout_height="wrap_content"
 		android:paddingRight="30dp"
 		android:paddingTop="20dp"
-		android:paddingBottom="20dp"
-		>
+		android:paddingBottom="20dp" >
 
 		<Button
 			android:id="@+id/cancel"
@@ -72,17 +92,15 @@
 			android:paddingRight="30dp"
 			android:text="Cancel"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-			/>
+            android:background="@color/dialog_back" />
 
 		<Button
 			android:id="@+id/ok"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Ok"
+			android:text="Validated PIN"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-			/>
+            android:background="@color/dialog_back" />
 
 		</LinearLayout>
 
