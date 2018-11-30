@@ -32,6 +32,7 @@
     </style>
 
     <style name="AlertDialogCustom" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="android:background">@color/dialog_back</item>
         <item name="android:textColor">@color/back</item>
         <item name="android:textColorPrimary">@color/back</item>
         <item name="android:colorAccent">@color/back</item>
