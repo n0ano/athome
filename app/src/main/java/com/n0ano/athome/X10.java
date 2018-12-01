@@ -120,11 +120,9 @@ private void init_data(String resp)
 
 }
 
-private void go_control(View v)
+private void do_control(final X10Device dev, boolean state)
 {
 
-    final X10Device dev = (X10Device) v.getTag();
-    boolean state = dev.get_state() ? false : true;
     dev.set_state(state, act);
     final String onoff = state ? "on" : "off";
     new Thread(new Runnable() {
@@ -136,6 +134,13 @@ private void go_control(View v)
         }
     }).start();
            
+}
+
+private void go_control(View v)
+{
+
+    X10Device dev = (X10Device) v.getTag();
+    do_control(dev, dev.get_state() ? false : true);
 }
 
 public void set_power(String name)
@@ -170,7 +175,7 @@ public void power(boolean state)
     X10Device dev = x10_adapter.getItem(x10_power);
     if (!dev.get_hold())
         if (dev.get_state() != state)
-            dev.set_state(state, act);
+            do_control(dev, state);
 }
 
 private void battery(String map)
@@ -181,9 +186,9 @@ private void battery(String map)
 
     boolean state = get_state(x10_power, map);
     int chg = act.get_battery();
-    if (chg < Common.BATTERY_LOW && !state)
+    if (chg < act.x10_batt_min && !state)
         power(true);
-    else if (chg > Common.BATTERY_HIGH && state)
+    else if (chg > act.x10_batt_max && state)
         power(false);
 }
 

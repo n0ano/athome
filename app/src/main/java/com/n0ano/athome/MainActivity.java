@@ -67,6 +67,9 @@ Egauge egauge;
 X10 x10;
 int x10_position;
 String x10_battery = "";
+int x10_batt_min;
+int x10_batt_max;
+int x10_batt_level;
 
 boolean running;
 
@@ -192,6 +195,10 @@ public boolean onOptionsItemSelected(MenuItem item)
 
     case R.id.action_x10:
         x10_dialog();
+        return true;
+
+    case R.id.action_developer:
+        developer_dialog();
         return true;
 
     case R.id.action_about:
@@ -442,10 +449,10 @@ private void x10_dialog()
     final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
     dialog.setContentView(R.layout.bar_x10);
 
-    int max = x10.x10_adapter.getCount();
-    String[] names = new String[max + 1];
+    int max_dev = x10.x10_adapter.getCount();
+    String[] names = new String[max_dev + 1];
     names[0] = "- none -";
-    for (i = 0; i < max; i++)
+    for (i = 0; i < max_dev; i++)
         names[i + 1] = x10.x10_adapter.getItem(i).get_name();
     final Spinner sv = (Spinner) dialog.findViewById(R.id.x10_battery);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.text_spinner, names);
@@ -466,6 +473,12 @@ private void x10_dialog()
 
     });
 
+    final TextView min = (TextView) dialog.findViewById(R.id.x10_batt_min);
+    min.setText(Integer.toString(x10_batt_min));
+
+    final TextView max = (TextView) dialog.findViewById(R.id.x10_batt_max);
+    max.setText(Integer.toString(x10_batt_max));
+
     Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
@@ -484,6 +497,44 @@ private void x10_dialog()
                 x10_battery = x10.x10_adapter.getItem(x10_position - 1).get_name();
             x10.set_power(x10_battery);
             pref.put_string("x10_battery", x10_battery);
+            x10_batt_min = Integer.parseInt(min.getText().toString());
+            pref.put_int("x10_batt_min", x10_batt_min);
+            x10_batt_max = Integer.parseInt(max.getText().toString());
+            pref.put_int("x10_batt_max", x10_batt_max);
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
+}
+
+private void developer_dialog()
+{
+    final Preferences pref = new Preferences(this);
+
+    final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_developer);
+
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.about_debug);
+    cb.setChecked(debug != 0);
+
+    final TextView level = (TextView) dialog.findViewById(R.id.x10_batt_level);
+    level.setText(Integer.toString(x10_batt_level));
+
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            debug = (cb.isChecked() ? 1 : 0);
+            pref.put_int("debug", debug);
             dialog.dismiss();
         }
     });
@@ -493,7 +544,6 @@ private void x10_dialog()
 
 private void about_dialog()
 {
-    final Preferences pref = new Preferences(this);
 
     final Dialog dialog = new Dialog(this, R.style.AlertDialogCustom);
     dialog.setContentView(R.layout.bar_about);
@@ -501,15 +551,10 @@ private void about_dialog()
     final TextView et = (TextView) dialog.findViewById(R.id.about_version);
     et.setText("Version: " + Version.VER_MAJOR + "." + Version.VER_MINOR + Version.VER_DEBUG);
 
-    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.about_debug);
-    cb.setChecked(debug != 0);
-
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            debug = (cb.isChecked() ? 1 : 0);
-            pref.put_int("debug", debug);
             dialog.dismiss();
         }
     });
@@ -541,6 +586,9 @@ private void restore_state()
     ecobee_thermos = new String[0];
 
     x10_battery = pref.get_string("x10_battery", "");
+    x10_batt_min = pref.get_int("x10_batt_min", Common.BATTERY_LOW);
+    x10_batt_max = pref.get_int("x10_batt_max", Common.BATTERY_HIGH);
+    x10_batt_level = pref.get_int("x10_batt_level", 0);
 
     debug = pref.get_int("debug", 0);
 }
@@ -685,6 +733,9 @@ public void close_url(BufferedReader inp)
 public int get_battery()
 {
     String chg;
+
+    if (x10_batt_level != 0)
+        return x10_batt_level;
 
     IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     Intent bs = this.registerReceiver(null, ifilter);

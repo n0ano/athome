@@ -28,6 +28,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_developer"
+        android:orderInCategory="101"
+        android:title="Developer"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_about"
         android:orderInCategory="101"
         android:title="About"
