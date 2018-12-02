@@ -230,7 +230,11 @@ public void update()
                                X10_URL + X10_API,
                                X10_GET,
                                "");
-    on_off(act.parse.json_get("state", resp, 1));
+    String l = act.parse.json_get("state", resp, 1);
+    if (l.length() < 16)
+        Log.d("X10 bad data: " + l + " => " + resp);
+    else
+        on_off(l);
 }
 
 }

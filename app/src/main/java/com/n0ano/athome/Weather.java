@@ -29,6 +29,8 @@ public class Weather {
 
 private final static int PERIOD = 60;   // weather only changes once a minute
 
+private final static int MAX_BARO = 10; // barometer trends over 10 minutes
+
 public final static String WUNDER_URL = "https://stationdata.wunderground.com";
 public final static String WUNDER_API = "/cgi-bin/stationlookup";
 public final static String WUNDER_STATION = "station=";
@@ -51,7 +53,10 @@ Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_wunder = new HashMap<String, String>();
 Map<String, String> data_ecobee = new HashMap<String, String>();
 
-Parse parse;
+ArrayList<Float> baro_hist = new ArrayList<Float>();
+Float baro_cum = 0.0f;
+Float baro_avg = 0.0f;
+int baro_icon;
 
 // Weather: class constructor
 //
@@ -61,7 +66,6 @@ public Weather(MainActivity act)
 {
 
 	this.act = act;
-    parse = act.parse;
     init_data();
 }
 
@@ -101,10 +105,25 @@ private void get_info_wunder(String resp)
     Set keys = data_wunder.keySet();
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = parse.xml_get(key, resp, 1);
+        val = act.parse.xml_get(key, resp, 1);
         key = data_wunder.get(key);
         data.put(key, (val != null) ? val : "");
     }
+    Float f = Float.valueOf(data.get("barometer"));
+    baro_hist.add(f);
+    int max = baro_hist.size();
+    if (max > MAX_BARO) {
+        baro_cum -= baro_hist.get(0);
+        baro_hist.remove(--max);
+    }
+    baro_cum += f;
+    baro_avg = baro_cum / baro_hist.size();
+    if (f > baro_avg)
+        baro_icon = R.drawable.barometer_up;
+    else if (f < baro_avg)
+        baro_icon = R.drawable.barometer_down;
+    else
+        baro_icon = R.drawable.barometer;
 }
 
 private void get_eco_thermos(String resp)
@@ -115,7 +134,7 @@ private void get_eco_thermos(String resp)
     if (ecobee_thermos_checked++ != 0)
         return;
     int idx = 0;
-    while ((name = parse.json_get("name", resp, ++idx)) != null) {
+    while ((name = act.parse.json_get("name", resp, ++idx)) != null) {
 Log.d("thermostat name - " + name);
         thermos.add(name);
     }
@@ -136,7 +155,7 @@ private void get_info_ecobee(String resp)
         which = 1;
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
-        val = parse.json_get(key, resp, which);
+        val = act.parse.json_get(key, resp, which);
         key = data_ecobee.get(key);
         data.put(key, val);
     }
@@ -170,8 +189,8 @@ public String ecobee_get_pin(String api)
                                "response_type=ecobeePin&client_id=" + api +
                                    "&scope=smartWrite",
                                "");
-    ecobee_auth_token = parse.json_get("code", resp, 1);
-    String pin = parse.json_get("ecobeePin", resp, 1);
+    ecobee_auth_token = act.parse.json_get("code", resp, 1);
+    String pin = act.parse.json_get("ecobeePin", resp, 1);
 Log.d("ecobee get pin for api - " + api + " = " + pin + "/" + ecobee_auth_token);
     return pin;
 }
@@ -187,10 +206,10 @@ private void ecobee_token(String type, String code, String api)
                             "&code=" + code +
                             "&client_id=" + api,
                         "");
-    if ((token = parse.json_get("access_token", resp, 1)) == null)
+    if ((token = act.parse.json_get("access_token", resp, 1)) == null)
         return;
-    act.ecobee_access = parse.json_get("access_token", resp, 1);
-    act.ecobee_refresh = parse.json_get("refresh_token", resp, 1);
+    act.ecobee_access = act.parse.json_get("access_token", resp, 1);
+    act.ecobee_refresh = act.parse.json_get("refresh_token", resp, 1);
     Preferences pref = new Preferences(act);
     pref.put_string("ecobee_access", act.ecobee_access);
     pref.put_string("ecobee_refresh", act.ecobee_refresh);
@@ -225,7 +244,7 @@ private String ecobee_query()
                                ECO_URL + ECO_DATA,
                                ECO_QUERY,
                                "Bearer " + act.ecobee_access);
-    String code = parse.json_get("code", resp, 1);
+    String code = act.parse.json_get("code", resp, 1);
     if (code == null || !code.equals("0"))
         return null;
     else
@@ -318,6 +337,9 @@ public void update()
 
             tv = (TextView) act.findViewById(R.id.weather_rain);
             tv.setText(data.get("rain") + " in");
+
+            ImageView bv = (ImageView) act.findViewById(R.id.weather_bar_dir);
+            bv.setImageResource(baro_icon);
 
             tv = (TextView) act.findViewById(R.id.weather_barometer);
             tv.setText(data.get("barometer") + " in");
