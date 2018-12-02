@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:paddingRight="10dp"
-            android:paddingLeft="40dp"
+            android:paddingLeft="10dp"
             >
 
             <RelativeLayout
@@ -32,12 +32,21 @@
                 >
 
                 <ImageView
-                    android:id="@+id/weather_out_icon"
+                    android:id="@+id/weather_out_timeout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:paddingTop="10dp"
+                    android:src="@drawable/timeout_10" />
+                <ImageView
+                    android:id="@+id/weather_out_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/weather_out_timeout"
+                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="5dp"
                     android:src="@drawable/outside"
                     android:onClick="go_temp_detail" />
 
@@ -72,12 +81,21 @@
                 >
 
                 <ImageView
-                    android:id="@+id/weather_in_icon"
+                    android:id="@+id/weather_in_timeout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:paddingTop="10dp"
+                    android:src="@drawable/timeout_10" />
+                <ImageView
+                    android:id="@+id/weather_in_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/weather_in_timeout"
+                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="5dp"
                     android:src="@drawable/inside"
                     android:onClick="go_temp_detail" />
 

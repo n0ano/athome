@@ -23,7 +23,7 @@ public final static String EGAUGE_QUERY = "json&I&a&m&Y=0,60";
 
 MainActivity act;
 
-int period = 0;
+int period = 1;
 
 int use_watt;
 int gen_watt;
@@ -80,20 +80,18 @@ private String k_watts(int w)
 public void update()
 {
 
-    // Called once a second
-    if (--period > 0)
-        return;
-    period = PERIOD;
-
     //
     // Get the data
     //
-    String resp = act.call_api("GET",
-                               act.egauge_url + EGAUGE_API,
-                               EGAUGE_QUERY,
-                               "");
-    use_watt = get_value("use", resp);
-    gen_watt = get_value("gen", resp);
+    if (period++ >= PERIOD) {
+        String resp = act.call_api("GET",
+                                   act.egauge_url + EGAUGE_API,
+                                   EGAUGE_QUERY,
+                                   "");
+        use_watt = get_value("use", resp);
+        gen_watt = get_value("gen", resp);
+        period = 1;
+    }
 
     //
     //  Display it
@@ -119,6 +117,9 @@ public void update()
 
             iv = (ImageView) act.findViewById(R.id.panel_arrow);
             set_arrow(iv, gen_watt, R.drawable.arrow_left, R.drawable.arrow_right);
+
+            iv = (ImageView) act.findViewById(R.id.egauge_timeout);
+            act.set_timeout(iv, period, PERIOD);
         }
     });
 }

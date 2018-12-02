@@ -44,7 +44,7 @@ public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selec
 
 MainActivity act;
 
-private int period = 0;        // Weather only changes once a minute
+private int period = PERIOD;        // Weather only changes once a minute
 
 private static int ecobee_thermos_checked;
 private String ecobee_auth_token = "";
@@ -303,18 +303,16 @@ Log.d("get temp detail for - " + ((id == R.id.weather_out_icon) ? "weather under
 public void update()
 {
 
-    // Called once a second
-    if (--period > 0)
-        return;
-    period = PERIOD;
-
     //
     //  Get the data
     //
-    data.put("in_temp", "--");
-    data.put("out_temp", "--");
-    get_wunder();
-    get_ecobee();
+    if (period++ >= PERIOD) {
+        data.put("in_temp", "--");
+        data.put("out_temp", "--");
+        get_wunder();
+        get_ecobee();
+        period = 1;
+    }
 
     //
     //  Display it
@@ -322,6 +320,7 @@ public void update()
     act.runOnUiThread(new Runnable() {
         public void run() {
             TextView tv;
+            ImageView iv;
 
             tv = (TextView) act.findViewById(R.id.weather_out_temp);
             tv.setText(data.get("out_temp"));
@@ -329,7 +328,7 @@ public void update()
             tv = (TextView) act.findViewById(R.id.weather_in_temp);
             tv.setText(data.get("in_temp"));
 
-            ImageView iv = (ImageView) act.findViewById(R.id.weather_dir);
+            iv = (ImageView) act.findViewById(R.id.weather_dir);
             iv.setRotation(Integer.valueOf(data.get("winddir")));
 
             tv = (TextView) act.findViewById(R.id.weather_speed);
@@ -338,11 +337,17 @@ public void update()
             tv = (TextView) act.findViewById(R.id.weather_rain);
             tv.setText(data.get("rain") + " in");
 
-            ImageView bv = (ImageView) act.findViewById(R.id.weather_bar_dir);
-            bv.setImageResource(baro_icon);
+            iv = (ImageView) act.findViewById(R.id.weather_bar_dir);
+            iv.setImageResource(baro_icon);
 
             tv = (TextView) act.findViewById(R.id.weather_barometer);
             tv.setText(data.get("barometer") + " in");
+
+            iv = (ImageView) act.findViewById(R.id.weather_out_timeout);
+            act.set_timeout(iv, period, PERIOD);
+
+            iv = (ImageView) act.findViewById(R.id.weather_in_timeout);
+            act.set_timeout(iv, period, PERIOD);
         }
     });
 }

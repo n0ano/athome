@@ -346,6 +346,61 @@ public void close_url(BufferedReader inp)
     }
 }
 
+public void set_timeout(ImageView v, int p, int maxp)
+{
+    int id = R.drawable.timeout_00;
+
+    int i = (p * 10) / maxp;
+    switch (i) {
+
+    case 0:
+        id = R.drawable.timeout_00;
+        break;
+
+    case 1:
+        id = R.drawable.timeout_01;
+        break;
+
+    case 2:
+        id = R.drawable.timeout_02;
+        break;
+
+    case 3:
+        id = R.drawable.timeout_03;
+        break;
+
+    case 4:
+        id = R.drawable.timeout_04;
+        break;
+
+    case 5:
+        id = R.drawable.timeout_05;
+        break;
+
+    case 6:
+        id = R.drawable.timeout_06;
+        break;
+
+    case 7:
+        id = R.drawable.timeout_07;
+        break;
+
+    case 8:
+        id = R.drawable.timeout_08;
+        break;
+
+    case 9:
+        id = R.drawable.timeout_09;
+        break;
+
+    case 10:
+        id = R.drawable.timeout_10;
+        break;
+
+    }
+    v.setImageResource(id);
+}
+
 public int get_battery()
 {
     String chg;
