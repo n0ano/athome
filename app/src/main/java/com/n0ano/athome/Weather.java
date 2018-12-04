@@ -156,8 +156,10 @@ private void get_info_ecobee(String resp)
     for (Iterator itr = keys.iterator(); itr.hasNext();) {
         key = (String)itr.next();
         val = act.parse.json_get(key, resp, which);
-        key = data_ecobee.get(key);
-        data.put(key, val);
+        if (val != null) {
+            key = data_ecobee.get(key);
+            data.put(key, val);
+        }
     }
 }
 

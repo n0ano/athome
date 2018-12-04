@@ -58,17 +58,18 @@ public String[] ecobee_thermos;
 private String url;
 
 int degree = 0;
-
 int debug = 0;
 
-Weather weather;
-Egauge egauge;
-X10 x10;
-int x10_position;
+public String x10_url;
 String x10_battery = "";
 int x10_batt_min;
 int x10_batt_max;
 int x10_batt_level;
+int x10_position;
+
+Weather weather;
+Egauge egauge;
+X10 x10;
 
 boolean running;
 
@@ -201,6 +202,7 @@ private void restore_state()
     ecobee_name = pref.get_string("ecobee_name", "");
     ecobee_thermos = new String[0];
 
+    x10_url = pref.get_string("x10_url", "");
     x10_battery = pref.get_string("x10_battery", "");
     x10_batt_min = pref.get_int("x10_batt_min", Common.BATTERY_LOW);
     x10_batt_max = pref.get_int("x10_batt_max", Common.BATTERY_HIGH);
@@ -446,11 +448,14 @@ private void doit()
         public void run() {
             while (working()) {
 
-                weather.update();
+                if (weather != null)
+                    weather.update();
 
-                egauge.update();
+                if (egauge != null)
+                    egauge.update();
 
-                x10.update();
+                if (x10 != null)
+                    x10.update();
 
                 SystemClock.sleep(1000);
             }

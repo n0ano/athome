@@ -36,7 +36,6 @@
             android:textSize="14sp"
 			android:text="Api Key: "
             android:textColor="@color/dialog_fore" />
-
 		<EditText
 			android:id="@+id/ecobee_api"
 			android:layout_width="match_parent"
@@ -64,7 +63,6 @@
             android:textSize="14sp"
 			android:text="Access Token: "
             android:textColor="@color/dialog_fore" />
-
 		<EditText
 			android:id="@+id/ecobee_access"
 			android:layout_width="match_parent"
@@ -92,7 +90,6 @@
             android:textSize="14sp"
 			android:text="Refresh Token: "
             android:textColor="@color/dialog_fore" />
-
 		<EditText
 			android:id="@+id/ecobee_refresh"
 			android:layout_width="match_parent"
@@ -120,7 +117,6 @@
             android:textSize="14sp"
 			android:text="Which thermostat: "
             android:textColor="@color/dialog_fore" />
-
 		<Spinner
 			android:id="@+id/ecobee_which"
 			android:layout_width="wrap_content"
@@ -178,7 +174,6 @@
 			android:text="Cancel"
             android:textColor="@color/dialog_fore"
             android:background="@color/dialog_back" />
-
 		<Button
 			android:id="@+id/ok"
 			android:layout_width="wrap_content"

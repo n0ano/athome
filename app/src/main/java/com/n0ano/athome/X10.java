@@ -28,7 +28,6 @@ public class X10 {
 
 final static int MAX_DEVICES = 17;
 
-final static String X10_URL = "http://n0ano.com";
 final static String X10_API = "/cgi-bin/athome/x10device";
 final static String X10_GET = "get";
 final static String X10_SET = "set";
@@ -56,7 +55,7 @@ public X10(final MainActivity act)
     new Thread(new Runnable() {
         public void run() {
             final String resp = act.call_api("GET",
-                                       X10_URL + X10_API,
+                                       act.x10_url + X10_API,
                                        X10_LIST,
                                        "");
             act.runOnUiThread(new Runnable() {
@@ -73,8 +72,10 @@ private void init_data(String resp)
     int i;
     String name;
 
-    String hcode = act.parse.json_get("code", resp, 1);
     x10_adapter.clear();
+    String hcode = act.parse.json_get("code", resp, 1);
+    if (hcode == null)
+        return;
     i = 0;
     while ((name = act.parse.json_get("name", resp, ++i)) != null) {
         x10_adapter.add_device(i - 1,
@@ -128,7 +129,7 @@ private void do_control(final X10Device dev, boolean state)
     new Thread(new Runnable() {
         public void run() {
             act.call_api("GET",
-                         X10_URL + X10_API,
+                         act.x10_url + X10_API,
                          X10_SET + "&code=" + dev.get_code() + "&state=" + onoff,
                          "");
         }
@@ -227,11 +228,11 @@ public void update()
     //  Get the data and display any changes
     //
     String resp = act.call_api("GET",
-                               X10_URL + X10_API,
+                               act.x10_url + X10_API,
                                X10_GET,
                                "");
     String l = act.parse.json_get("state", resp, 1);
-    if (l.length() < 16)
+    if (l == null || l.length() < 16)
         Log.d("X10 bad data: " + l + " => " + resp);
     else
         on_off(l);

@@ -40,7 +40,6 @@
 			android:text="Server: "
             android:textColor="@color/dialog_fore"
 			/>
-
 		<EditText
 			android:id="@+id/egauge_url"
 			android:layout_width="match_parent"
@@ -74,7 +73,6 @@
             android:textColor="@color/dialog_fore"
             android:background="@color/dialog_back"
 			/>
-
 		<Button
 			android:id="@+id/ok"
 			android:layout_width="wrap_content"
