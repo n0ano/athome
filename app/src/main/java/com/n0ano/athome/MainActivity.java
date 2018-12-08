@@ -61,6 +61,7 @@ int degree = 0;
 int debug = 0;
 
 public String x10_url;
+String x10_jwt;
 String x10_battery = "";
 int x10_batt_min;
 int x10_batt_max;
@@ -203,6 +204,7 @@ private void restore_state()
     ecobee_thermos = new String[0];
 
     x10_url = pref.get_string("x10_url", "");
+    x10_jwt = pref.get_string("x10_jwt", "none");
     x10_battery = pref.get_string("x10_battery", "");
     x10_batt_min = pref.get_int("x10_batt_min", Common.BATTERY_LOW);
     x10_batt_max = pref.get_int("x10_batt_max", Common.BATTERY_HIGH);

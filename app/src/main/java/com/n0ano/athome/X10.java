@@ -56,7 +56,7 @@ public X10(final MainActivity act)
         public void run() {
             final String resp = act.call_api("GET",
                                        act.x10_url + X10_API,
-                                       X10_LIST,
+                                       X10_LIST + "&token=" + act.x10_jwt,
                                        "");
             act.runOnUiThread(new Runnable() {
                 public void run() {
@@ -128,10 +128,12 @@ private void do_control(final X10Device dev, boolean state)
     final String onoff = state ? "on" : "off";
     new Thread(new Runnable() {
         public void run() {
-            act.call_api("GET",
-                         act.x10_url + X10_API,
-                         X10_SET + "&code=" + dev.get_code() + "&state=" + onoff,
-                         "");
+            String resp = act.call_api("GET",
+                                       act.x10_url + X10_API,
+                                       X10_SET + "&code=" + dev.get_code() +
+                                                 "&state=" + onoff +
+                                                 "&token=" + act.x10_jwt,
+                                       "");
         }
     }).start();
            

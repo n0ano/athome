@@ -295,6 +295,9 @@ private void x10_dialog()
     final EditText et = (EditText) dialog.findViewById(R.id.x10_url);
     et.setText(act.x10_url);
 
+    final EditText jt = (EditText) dialog.findViewById(R.id.x10_jwt);
+    jt.setText(act.x10_jwt);
+
     int max_dev = act.x10.x10_adapter.getCount();
     String[] names = new String[max_dev + 1];
     names[0] = "- none -";
@@ -331,6 +334,8 @@ private void x10_dialog()
         public void onClick(View v) {
             act.x10_url = et.getText().toString();
             pref.put_string("x10_url", act.x10_url);
+            act.x10_jwt = jt.getText().toString();
+            pref.put_string("x10_jwt", act.x10_jwt);
             if (act.x10_position <= 0)
                 act.x10_battery = "";
             else
