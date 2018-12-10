@@ -52,6 +52,12 @@ public X10(final MainActivity act)
 	this.act = act;
 
     x10_adapter = new X10Adapter(act);
+    startup();
+}
+
+public void startup()
+{
+
     new Thread(new Runnable() {
         public void run() {
             final String resp = act.call_api("GET",
@@ -74,14 +80,14 @@ private void init_data(String resp)
 
     x10_adapter.clear();
     String hcode = act.parse.json_get("code", resp, 1);
-    if (hcode == null)
-        return;
-    i = 0;
-    while ((name = act.parse.json_get("name", resp, ++i)) != null) {
-        x10_adapter.add_device(i - 1,
-                               new X10Device(name,
-                                             hcode + i,
-                                             View.inflate(act, R.layout.x10_outlet, null)));
+    if (hcode != null) {
+        i = 0;
+        while ((name = act.parse.json_get("name", resp, ++i)) != null) {
+            x10_adapter.add_device(i - 1,
+                                   new X10Device(name,
+                                                 hcode + i,
+                                                 View.inflate(act, R.layout.x10_outlet, null)));
+        }
     }
     set_power(act.x10_battery);
     TableLayout tl = (TableLayout) act.findViewById(R.id.x10_table);

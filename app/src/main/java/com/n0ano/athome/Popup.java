@@ -1,46 +1,23 @@
 package com.n0ano.athome;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Point;
 import android.net.Uri;
-import android.os.BatteryManager;
-import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
 import com.n0ano.athome.Version;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class Popup extends MainActivity
 {
@@ -347,6 +324,7 @@ private void x10_dialog()
             act.x10_batt_max = Integer.parseInt(max.getText().toString());
             pref.put_int("x10_batt_max", act.x10_batt_max);
             dialog.dismiss();
+            act.x10.startup();
         }
     });
 }
