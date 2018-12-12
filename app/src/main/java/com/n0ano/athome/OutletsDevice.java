@@ -23,8 +23,14 @@ import java.util.Set;
 //
 public class OutletsDevice {
 
+final static int TYPE_X10 =     0;
+final static int TYPE_TPLINK =  1;
+
 private String name;
+private int type;
+private int index;
 private String code;
+private String url;
 private boolean state;
 private boolean hold;
 private View view;
@@ -32,11 +38,33 @@ private View view;
 private ImageView icon;
 private TextView tv_name;
 
-public OutletsDevice(String name, String code, View view)
+public OutletsDevice(String name, int id, String code, View view)
 {
 
+Log.d("device " + name + " = " + code + id);
     this.name = name;
+    this.type = TYPE_X10;
+    this.index = id;
     this.code = code;
+    this.url = null;
+    this.view = view;
+    icon = view.findViewById(R.id.outlet);
+    tv_name = view.findViewById(R.id.outlet_name);
+    tv_name.setText(name);
+
+    this.state = false;
+    this.hold = false;
+}
+
+public OutletsDevice(String name, String code, String url, View view)
+{
+
+Log.d("device " + name + " = " + code);
+    this.name = name;
+    this.type = TYPE_TPLINK;
+    this.index = 0;
+    this.code = code;
+    this.url = url;
     this.view = view;
     icon = view.findViewById(R.id.outlet);
     tv_name = view.findViewById(R.id.outlet_name);
@@ -52,10 +80,22 @@ public String get_name()
     return name;
 }
 
-public void set_name(String name)
+public int get_type()
 {
 
-    this.name = name;
+    return this.type;
+}
+
+public int get_index()
+{
+
+    return index;
+}
+
+public void set_index(int index)
+{
+
+    this.index = index;
 }
 
 public String get_code()
@@ -64,10 +104,10 @@ public String get_code()
     return code;
 }
 
-public void set_code(String code)
+public String get_url()
 {
 
-    this.code = code;
+    return this.url;
 }
 
 public View get_view()
@@ -105,7 +145,7 @@ public void set_state(final boolean state, MainActivity act)
     final int draw;
 
     this.state = state;
-Log.d(name + " set state to " + (state ? "on, " : "off, ") + (hold ? "holding" : "normal"));
+//Log.d(name + "(" + code + index + ") set state to " + (state ? "on, " : "off, ") + (hold ? "holding" : "normal"));
     if (hold)
         draw = state ? R.drawable.outlet_on_red : R.drawable.outlet_off_red;
     else

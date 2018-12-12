@@ -87,7 +87,8 @@ public void update()
         String resp = act.call_api("GET",
                                    act.egauge_url + EGAUGE_API,
                                    EGAUGE_QUERY,
-                                   "");
+                                   "",
+                                   null);
         use_watt = get_value("use", resp);
         gen_watt = get_value("gen", resp);
         period = 1;

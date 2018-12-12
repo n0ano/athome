@@ -22,9 +22,13 @@ import com.n0ano.athome.Version;
 public class Popup extends MainActivity
 {
 
+public final static String ECOBEE_REAUTH = "https://www.ecobee.com";
+
 MainActivity act;
 
 private int ecobee_swhich;
+
+private int batt_pos;
 
 Preferences pref;
 
@@ -140,7 +144,7 @@ private void ecobee_how()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Common.ECOBEE_REAUTH));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(ECOBEE_REAUTH));
             startActivity(intent);
             dialog.dismiss();
         }
@@ -266,24 +270,30 @@ private void ecobee_dialog()
 private void outlets_dialog()
 {
     int i;
+    String name, pname;
 
     final Dialog dialog = start_dialog(R.layout.bar_outlets);
 
     int max_dev = act.outlets.outlets_adapter.getCount();
     String[] names = new String[max_dev + 1];
     names[0] = "- none -";
-    for (i = 0; i < max_dev; i++)
-        names[i + 1] = act.outlets.outlets_adapter.getItem(i).get_name();
+    batt_pos = 0;
+    pname = act.outlets_battery;
+    for (i = 0; i < max_dev; i++) {
+        name = act.outlets.outlets_adapter.getItem(i).get_name();
+        names[i + 1] = name;
+        if (name.equals(pname))
+            batt_pos = i + 1;
+    }
     final Spinner sv = (Spinner) dialog.findViewById(R.id.outlets_battery);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, names);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     sv.setAdapter(adapter);
-    act.outlets_position = 0;
-    sv.setSelection(act.outlets.outlets_power + 1);
+    sv.setSelection(batt_pos);
     sv.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            act.outlets_position = position;
+            batt_pos = position;
         }
         
         @Override
@@ -319,10 +329,10 @@ private void outlets_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (act.outlets_position <= 0)
+            if (batt_pos <= 0)
                 act.outlets_battery = "";
             else
-                act.outlets_battery = act.outlets.outlets_adapter.getItem(act.outlets_position - 1).get_name();
+                act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
             pref.put_string("outlets_battery", act.outlets_battery);
             act.outlets_batt_min = Integer.parseInt(min.getText().toString());
@@ -366,10 +376,20 @@ private void tplink_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_tplink);
 
+    final EditText ut = (EditText) dialog.findViewById(R.id.tplink_user);
+    ut.setText(act.tplink_user);
+
+    final EditText pt = (EditText) dialog.findViewById(R.id.tplink_pwd);
+    pt.setText(act.tplink_pwd);
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            act.tplink_user = ut.getText().toString();
+            pref.put_string("tplink_user", act.tplink_user);
+            act.tplink_pwd = pt.getText().toString();
+            pref.put_string("tplink_pwd", act.tplink_pwd);
             dialog.dismiss();
             act.outlets.startup();
         }

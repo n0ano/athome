@@ -37,12 +37,18 @@ import com.n0ano.athome.Log;
 import com.n0ano.athome.Version;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
 {
+
+public final static int BATTERY_LOW  = 20;
+public final static int BATTERY_HIGH = 90;
 
 public String egauge_url;
 
@@ -60,14 +66,16 @@ private String url;
 int degree = 0;
 int debug = 0;
 
-public String x10_url;
+String x10_url;
 String x10_jwt;
+
+String tplink_user;
+String tplink_pwd;
 
 String outlets_battery = "";
 int outlets_batt_min;
 int outlets_batt_max;
 int outlets_batt_level;
-int outlets_position;
 
 Weather weather;
 Egauge egauge;
@@ -205,12 +213,15 @@ private void restore_state()
     ecobee_thermos = new String[0];
 
     outlets_battery = pref.get_string("outlets_battery", "");
-    outlets_batt_min = pref.get_int("outlets_batt_min", Common.BATTERY_LOW);
-    outlets_batt_max = pref.get_int("outlets_batt_max", Common.BATTERY_HIGH);
+    outlets_batt_min = pref.get_int("outlets_batt_min", BATTERY_LOW);
+    outlets_batt_max = pref.get_int("outlets_batt_max", BATTERY_HIGH);
     outlets_batt_level = pref.get_int("outlets_batt_level", 0);
 
     x10_url = pref.get_string("x10_url", "");
     x10_jwt = pref.get_string("x10_jwt", "none");
+
+    tplink_user = pref.get_string("tplink_user", "");
+    tplink_pwd = pref.get_string("tplink_pwd", "");
 
     debug = pref.get_int("debug", 0);
 }
@@ -278,13 +289,13 @@ private void test_parse()
  *      of data you might be better off using the open_url/read_url/close_url
  *      interface available right below this one.
  */
-public String call_api(String type, String uri, String params, String auth)
+public String call_api(String type, String uri, String params, String auth, String body)
 {
     HttpURLConnection con = null;
     String res = "";
 
     if (debug > 0)
-        Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth);
+        Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body);
     if (!params.equals(""))
         uri = uri + "?" + params;
     try {
@@ -294,6 +305,15 @@ public String call_api(String type, String uri, String params, String auth)
             con.setDoOutput(true);
         if (!auth.equals(""))
             con.setRequestProperty("Authorization", auth);
+        if (body != null) {
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setDoInput(true);
+            OutputStream os = con.getOutputStream();
+            BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            wr.write(body);
+            wr.flush();
+            wr.close();
+        }
         InputStreamReader in = new InputStreamReader(con.getInputStream());
         BufferedReader inp = new BufferedReader (in);
         StringBuilder response = new StringBuilder();

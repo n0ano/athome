@@ -169,7 +169,8 @@ private void get_wunder()
     String resp = act.call_api("GET",
                                WUNDER_URL + WUNDER_API,
                                WUNDER_STATION + act.wunder_id + WUNDER_QUERY,
-                               "");
+                               "",
+                               null);
 //Log.d("under:" + resp);
     if (resp.isEmpty() || resp.contains("<conds></conds>"))
         Log.d("get_wunder: no data for station " + act.wunder_id);
@@ -190,7 +191,8 @@ public String ecobee_get_pin(String api)
                                ECO_URL + ECO_AUTHORIZE,
                                "response_type=ecobeePin&client_id=" + api +
                                    "&scope=smartWrite",
-                               "");
+                               "",
+                               null);
     ecobee_auth_token = act.parse.json_get("code", resp, 1);
     String pin = act.parse.json_get("ecobeePin", resp, 1);
 Log.d("ecobee get pin for api - " + api + " = " + pin + "/" + ecobee_auth_token);
@@ -207,7 +209,8 @@ private void ecobee_token(String type, String code, String api)
                         "grant_type=" + type +
                             "&code=" + code +
                             "&client_id=" + api,
-                        "");
+                        "",
+                        null);
     if ((token = act.parse.json_get("access_token", resp, 1)) == null)
         return;
     act.ecobee_access = act.parse.json_get("access_token", resp, 1);
@@ -245,7 +248,8 @@ private String ecobee_query()
     resp = act.call_api("GET",
                                ECO_URL + ECO_DATA,
                                ECO_QUERY,
-                               "Bearer " + act.ecobee_access);
+                               "Bearer " + act.ecobee_access,
+                               null);
     String code = act.parse.json_get("code", resp, 1);
     if (code == null || !code.equals("0"))
         return null;
