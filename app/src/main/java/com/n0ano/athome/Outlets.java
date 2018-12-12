@@ -24,7 +24,7 @@ import java.util.Set;
 //
 // Class to handle weather data
 //
-public class X10 {
+public class Outlets {
 
 final static int MAX_DEVICES = 17;
 
@@ -37,22 +37,49 @@ final static String X10_STATE_MAP = " \"state\":\"";
 
 MainActivity act;
 
-int x10_power = -1;
+int outlets_power = -1;
 String state_map = "0000000000000000";
 
-X10Adapter x10_adapter;
+OutletsAdapter outlets_adapter;
 
-// X10: class constructor
+// Outlets: class constructor
 //
 //   act - activity that instantiated the class
 //
-public X10(final MainActivity act)
+public Outlets(final MainActivity act)
 {
 
 	this.act = act;
 
-    x10_adapter = new X10Adapter(act);
+    outlets_adapter = new OutletsAdapter(act);
     startup();
+}
+
+private void get_x10_devices()
+{
+    int i, idx;
+    String name;
+
+    final String resp = act.call_api("GET",
+                               act.x10_url + X10_API,
+                               X10_LIST + "&token=" + act.x10_jwt,
+                               "");
+
+    String hcode = act.parse.json_get("code", resp, 1);
+    if (hcode != null) {
+        i = 0;
+        while ((name = act.parse.json_get("name", resp, ++i)) != null) {
+            if (!name.isEmpty())
+                outlets_adapter.add_device(new OutletsDevice(name,
+                                                             hcode + i,
+                                                             View.inflate(act, R.layout.outlet, null)));
+        }
+    }
+}
+
+private void get_tplink_devices()
+{
+
 }
 
 public void startup()
@@ -60,45 +87,35 @@ public void startup()
 
     new Thread(new Runnable() {
         public void run() {
-            final String resp = act.call_api("GET",
-                                       act.x10_url + X10_API,
-                                       X10_LIST + "&token=" + act.x10_jwt,
-                                       "");
+            outlets_adapter.clear();
+
+            get_x10_devices();
+
+            get_tplink_devices();
+
             act.runOnUiThread(new Runnable() {
                 public void run() {
-                    init_data(resp);
+                    init_view();
                 }
             });
         }
     }).start();
 }
 
-private void init_data(String resp)
+private void init_view()
 {
     int i;
-    String name;
 
-    x10_adapter.clear();
-    String hcode = act.parse.json_get("code", resp, 1);
-    if (hcode != null) {
-        i = 0;
-        while ((name = act.parse.json_get("name", resp, ++i)) != null) {
-            x10_adapter.add_device(i - 1,
-                                   new X10Device(name,
-                                                 hcode + i,
-                                                 View.inflate(act, R.layout.x10_outlet, null)));
-        }
-    }
-    set_power(act.x10_battery);
-    TableLayout tl = (TableLayout) act.findViewById(R.id.x10_table);
+    set_power(act.outlets_battery);
+    TableLayout tl = (TableLayout) act.findViewById(R.id.outlets_table);
     tl.removeAllViews();
     TableRow tr = null;
     TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
     params.setMargins(0, 40, 0, 0); /* left, top, right, bottom */
     int row = 3;
-    int max_devices = x10_adapter.getCount();
+    int max_devices = outlets_adapter.getCount();
     for (i = 0; i < max_devices; i++) {
-        X10Device dev = x10_adapter.getItem(i);
+        OutletsDevice dev = outlets_adapter.getItem(i);
         if (++row > 3) {
             row = 1;
             if (tr != null)
@@ -114,7 +131,7 @@ private void init_data(String resp)
         });
         v.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
-                X10Device dev = (X10Device) v.getTag();
+                OutletsDevice dev = (OutletsDevice) v.getTag();
                 dev.set_hold(!dev.get_hold());
                 dev.set_state(dev.get_state(), act);
                 return true;
@@ -127,7 +144,7 @@ private void init_data(String resp)
 
 }
 
-private void do_control(final X10Device dev, boolean state)
+private void do_control(final OutletsDevice dev, boolean state)
 {
 
     dev.set_state(state, act);
@@ -148,21 +165,21 @@ private void do_control(final X10Device dev, boolean state)
 private void go_control(View v)
 {
 
-    X10Device dev = (X10Device) v.getTag();
+    OutletsDevice dev = (OutletsDevice) v.getTag();
     do_control(dev, dev.get_state() ? false : true);
 }
 
 public void set_power(String name)
 {
 
-    x10_power = -1;
+    outlets_power = -1;
     if (name.isEmpty())
         return;
 
-    int max = x10_adapter.getCount();
+    int max = outlets_adapter.getCount();
     for (int i = 0; i < max; i++)
-        if (x10_adapter.getItem(i).get_name().equals(name)) {
-            x10_power = i;
+        if (outlets_adapter.getItem(i).get_name().equals(name)) {
+            outlets_power = i;
             return;
         }
 }
@@ -170,18 +187,18 @@ public void set_power(String name)
 public void set_power(int i)
 {
 
-    x10_power = i;
-    act.x10_battery = x10_adapter.getItem(i).get_name();
+    outlets_power = i;
+    act.outlets_battery = outlets_adapter.getItem(i).get_name();
     return;
 }
 
 public void power(boolean state)
 {
 
-    if (x10_power < 0)
+    if (outlets_power < 0)
         return;
 
-    X10Device dev = x10_adapter.getItem(x10_power);
+    OutletsDevice dev = outlets_adapter.getItem(outlets_power);
     if (!dev.get_hold())
         if (dev.get_state() != state)
             do_control(dev, state);
@@ -190,14 +207,14 @@ public void power(boolean state)
 private void battery(String map)
 {
 
-    if (x10_power < 0)
+    if (outlets_power < 0)
         return;
 
-    boolean state = get_state(x10_power, map);
+    boolean state = get_state(outlets_power, map);
     int chg = act.get_battery();
-    if (chg < act.x10_batt_min && !state)
+    if (chg < act.outlets_batt_min && !state)
         power(true);
-    else if (chg > act.x10_batt_max && state)
+    else if (chg > act.outlets_batt_max && state)
         power(false);
 }
 
@@ -214,10 +231,10 @@ private void on_off(String line)
     boolean now;
 
     if (!line.equals(state_map)) {
-        int max_devices = x10_adapter.getCount();
+        int max_devices = outlets_adapter.getCount();
         if (!line.isEmpty()) {
             for (i = 0; i < max_devices; i++) {
-                X10Device dev = x10_adapter.getItem(i);
+                OutletsDevice dev = outlets_adapter.getItem(i);
                 then = get_state(i, state_map);
                 now = get_state(i, line);
                 if ((then != now) && (dev.get_state() != now))
@@ -229,7 +246,7 @@ private void on_off(String line)
     battery(state_map);
 }
 
-public void update()
+private void x10_update()
 {
 
     //
@@ -244,6 +261,19 @@ public void update()
         Log.d("X10 bad data: " + l + " => " + resp);
     else
         on_off(l);
+}
+
+private void tplink_update()
+{
+
+}
+
+public void update()
+{
+
+    x10_update();
+
+    tplink_update();
 }
 
 }

@@ -24,36 +24,35 @@ import java.util.Set;
 
 // Created by n0ano on 10/10/16.
 //
-public class X10Adapter extends ArrayAdapter<X10Device> {
+public class OutletsAdapter extends ArrayAdapter<OutletsDevice> {
 
 MainActivity act;
 
 int max;
-ArrayList<X10Device> devices;
+ArrayList<OutletsDevice> devices;
 
-public X10Adapter(MainActivity act)
+public OutletsAdapter(MainActivity act)
 {
 
     super(act, 0);
 
     this.act = act;
 
-    devices = new ArrayList<X10Device>();
+    devices = new ArrayList<OutletsDevice>();
     max = 0;
 }
 
-void add_device(int idx, X10Device dev)
+void add_device(OutletsDevice dev)
 {
 
-    devices.add(idx, dev);
-    ++max;
+    devices.add(max++, dev);
 }
 
 @Override
 public void clear()
 {
 
-    devices = new ArrayList<X10Device>();
+    devices = new ArrayList<OutletsDevice>();
     max = 0;
 }
 
@@ -65,7 +64,7 @@ public int getCount()
 }
 
 @Override
-public X10Device getItem(int idx)
+public OutletsDevice getItem(int idx)
 {
 
     return devices.get(idx);

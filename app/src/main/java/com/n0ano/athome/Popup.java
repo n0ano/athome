@@ -52,8 +52,8 @@ public boolean menu_click(int item)
         ecobee_dialog();
         return true;
 
-    case R.id.action_x10:
-        x10_dialog();
+    case R.id.action_outlets:
+        outlets_dialog();
         return true;
 
     case R.id.action_developer:
@@ -263,6 +263,77 @@ private void ecobee_dialog()
     });
 }
 
+private void outlets_dialog()
+{
+    int i;
+
+    final Dialog dialog = start_dialog(R.layout.bar_outlets);
+
+    int max_dev = act.outlets.outlets_adapter.getCount();
+    String[] names = new String[max_dev + 1];
+    names[0] = "- none -";
+    for (i = 0; i < max_dev; i++)
+        names[i + 1] = act.outlets.outlets_adapter.getItem(i).get_name();
+    final Spinner sv = (Spinner) dialog.findViewById(R.id.outlets_battery);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, names);
+    adapter.setDropDownViewResource(R.layout.text_spinner);
+    sv.setAdapter(adapter);
+    act.outlets_position = 0;
+    sv.setSelection(act.outlets.outlets_power + 1);
+    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            act.outlets_position = position;
+        }
+        
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // TODO Auto-generated method stub
+        }
+
+    });
+
+    final TextView min = (TextView) dialog.findViewById(R.id.outlets_batt_min);
+    min.setText(Integer.toString(act.outlets_batt_min));
+
+    final TextView max = (TextView) dialog.findViewById(R.id.outlets_batt_max);
+    max.setText(Integer.toString(act.outlets_batt_max));
+
+    Button bv_how = (Button) dialog.findViewById(R.id.outlets_x10);
+    bv_how.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            x10_dialog();
+        }
+    });
+
+    Button bv_auth = (Button) dialog.findViewById(R.id.outlets_tplink);
+    bv_auth.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            tplink_dialog();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (act.outlets_position <= 0)
+                act.outlets_battery = "";
+            else
+                act.outlets_battery = act.outlets.outlets_adapter.getItem(act.outlets_position - 1).get_name();
+            act.outlets.set_power(outlets_battery);
+            pref.put_string("outlets_battery", act.outlets_battery);
+            act.outlets_batt_min = Integer.parseInt(min.getText().toString());
+            pref.put_int("outlets_batt_min", act.outlets_batt_min);
+            act.outlets_batt_max = Integer.parseInt(max.getText().toString());
+            pref.put_int("outlets_batt_max", act.outlets_batt_max);
+            dialog.dismiss();
+        }
+    });
+}
+
 private void x10_dialog()
 {
     int i;
@@ -275,36 +346,6 @@ private void x10_dialog()
     final EditText jt = (EditText) dialog.findViewById(R.id.x10_jwt);
     jt.setText(act.x10_jwt);
 
-    int max_dev = act.x10.x10_adapter.getCount();
-    String[] names = new String[max_dev + 1];
-    names[0] = "- none -";
-    for (i = 0; i < max_dev; i++)
-        names[i + 1] = act.x10.x10_adapter.getItem(i).get_name();
-    final Spinner sv = (Spinner) dialog.findViewById(R.id.x10_battery);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, names);
-    adapter.setDropDownViewResource(R.layout.text_spinner);
-    sv.setAdapter(adapter);
-    act.x10_position = 0;
-    sv.setSelection(act.x10.x10_power + 1);
-    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            act.x10_position = position;
-        }
-        
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            // TODO Auto-generated method stub
-        }
-
-    });
-
-    final TextView min = (TextView) dialog.findViewById(R.id.x10_batt_min);
-    min.setText(Integer.toString(act.x10_batt_min));
-
-    final TextView max = (TextView) dialog.findViewById(R.id.x10_batt_max);
-    max.setText(Integer.toString(act.x10_batt_max));
-
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
@@ -313,18 +354,24 @@ private void x10_dialog()
             pref.put_string("x10_url", act.x10_url);
             act.x10_jwt = jt.getText().toString();
             pref.put_string("x10_jwt", act.x10_jwt);
-            if (act.x10_position <= 0)
-                act.x10_battery = "";
-            else
-                act.x10_battery = act.x10.x10_adapter.getItem(act.x10_position - 1).get_name();
-            act.x10.set_power(x10_battery);
-            pref.put_string("x10_battery", act.x10_battery);
-            act.x10_batt_min = Integer.parseInt(min.getText().toString());
-            pref.put_int("x10_batt_min", act.x10_batt_min);
-            act.x10_batt_max = Integer.parseInt(max.getText().toString());
-            pref.put_int("x10_batt_max", act.x10_batt_max);
             dialog.dismiss();
-            act.x10.startup();
+            act.outlets.startup();
+        }
+    });
+}
+
+private void tplink_dialog()
+{
+    int i;
+
+    final Dialog dialog = start_dialog(R.layout.bar_tplink);
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+            act.outlets.startup();
         }
     });
 }
@@ -337,8 +384,8 @@ private void developer_dialog()
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.about_debug);
     cb.setChecked(act.debug != 0);
 
-    final TextView level = (TextView) dialog.findViewById(R.id.x10_batt_level);
-    level.setText(Integer.toString(act.x10_batt_level));
+    final TextView level = (TextView) dialog.findViewById(R.id.outlets_batt_level);
+    level.setText(Integer.toString(act.outlets_batt_level));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
@@ -346,7 +393,7 @@ private void developer_dialog()
         public void onClick(View v) {
             act.debug = (cb.isChecked() ? 1 : 0);
             pref.put_int("debug", act.debug);
-            act.x10_batt_level = Integer.parseInt(level.getText().toString());
+            act.outlets_batt_level = Integer.parseInt(level.getText().toString());
             dialog.dismiss();
         }
     });

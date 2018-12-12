@@ -4,34 +4,20 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Developer"
-        android:textSize="20dp"
-        android:paddingTop="10dp"
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-        android:textColor="@color/dialog_fore" />
+        android:paddingBottom="10dp" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
-
-        <CheckBox
-            android:id="@+id/about_debug"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text=" Debugging prints"
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="TP-LINK"
+            android:textSize="20dp"
             android:textColor="@color/dialog_fore" />
 
         </LinearLayout>
@@ -42,27 +28,27 @@
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+        android:paddingRight="10dp"
+		>
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
-			android:text="Battery level%: "
-            android:textColor="@color/dialog_fore" />
-			android:layout_height="wrap_content" />
+			android:text="Server: "
+            android:textColor="@color/dialog_fore"
+			/>
 		<EditText
-			android:id="@+id/outlets_batt_level"
-			android:layout_width="wrap_content"
+			android:id="@+id/tplink_url"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text=""
-            android:hint="    "
-            android:inputType="number"
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
 			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor" />
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
 
 		</LinearLayout>
 
@@ -91,6 +77,6 @@
             android:textColor="@color/dialog_fore"
             android:background="@color/dialog_back" />
 
-    </LinearLayout>
+		</LinearLayout>
 
 </LinearLayout>

@@ -22,9 +22,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_x10"
+        android:id="@+id/action_outlets"
         android:orderInCategory="100"
-        android:title="X10"
+        android:title="Outlets"
         app:showAsAction="never" />
 
     <item

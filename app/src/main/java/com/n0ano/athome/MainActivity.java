@@ -62,15 +62,16 @@ int debug = 0;
 
 public String x10_url;
 String x10_jwt;
-String x10_battery = "";
-int x10_batt_min;
-int x10_batt_max;
-int x10_batt_level;
-int x10_position;
+
+String outlets_battery = "";
+int outlets_batt_min;
+int outlets_batt_max;
+int outlets_batt_level;
+int outlets_position;
 
 Weather weather;
 Egauge egauge;
-X10 x10;
+Outlets outlets;
 
 boolean running;
 
@@ -203,12 +204,13 @@ private void restore_state()
     ecobee_name = pref.get_string("ecobee_name", "");
     ecobee_thermos = new String[0];
 
+    outlets_battery = pref.get_string("outlets_battery", "");
+    outlets_batt_min = pref.get_int("outlets_batt_min", Common.BATTERY_LOW);
+    outlets_batt_max = pref.get_int("outlets_batt_max", Common.BATTERY_HIGH);
+    outlets_batt_level = pref.get_int("outlets_batt_level", 0);
+
     x10_url = pref.get_string("x10_url", "");
     x10_jwt = pref.get_string("x10_jwt", "none");
-    x10_battery = pref.get_string("x10_battery", "");
-    x10_batt_min = pref.get_int("x10_batt_min", Common.BATTERY_LOW);
-    x10_batt_max = pref.get_int("x10_batt_max", Common.BATTERY_HIGH);
-    x10_batt_level = pref.get_int("x10_batt_level", 0);
 
     debug = pref.get_int("debug", 0);
 }
@@ -409,8 +411,8 @@ public int get_battery()
 {
     String chg;
 
-    if (x10_batt_level != 0)
-        return x10_batt_level;
+    if (outlets_batt_level != 0)
+        return outlets_batt_level;
 
     IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     Intent bs = this.registerReceiver(null, ifilter);
@@ -441,8 +443,8 @@ private void doit()
     final Egauge egauge = new Egauge( this);
     this.egauge = egauge;
 
-    final X10 x10 = new X10(this);
-    this.x10 = x10;
+    final Outlets outlets = new Outlets(this);
+    this.outlets = outlets;
 
     this.running = true;
 
@@ -456,8 +458,8 @@ private void doit()
                 if (egauge != null)
                     egauge.update();
 
-                if (x10 != null)
-                    x10.update();
+                if (outlets != null)
+                    outlets.update();
 
                 SystemClock.sleep(1000);
             }

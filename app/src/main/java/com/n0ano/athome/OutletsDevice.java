@@ -21,7 +21,7 @@ import java.util.Set;
 //
 // Class to handle weather data
 //
-public class X10Device {
+public class OutletsDevice {
 
 private String name;
 private String code;
@@ -32,7 +32,7 @@ private View view;
 private ImageView icon;
 private TextView tv_name;
 
-public X10Device(String name, String code, View view)
+public OutletsDevice(String name, String code, View view)
 {
 
     this.name = name;

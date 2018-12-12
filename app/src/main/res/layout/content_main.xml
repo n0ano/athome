@@ -27,7 +27,7 @@
 
             <include layout="@layout/weather" />
 
-            <include layout="@layout/x10" />
+            <include layout="@layout/outlets_table" />
 
             </LinearLayout>
 

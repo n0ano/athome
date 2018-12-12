@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/x10_main"
+    android:id="@+id/outlets_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -10,7 +10,7 @@
     tools:showIn="@layout/content_main">
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/x10_table"
+        android:id="@+id/outlets_table"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:stretchColumns="*" >
