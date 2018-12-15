@@ -81,14 +81,6 @@ public int json_get_next(String search, int start, String resp)
     Char ch = new Char(resp, start + 1);
     while ((c = ch.peek()) == ' ' || c == '\t' || c == '\n')
         c = ch.next();
-    if (c == '"') {
-        while ((c = ch.next()) != '"')
-            ;
-    } else {
-        while (number(c))
-            c = ch.next();
-        ch.prior();
-    }
     return ch.index();
 }
 
@@ -108,23 +100,70 @@ private boolean number(int c)
     }
 }
 
-private String json_backup(int end, String resp)
+private int json_span(int start, Char ch)
 {
+    int c;
 
-    int start = end;
-    if (resp.charAt(start) == '"') {
-        while (resp.charAt(--start) != '"')
-            ;
-    } else {
-        while (number(resp.charAt(start)))
-            --start;
+    while ((c = ch.peek()) != start)
+        ch.next();
+    return ch.index();
+}
+
+public String json_list(String resp, int idx)
+{
+    String r;
+    int c;
+    int start;
+
+    Char ch = new Char(resp, 0);
+    while (--idx > 0) {
+        while ((c = ch.next()) != ',')
+            if (c == Char.EOF)
+                return null;
     }
-    return resp.substring(start + 1, end);
+    while (ch.peek() != '"')
+        if ((c = ch.next()) == Char.EOF)
+            return null;
+    ch.next();
+    start = ch.index();
+    r = resp.substring(start, json_span('"', ch));
+    return r;
+}
+
+private String json_object(int start, String resp)
+{
+    int c;
+    int end;
+
+    Char ch = new Char(resp, start);
+    switch (ch.peek()) {
+
+    case '[':
+        ch.next();
+        start = ch.index();
+        end = json_span(']', ch);
+        break;
+
+    case '"':
+        ch.next();
+        start = ch.index();
+        end = json_span('"', ch);
+        break;
+
+    default:
+        while ((c = ch.next()) >= '0' && c <= '9')
+            ;
+        end = ch.index();
+        break;
+
+    }
+    return resp.substring(start, end);
 }
 
 public String json_get(String name, String resp, int which)
 {
-    int end = 0;
+    String r;
+    int start = 0;
     int precision = 0;
 
     if (name.charAt(0) == '%') {
@@ -133,11 +172,12 @@ public String json_get(String name, String resp, int which)
     }
     String search = "\"" + name + "\"";
     while (which-- > 0) {
-        end = json_get_next(search, end, resp);
-        if (end < 0)
+        start = json_get_next(search, start, resp);
+        if (start < 0)
             return null;
     }
-    return stoi(precision, json_backup(end, resp));
+    r = stoi(precision, json_object(start, resp));
+    return r;
 }
 
 public String json_get(String name, String resp)

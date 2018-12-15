@@ -47,7 +47,6 @@ MainActivity act;
 private int period = PERIOD;        // Weather only changes once a minute
 
 private static int ecobee_thermos_checked;
-private String ecobee_auth_token = "";
 
 Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_wunder = new HashMap<String, String>();
@@ -193,9 +192,11 @@ public String ecobee_get_pin(String api)
                                    "&scope=smartWrite",
                                "",
                                null);
-    ecobee_auth_token = act.parse.json_get("code", resp, 1);
+    act.ecobee_access = act.parse.json_get("code", resp, 1);
+    Preferences pref = new Preferences(act);
+    pref.put_string("ecobee_access", act.ecobee_access);
     String pin = act.parse.json_get("ecobeePin", resp, 1);
-Log.d("ecobee get pin for api - " + api + " = " + pin + "/" + ecobee_auth_token);
+Log.d("ecobee get pin for api - " + api + " = " + pin + "/" + act.ecobee_access);
     return pin;
 }
 
@@ -232,7 +233,7 @@ Log.d("ecoBee tokens access/refresh - " + act.ecobee_access + "/" + act.ecobee_r
 public void ecobee_authorize(String api)
 {
 
-    ecobee_token("ecobeePin", ecobee_auth_token, api);
+    ecobee_token("ecobeePin", act.ecobee_access, api);
 }
 
 private void ecobee_refresh()

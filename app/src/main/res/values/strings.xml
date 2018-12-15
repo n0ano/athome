@@ -34,32 +34,19 @@ button on this page
 the authorizion process can
 proceed as follows:
 <p>-
-Pressing the <b>Start</b>
-button will spawn a browser that
+A web browser is spawned that
 goes to the ecoBee web portal.
-<p>-
-Login to the portal with your
-ecobee account info
-(create a new account
-if you don&quot;t have one).
-<p>-
-Follow the instructions on
-the <b>Developer</b> section
-to create a new <i>app</i>.
-<p>-
-The new app page will create a new
-<b>API Key</b>.
-<p>-
-Copy that API key to the Android
-clip board so you can paste it
-into the AtHome app.
+Login to the portal,
+create a new <i>app</i>,
+and copy the new <b>API Key</b>
+for that app to the clipboard.
 <p>-
 Swith back to the AtHome app and
 paste the API key into the <b>ecoBee</b>
 popup
 (you could manually type the key in
 but it&quot;s long, random, and mistake
-prone - cut/paste is a lot
+prone - copy/paste is a lot
 easier).
 <p>-
 Press the <b>CREATE PIN</b> button.
@@ -70,14 +57,11 @@ next step.
 <p>-
 Switch back to the browser and
 go to the <b>My Apps</b> section.
-<p>-
 Select the application you created
 and press the <b>Add Application</b> button.
-<p>-
 In the new window enter the 4 digit
 PIN that you got earlier and select
 the <b>Validate</b> button.
-<p>-
 The window will change and you can
 finally select the <b>Add Application</b>
 button that replaced the <b>Validate</b>

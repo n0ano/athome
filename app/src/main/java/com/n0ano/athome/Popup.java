@@ -144,8 +144,7 @@ private void ecobee_how()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(ECOBEE_REAUTH));
-            startActivity(intent);
+            act.start_browser(ECOBEE_REAUTH);
             dialog.dismiss();
         }
     });
@@ -212,6 +211,8 @@ private void ecobee_dialog()
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, act.ecobee_thermos);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     sv.setAdapter(adapter);
+    if (act.ecobee_thermos.length <= 0)
+        act.ecobee_which = -1;
     ecobee_swhich = act.ecobee_which;
     if (act.ecobee_which >= 0)
         sv.setSelection(ecobee_swhich = act.ecobee_which);

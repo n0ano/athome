@@ -15,7 +15,7 @@
     <color name="back">#000000</color>
     <color name="fore">#ffffff</color>
     <color name="fore_dim">#88ffffff</color>
-    <color name="buttonBack">#444444</color>
+    <color name="buttonBack">#eeeeee</color>
 
     <color name="dialog_back">#cccccc</color>
     <color name="dialog_fore">#000000</color>

@@ -135,15 +135,18 @@
             android:id="@+id/ecobee_how"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="How to authorize"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
+            android:background="@color/buttonBack" />
 
         </LinearLayout>
 
 	<LinearLayout
 		android:gravity="center"
 		android:orientation="horizontal"
+		android:paddingTop="10dp"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content" >
 
@@ -151,9 +154,11 @@
             android:id="@+id/ecobee_dopin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="Create PIN"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
+            android:background="@color/buttonBack" />
 
         </LinearLayout>
 

@@ -118,7 +118,7 @@
             android:paddingRight="10dp"
             android:text="X10 Configuration"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
+            android:background="@color/buttonBack" />
 
         </LinearLayout>
 
@@ -138,7 +138,7 @@
             android:paddingRight="10dp"
             android:text="TP-Link Configuration"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
+            android:background="@color/buttonBack" />
 
         </LinearLayout>
 

@@ -6,9 +6,13 @@ package com.n0ano.athome;
 public class Char
 {
 
+public final static int EOF = 60;
+
 private String line;
 private int idx;
 String ws;
+
+private boolean debug = false;
 
 public Char(String line, int start, String ws)
 {
@@ -45,7 +49,10 @@ public int next()
             ;
         prior();
     }
-    return line.charAt(++idx);
+    if (++idx >= line.length())
+        return EOF;
+if (debug) Log.d("DDD: next(" + idx + ") = " + line.charAt(idx));
+    return line.charAt(idx);
 }
 
 public int prior()
@@ -53,6 +60,7 @@ public int prior()
 
     if (--idx < 0)
         idx = 0;
+if (debug) Log.d("DDD: prior(" + idx + ") = " + line.charAt(idx));
     return line.charAt(idx);
 }
 
@@ -67,6 +75,12 @@ public int index()
 {
 
     return idx;
+}
+
+public void set_debug(boolean state)
+{
+
+    debug = state;
 }
 
 }

@@ -196,6 +196,13 @@ public boolean onOptionsItemSelected(MenuItem item)
     return super.onOptionsItemSelected(item);
 }
 
+public void start_browser(String uri)
+{
+
+    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+    startActivity(intent);
+}
+
 private void restore_state()
 {
 
@@ -255,31 +262,54 @@ private void test_parse()
 "    \"pageSize\": \"1234\"\n" +
 "    \"state\":\"0000000000011001\",\n" +
 "    \"result\":\"OK\"\n" +
+"  },\n" +
+" \"house\":[\n" +
+"  {\n" +
+"   \"code\":\"d\",\n" +
+"   \"devices\":[\n" +
+"     \"Crystal Lamp\",\n" +
+"     \"\",\n" +
+"     \"Patio Lights\",\n" +
+"     \"Patio Fountain\",\n" +
+"     \"AtHome Display\",\n" +
+"     \"Don's Office\",\n" +
+"     \"Office Fountain\",\n" +
+"     \"Office Acquarium\"\n" +
+"   ]\n" +
+"  },\n" +
+"  {\n" +
+"   \"code\":\"e\",\n" +
+"   \"devices\":[\n" +
+"     \"Router\"\n" +
+"   ]\n" +
 "  }\n" +
+" ],\n" +
+" \"result\":\"OK\"\n" +
 "}";
-    Log.d("xml - " + xml);
-    Log.d("json - " + json);
 
-    Log.d("xml xyzzy() = " + parse.xml_get("xyzzy", xml, 1));
-    Log.d("xml page(1:one) = " + parse.xml_get("page", xml));
-    Log.d("xml page(2:two) = " + parse.xml_get("page", xml, 2));
-    Log.d("xml page(3:) = " + parse.xml_get("page", xml, 3));
-    Log.d("xml totalPages(1:10) = " + parse.xml_get("totalPages", xml));
-    Log.d("xml pageSize(1:2) = " + parse.xml_get("pageSize", xml));
-    Log.d("xml pageSize(2:1234) = " + parse.xml_get("pageSize", xml, 2));
-    Log.d("xml max(1:59.0) = " + parse.xml_get("maxtemp", xml, 1));
-    Log.d("xml min(1:39.9) = " + parse.xml_get("mintemp", xml, 1));
-    Log.d("xml max_time(1:06:15PM) = " + parse.xml_get("maxtemp_time", xml, 1));
-    Log.d("xml min_time(1:02:35PM) = " + parse.xml_get("mintemp_time", xml, 1));
+    Log.d("Parsing test start");
+    Log.d("xml - \n" + xml);
+    Log.d("json - \n" + json);
 
-    Log.d("json xyzzy() = " + parse.json_get("xyzzy", json, 1));
-    Log.d("json page(1:one) = " + parse.json_get("page", json));
-    Log.d("json page(2:two) = " + parse.json_get("page", json, 2));
-    Log.d("json page(3:) = " + parse.json_get("page", json, 3));
-    Log.d("json totalPages(1:10) = " + parse.json_get("totalPages", json));
-    Log.d("json pageSize(1:2) = " + parse.json_get("pageSize", json));
-    Log.d("json pageSize(2:1234) = " + parse.json_get("pageSize", json, 2));
-    Log.d("json state(1:0000000000011001) = " + parse.json_get("state", json));
+    Log.d("xml xyzzy() null = " + parse.xml_get("xyzzy", xml, 1));
+    Log.d("xml page(1,2,3) one,two,null = " + parse.xml_get("page", xml) + "," + parse.xml_get("page", xml, 2) + "," + parse.xml_get("page", xml, 3));
+    Log.d("xml totalPages(1) 10 = " + parse.xml_get("totalPages", xml));
+    Log.d("xml pageSize(1,2) 2,1234 = " + parse.xml_get("pageSize", xml) + "," + parse.xml_get("pageSize", xml, 2));
+    Log.d("xml max(1) 59.0 = " + parse.xml_get("maxtemp", xml, 1));
+    Log.d("xml min(1) 39.9 = " + parse.xml_get("mintemp", xml, 1));
+    Log.d("xml max_time(1) 06:15PM = " + parse.xml_get("maxtemp_time", xml, 1));
+    Log.d("xml min_time(1) 02:35PM = " + parse.xml_get("mintemp_time", xml, 1));
+
+    Log.d("json xyzzy() xyzzy = " + parse.json_get("xyzzy", json, 1));
+    Log.d("json page(1,2,3) one,two,null = " + parse.json_get("page", json) + "," + parse.json_get("page", json, 2) + "," + parse.json_get("page", json, 3));
+    Log.d("json totalPages(1) 10 = " + parse.json_get("totalPages", json));
+    Log.d("json pageSize(1,2) 2,1234 = " + parse.json_get("pageSize", json) + "," + parse.json_get("pageSize", json, 2));
+    Log.d("json state(1) 0000000000011001 = " + parse.json_get("state", json));
+
+    Log.d("json code(1,2) d,e = " + parse.json_get("code", json) + "," + parse.json_get("code", json, 2));
+    Log.d("json devices(1,2) ... = " + parse.json_get("devices", json) + "," + parse.json_get("devices", json, 2));
+
+    Log.d("Parsing test ended");
 }
 
 

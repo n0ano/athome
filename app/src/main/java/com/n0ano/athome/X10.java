@@ -61,7 +61,8 @@ public void get_devices(OutletsAdapter adapter)
     String hcode = act.parse.json_get("code", resp, 1);
     if (hcode != null) {
         i = 0;
-        while ((name = act.parse.json_get("name", resp, ++i)) != null) {
+        String devices = act.parse.json_get("devices", resp, 1);
+        while ((name = act.parse.json_list(devices, ++i)) != null) {
             if (!name.isEmpty())
                 adapter.add_device(new OutletsDevice(name,
                                                      i,

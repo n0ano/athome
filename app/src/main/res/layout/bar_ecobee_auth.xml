@@ -35,7 +35,8 @@
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text="Api Key: "
-            android:textColor="@color/dialog_fore" />
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_back" />
 		<TextView
 			android:id="@+id/ecobee_api"
 			android:layout_width="wrap_content"
@@ -43,7 +44,7 @@
             android:textSize="14sp"
 			android:text=""
             android:textColor="@color/dialog_fore"
-            android:backgroundTint="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_back"
 			android:paddingLeft="5dp" />
 
             </LinearLayout>
@@ -61,7 +62,8 @@
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text="Pin: "
-            android:textColor="@color/dialog_fore" />
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_back" />
 		<TextView
 			android:id="@+id/ecobee_pin"
 			android:layout_width="wrap_content"
@@ -69,7 +71,7 @@
             android:textSize="14sp"
             android:text="____"
             android:textColor="@color/dialog_fore"
-            android:backgroundTint="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_back"
 			android:paddingLeft="5dp" />
 
 		</LinearLayout>
