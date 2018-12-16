@@ -124,6 +124,8 @@ private void go_control(View v)
 {
 
     OutletsDevice dev = (OutletsDevice) v.getTag();
+    if (dev.get_hold())
+        return;
     switch (dev.get_type()) {
 
     case OutletsDevice.TYPE_X10:
