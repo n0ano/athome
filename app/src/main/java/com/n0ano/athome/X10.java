@@ -35,7 +35,7 @@ final static String X10_STATE_MAP = " \"state\":\"";
 
 MainActivity act;
 
-String state_map = "0000000000000000";
+Map<String, String> onoff_state = new HashMap<String, String>();
 
 // X10: class constructor
 //
@@ -49,8 +49,8 @@ public X10(final MainActivity act)
 
 public void get_devices(OutletsAdapter adapter)
 {
-    int i, idx;
-    String name;
+    int i, hi, idx;
+    String name, hcode;
 
     final String resp = act.call_api("GET",
                                act.x10_url + X10_API,
@@ -58,10 +58,11 @@ public void get_devices(OutletsAdapter adapter)
                                "",
                                null);
 
-    String hcode = act.parse.json_get("code", resp, 1);
-    if (hcode != null) {
+    hi = 0;
+    while ((hcode = act.parse.json_get("code", resp, ++hi)) != null) {
         i = 0;
-        String devices = act.parse.json_get("devices", resp, 1);
+        onoff_state.put(hcode, "0000000000000000");
+        String devices = act.parse.json_get("devices", resp, hi);
         while ((name = act.parse.json_list(devices, ++i)) != null) {
             if (!name.isEmpty())
                 adapter.add_device(new OutletsDevice(name,
@@ -99,29 +100,52 @@ public void control(final OutletsDevice dev, boolean state)
 private boolean get_state(int idx, String map)
 {
 
+    if (map.length() < 16) {
+        Log.d("Bad state map - " + map);
+        return false;
+    }
     return ((map.charAt(16 - idx) == '0') ? false : true);
 }
 
-private void on_off(String line, OutletsAdapter outlets_adapter)
+private boolean status_changed(String resp)
 {
     int i;
-    boolean then;
-    boolean now;
+    boolean changed;
+    String code, line;
 
-    if (!line.equals(state_map) && !line.isEmpty()) {
+    i = 0;
+    changed = false;
+    while ((code = act.parse.json_get("code", resp, ++i)) != null) {
+        if ((line = act.parse.json_get("state", resp, i)) == null) {
+            Log.d("X10 bad state data: " + resp);
+            return false;
+        }
+        if (!line.equals(onoff_state.get(code))) {
+            onoff_state.put(code, line);
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+private void on_off(String resp, OutletsAdapter outlets_adapter)
+{
+    int i;
+    boolean state;
+
+    if (status_changed(resp)) {
         int max_devices = outlets_adapter.getCount();
         for (i = 0; i < max_devices; i++) {
             OutletsDevice dev = outlets_adapter.getItem(i);
             if (dev.get_type() == OutletsDevice.TYPE_X10) {
+                String code = dev.get_code();
                 int idx = dev.get_index();
-                then = get_state(idx, state_map);
-                now = get_state(idx, line);
-                if (then != now)
-                    dev.set_state(now, act);
+                state = get_state(idx, onoff_state.get(code));
+                if (state != dev.get_state())
+                    dev.set_state(state, act);
             }
         }
     }
-    state_map = line;
 }
 
 public void update(OutletsAdapter outlets_adapter)
@@ -135,11 +159,10 @@ public void update(OutletsAdapter outlets_adapter)
                                X10_GET,
                                "",
                                null);
-    String l = act.parse.json_get("state", resp, 1);
-    if (l == null || l.length() < 16)
-        Log.d("X10 bad data: " + l + " => " + resp);
+    if (act.parse.json_get("house", resp, 1) == null)
+        Log.d("X10 bad get data: " + resp);
     else
-        on_off(l, outlets_adapter);
+        on_off(resp, outlets_adapter);
 }
 
 }

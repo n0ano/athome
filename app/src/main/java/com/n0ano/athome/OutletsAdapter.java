@@ -44,7 +44,14 @@ public OutletsAdapter(MainActivity act)
 
 void add_device(OutletsDevice dev)
 {
+    int i;
 
+    for (i = 0; i < max; i++)
+        if (devices.get(i).get_name().compareTo(dev.get_name()) >= 0) {
+            devices.add(i, dev);
+            max++;
+            return;
+        }
     devices.add(max++, dev);
 }
 

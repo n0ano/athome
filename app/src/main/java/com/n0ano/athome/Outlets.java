@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -105,6 +106,7 @@ public void init_view()
         v.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 OutletsDevice dev = (OutletsDevice) v.getTag();
+Log.d("long press on " + dev.get_name());
                 dev.set_hold(!dev.get_hold());
                 dev.set_state(dev.get_state(), act);
                 return true;
