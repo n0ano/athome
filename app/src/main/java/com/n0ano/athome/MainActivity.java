@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -50,7 +51,10 @@ public class MainActivity extends AppCompatActivity
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
 
+public int egauge_layout;
 public String egauge_url;
+
+public int weather_layout;
 
 public String wunder_id;
 
@@ -203,12 +207,32 @@ public void start_browser(String uri)
     startActivity(intent);
 }
 
+public void view_show(int view_id, int[] ids, int main)
+{
+    int id;
+
+    if (view_id > ids.length)
+        view_id = 0;
+    id = ids[view_id];
+    View v = findViewById(main);
+    ViewGroup parent = (ViewGroup) v.getParent();
+    int index = parent.indexOfChild(v);
+    parent.removeView(v);
+    v = getLayoutInflater().inflate(id, parent, false);
+    parent.addView(v, index);
+}
+
 private void restore_state()
 {
 
     Preferences pref = new Preferences(this);
 
+    egauge_layout = pref.get_int("egauge_layout", 1);
+    view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
     egauge_url = pref.get_string("egauge_url", "");
+
+    weather_layout = pref.get_int("weather_layout", 1);
+    view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
 
     wunder_id = pref.get_string("wunder_id", "");
 
@@ -505,7 +529,7 @@ private void doit()
                 if (weather != null)
                     weather.update();
 
-                if (egauge != null)
+                if (egauge != null && egauge_layout != 0)
                     egauge.update();
 
                 if (outlets != null)

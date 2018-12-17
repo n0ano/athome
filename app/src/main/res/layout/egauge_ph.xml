@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/egauge_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MainActivity"
+    tools:showIn="@layout/content_main">
+
+    <LinearLayout
+        android:id="@+id/egauge"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="40dp" >
+
+        <LinearLayout
+            android:id="@+id/egauge"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/egauge_timeout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="15dp"
+                android:src="@drawable/timeout_10" />
+
+            <!-- grid -->
+            <LinearLayout
+                android:id="@+id/egauge_grid"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp" >
+
+                <ImageView
+                    android:id="@+id/grid_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/grid" />
+
+                <TextView
+                    android:id="@+id/grid_watt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="0 W" />
+
+                </LinearLayout>
+
+            <!-- grid arrow -->
+            <ImageView
+                android:id="@+id/grid_arrow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:paddingTop="20dp"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:src="@drawable/arrow_left" />
+
+            <!-- house -->
+            <LinearLayout
+                android:id="@+id/egauge_house"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <ImageView
+                    android:id="@+id/house_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/house" />
+
+                <TextView
+                    android:id="@+id/house_watt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="0 W" />
+
+                </LinearLayout>
+
+            <!-- panel arrow -->
+            <ImageView
+                android:id="@+id/panel_arrow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:paddingTop="20dp"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:src="@drawable/arrow_right" />
+
+            <!-- panel -->
+            <LinearLayout
+                android:id="@+id/egauge_panel"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <ImageView
+                    android:id="@+id/panel_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/panel" />
+
+                <TextView
+                    android:id="@+id/panel_watt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="0 W" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -10,15 +10,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_wunder"
+        android:id="@+id/action_weather"
         android:orderInCategory="100"
-        android:title="Weather Underground"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_ecobee"
-        android:orderInCategory="100"
-        android:title="ecoBee"
+        android:title="Weather"
         app:showAsAction="never" />
 
     <item

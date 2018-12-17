@@ -38,21 +38,21 @@
 			android:text="Layout: "
             android:textColor="@color/dialog_fore" />
 		<RadioGroup
-            android:id="@+id/egauge_layout"
+            android:id="@+id/weather_layout"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" >
             <RadioButton
-                android:id="@+id/egauge_none"
+                android:id="@+id/weather_none"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="None" />
             <RadioButton
-                android:id="@+id/egauge_tablet"
+                android:id="@+id/weather_tablet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tablet" />
             <RadioButton
-                android:id="@+id/egauge_phone"
+                android:id="@+id/weather_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Phone" />
@@ -61,34 +61,44 @@
 		</LinearLayout>
 
 	<LinearLayout
-		android:layout_width="match_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+        android:paddingRight="10dp" >
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text="Server: "
+        <Button
+            android:id="@+id/weather_ecobee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="ecoBee Configuration"
             android:textColor="@color/dialog_fore"
-			/>
-		<EditText
-			android:id="@+id/egauge_url"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text=""
-            android:textColor="@color/dialog_fore"
-            android:backgroundTint="@color/dialog_fore"
-			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor"
-			/>
+            android:background="@color/buttonBack" />
 
-		</LinearLayout>
+        </LinearLayout>
+
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <Button
+            android:id="@+id/weather_under"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Weather Underground Configuration"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/buttonBack" />
+
+        </LinearLayout>
 
 	<LinearLayout
 		android:gravity="right"

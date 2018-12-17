@@ -329,32 +329,32 @@ public void update()
             TextView tv;
             ImageView iv;
 
-            tv = (TextView) act.findViewById(R.id.weather_out_temp);
-            tv.setText(data.get("out_temp"));
+            if ((tv = (TextView) act.findViewById(R.id.weather_out_temp)) != null)
+                tv.setText(data.get("out_temp"));
 
-            tv = (TextView) act.findViewById(R.id.weather_in_temp);
-            tv.setText(data.get("in_temp"));
+            if ((tv = (TextView) act.findViewById(R.id.weather_in_temp)) != null)
+                tv.setText(data.get("in_temp"));
 
-            iv = (ImageView) act.findViewById(R.id.weather_dir);
-            iv.setRotation(Integer.valueOf(data.get("winddir")));
+            if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
+                iv.setRotation(Integer.valueOf(data.get("winddir")));
 
-            tv = (TextView) act.findViewById(R.id.weather_speed);
-            tv.setText(data.get("windspeed"));
+            if ((tv = (TextView) act.findViewById(R.id.weather_speed)) != null)
+                tv.setText(data.get("windspeed"));
 
-            tv = (TextView) act.findViewById(R.id.weather_rain);
-            tv.setText(data.get("rain") + " in");
+            if ((tv = (TextView) act.findViewById(R.id.weather_rain)) != null)
+                tv.setText(data.get("rain") + " in");
 
-            iv = (ImageView) act.findViewById(R.id.weather_bar_dir);
-            iv.setImageResource(baro_icon);
+            if ((iv = (ImageView) act.findViewById(R.id.weather_bar_dir)) != null)
+                iv.setImageResource(baro_icon);
 
-            tv = (TextView) act.findViewById(R.id.weather_barometer);
-            tv.setText(data.get("barometer") + " in");
+            if ((tv = (TextView) act.findViewById(R.id.weather_barometer)) != null)
+                tv.setText(data.get("barometer") + " in");
 
-            iv = (ImageView) act.findViewById(R.id.weather_out_timeout);
-            act.set_timeout(iv, period, PERIOD);
+            if ((iv = (ImageView) act.findViewById(R.id.weather_out_timeout)) != null)
+                act.set_timeout(iv, period, PERIOD);
 
-            iv = (ImageView) act.findViewById(R.id.weather_in_timeout);
-            act.set_timeout(iv, period, PERIOD);
+            if ((iv = (ImageView) act.findViewById(R.id.weather_in_timeout)) != null)
+                act.set_timeout(iv, period, PERIOD);
         }
     });
 }

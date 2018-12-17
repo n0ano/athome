@@ -104,23 +104,23 @@ public void update()
 
             int grid_watt = gen_watt - use_watt;
 
-            tv = (TextView) act.findViewById(R.id.grid_watt);
-            tv.setText(k_watts(grid_watt));
+            if ((tv = (TextView) act.findViewById(R.id.grid_watt)) != null)
+                tv.setText(k_watts(grid_watt));
 
-            tv = (TextView) act.findViewById(R.id.house_watt);
-            tv.setText(k_watts(use_watt));
+            if ((tv = (TextView) act.findViewById(R.id.house_watt)) != null)
+                tv.setText(k_watts(use_watt));
 
-            tv = (TextView) act.findViewById(R.id.panel_watt);
-            tv.setText(k_watts(gen_watt));
+            if ((tv = (TextView) act.findViewById(R.id.panel_watt)) != null)
+                tv.setText(k_watts(gen_watt));
 
-            iv = (ImageView) act.findViewById(R.id.grid_arrow);
-            set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
+            if ((iv = (ImageView) act.findViewById(R.id.grid_arrow)) != null)
+                set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
 
-            iv = (ImageView) act.findViewById(R.id.panel_arrow);
-            set_arrow(iv, gen_watt, R.drawable.arrow_left, R.drawable.arrow_right);
+            if ((iv = (ImageView) act.findViewById(R.id.panel_arrow)) != null)
+                set_arrow(iv, gen_watt, R.drawable.arrow_left, R.drawable.arrow_right);
 
-            iv = (ImageView) act.findViewById(R.id.egauge_timeout);
-            act.set_timeout(iv, period, PERIOD);
+            if ((iv = (ImageView) act.findViewById(R.id.egauge_timeout)) != null)
+                act.set_timeout(iv, period, PERIOD);
         }
     });
 }

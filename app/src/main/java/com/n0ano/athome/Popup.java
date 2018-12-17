@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -23,6 +24,34 @@ public class Popup extends MainActivity
 {
 
 public final static String ECOBEE_REAUTH = "https://www.ecobee.com";
+
+public final static int EGAUGE_NONE =       0;
+public final static int EGAUGE_TABLET =     1;
+public final static int EGAUGE_PHONE =      2;
+public final static int radio_egauge[] = {
+    R.id.egauge_none,
+    R.id.egauge_tablet,
+    R.id.egauge_phone
+};
+public final static int layout_egauge[] = {
+    R.layout.egauge,
+    R.layout.egauge_tab,
+    R.layout.egauge_ph
+};
+
+public final static int WEATHER_NONE =      0;
+public final static int WEATHER_TABLET =    1;
+public final static int WEATHER_PHONE =     2;
+public final static int radio_weather[] = {
+    R.id.weather_none,
+    R.id.weather_tablet,
+    R.id.weather_phone
+};
+public final static int layout_weather[] = {
+    R.layout.weather,
+    R.layout.weather_tab,
+    R.layout.weather_ph
+};
 
 MainActivity act;
 
@@ -39,6 +68,17 @@ public Popup(MainActivity act)
     pref = new Preferences(act);
 }
 
+private int index_id(int index, int[] ids)
+{
+    int i, max;
+
+    max = ids.length;
+    for (i = 0; i < max; i++)
+        if (ids[i] == index)
+            return i;
+    return 0;
+}
+
 public boolean menu_click(int item)
 {
 
@@ -48,12 +88,8 @@ public boolean menu_click(int item)
         egauge_dialog();
         return true;
 
-    case R.id.action_wunder:
-        wunder_dialog();
-        return true;
-
-    case R.id.action_ecobee:
-        ecobee_dialog();
+    case R.id.action_weather:
+        weather_dialog();
         return true;
 
     case R.id.action_outlets:
@@ -127,6 +163,9 @@ private void egauge_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_egauge);
 
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.egauge_layout);
+    rg.check(radio_egauge[act.egauge_layout]);
+
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
     et.setText(act.egauge_url);
 
@@ -134,8 +173,11 @@ private void egauge_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            act.egauge_layout = index_id(rg.getCheckedRadioButtonId(), radio_egauge);
+            pref.put_int("egauge_layout", act.egauge_layout);
             act.egauge_url = et.getText().toString();
             pref.put_string("egauge_url", act.egauge_url);
+            act.view_show(act.egauge_layout, Popup.layout_egauge, R.id.egauge_main);
             dialog.dismiss();
         }
     });
@@ -291,6 +333,44 @@ private void ecobee_dialog()
             pref.put_string("ecobee_refresh", act.ecobee_refresh);
             pref.put_int("ecobee_which", act.ecobee_which);
             pref.put_string("ecobee_name", act.ecobee_name);
+            dialog.dismiss();
+        }
+    });
+}
+
+private void weather_dialog()
+{
+    int i;
+    String name, pname;
+
+    final Dialog dialog = start_dialog(R.layout.bar_weather);
+
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.weather_layout);
+    rg.check(radio_weather[act.weather_layout]);
+
+    Button bv_how = (Button) dialog.findViewById(R.id.weather_ecobee);
+    bv_how.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ecobee_dialog();
+        }
+    });
+
+    Button bv_auth = (Button) dialog.findViewById(R.id.weather_under);
+    bv_auth.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            wunder_dialog();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.weather_layout = index_id(rg.getCheckedRadioButtonId(), radio_weather);
+            pref.put_int("weather_layout", act.weather_layout);
+            act.view_show(act.weather_layout, Popup.layout_weather, R.id.weather_main);
             dialog.dismiss();
         }
     });

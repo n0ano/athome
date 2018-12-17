@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/weather_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MainActivity"
+    tools:showIn="@layout/content_main">
+
+    <LinearLayout
+        android:id="@+id/weather"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <RelativeLayout
+            android:id="@+id/weather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            >
+
+            <RelativeLayout
+                android:id="@+id/weather_out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+                <ImageView
+                    android:id="@+id/weather_out_timeout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:src="@drawable/timeout_10" />
+                <ImageView
+                    android:id="@+id/weather_out_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/weather_out_timeout"
+                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="5dp"
+                    android:src="@drawable/outside"
+                    android:onClick="go_temp_detail" />
+
+                <TextView
+                    android:id="@+id/weather_out_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@id/weather_out_icon"
+                    android:paddingLeft="10dp"
+                    android:textSize="54sp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/weather_out_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/weather_out_temp"
+                    android:layout_toRightOf="@id/weather_out_temp"
+                    android:textSize="32sp"
+                    android:paddingLeft="10dp"
+                    android:text="&#xb0;F" />
+
+                </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/weather_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/weather_out"
+                android:layout_below="@id/weather_out"
+                >
+
+                <ImageView
+                    android:id="@+id/weather_in_timeout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:src="@drawable/timeout_10" />
+                <ImageView
+                    android:id="@+id/weather_in_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/weather_in_timeout"
+                    android:layout_alignParentTop="true"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="5dp"
+                    android:src="@drawable/inside"
+                    android:onClick="go_temp_detail" />
+
+                <TextView
+                    android:id="@+id/weather_in_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/weather_in_icon"
+                    android:layout_alignParentTop="true"
+                    android:paddingLeft="10dp"
+                    android:textSize="54sp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/weather_in_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/weather_in_temp"
+                    android:layout_toRightOf="@id/weather_in_temp"
+                    android:textSize="32sp"
+                    android:paddingLeft="10dp"
+                    android:text="&#xb0;F" />
+
+                </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/weather_drop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/rain_drop" />
+
+            <TextView
+                android:id="@+id/weather_rain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weather_drop"
+                android:layout_alignParentRight="true"
+                android:textSize="24sp"
+                android:text="0.0 in" />
+
+            <ImageView
+                android:id="@+id/weather_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@id/weather_drop"
+                android:src="@drawable/circle_tick" />
+
+            <TextView
+                android:id="@+id/weather_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_alignTop="@id/weather_dir"
+                android:layout_alignLeft="@id/weather_dir"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="34dp"
+                android:textSize="24sp"
+                android:hint="00.0"
+                android:textColorHint="#00ffffff"
+                android:text="12.3" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_alignLeft="@id/weather_speed"
+                android:layout_alignTop="@id/weather_speed"
+                android:layout_marginTop="24dp"
+                android:layout_marginLeft="8dp"
+                android:textSize="14sp"
+                android:text="mph" />
+
+            <ImageView
+                android:id="@+id/weather_bar_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@id/weather_dir"
+                android:paddingTop="20dp"
+                android:paddingRight="10dp"
+                android:src="@drawable/barometer" />
+
+            <TextView
+                android:id="@+id/weather_barometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/weather_bar_dir"
+                android:layout_below="@id/weather_bar_dir"
+                android:paddingRight="10dp"
+                android:textSize="18sp"
+                android:text="0.0 in" />
+
+            </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
