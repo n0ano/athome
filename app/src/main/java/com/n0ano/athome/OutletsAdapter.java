@@ -42,6 +42,27 @@ public OutletsAdapter(MainActivity act)
     max = 0;
 }
 
+private int search(String str, int i, int j)
+{
+    int c, k;
+
+    for (;;) {
+        k = ((j - i)/2) + i;
+        c = str.compareTo(devices.get(i).get_name());
+        if (c == 0)
+            return k;
+        if (c < 0) {
+            j = k - 1;
+            if (i > j)
+                return j;
+        } else {
+            i = k + 1;
+            if (i > j)
+                return k;
+        }
+    }
+}
+
 void add_device(OutletsDevice dev)
 {
     int i;

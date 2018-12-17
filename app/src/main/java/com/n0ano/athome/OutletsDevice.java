@@ -104,6 +104,40 @@ public String get_code()
     return code;
 }
 
+public String get_dev_code()
+{
+
+    switch (type) {
+
+    case TYPE_X10:
+        return code + index;
+
+    case TYPE_TPLINK:
+        return code;
+
+    default:
+        return "?";
+
+    }
+}
+
+public String get_tname()
+{
+
+    switch (type) {
+
+    case TYPE_X10:
+        return "X10";
+
+    case TYPE_TPLINK:
+        return "TP-LINK";
+
+    default:
+        return "?";
+
+    }
+}
+
 public String get_url()
 {
 

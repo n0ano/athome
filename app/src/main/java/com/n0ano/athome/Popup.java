@@ -94,6 +94,34 @@ private Dialog start_dialog(int id)
     return dialog;
 }
 
+public void device_dialog(final OutletsDevice dev)
+{
+
+    final Dialog dialog = start_dialog(R.layout.bar_device);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.device_name);
+    tv.setText(dev.get_name());
+
+    tv = (TextView) dialog.findViewById(R.id.device_type);
+    tv.setText(dev.get_tname());
+
+    tv = (TextView) dialog.findViewById(R.id.device_code);
+    tv.setText(dev.get_dev_code());
+
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.device_hold);
+    cb.setChecked(dev.get_hold());
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dev.set_hold(cb.isChecked());
+            dev.set_state(dev.get_state(), act);
+            dialog.dismiss();
+        }
+    });
+}
+
 private void egauge_dialog()
 {
 

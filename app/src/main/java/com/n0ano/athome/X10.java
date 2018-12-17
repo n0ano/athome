@@ -88,7 +88,7 @@ public void control(final OutletsDevice dev, boolean state)
         public void run() {
             String resp = act.call_api("GET",
                                        act.x10_url + X10_API,
-                                       X10_SET + "&code=" + dev.get_code() + dev.get_index() +
+                                       X10_SET + "&code=" + dev.get_dev_code() +
                                                  "&state=" + onoff +
                                                  "&token=" + act.x10_jwt,
                                        "",

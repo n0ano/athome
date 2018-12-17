@@ -107,8 +107,10 @@ public void init_view()
             public boolean onLongClick(View v) {
                 OutletsDevice dev = (OutletsDevice) v.getTag();
 Log.d("long press on " + dev.get_name());
-                dev.set_hold(!dev.get_hold());
-                dev.set_state(dev.get_state(), act);
+                //dev.set_hold(!dev.get_hold());
+                //dev.set_state(dev.get_state(), act);
+                Popup popup = new Popup(act);
+                popup.device_dialog(dev);
                 return true;
             }
         });
