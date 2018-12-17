@@ -19,7 +19,7 @@ public class Egauge {
 private final static int PERIOD = 10;   // check eGauge every 10 seconds
 
 public final static String EGAUGE_API = "/cgi-bin/egauge-show";
-public final static String EGAUGE_QUERY = "json&I&a&m&Y=0,60";
+public final static String EGAUGE_QUERY = "I&a&n=1";
 
 MainActivity act;
 
@@ -42,13 +42,13 @@ private int get_value(String name, String resp)
 {
     int w = 0;
 
-    int end = resp.indexOf(",\"cname\":\"" + name);
+    int end = resp.indexOf("\">" + name + "</cname>");
     if (end >= 0) {
         while (resp.charAt(--end) != '.')
             if (end <= 0)
                 return 0;
         int start = end;
-        while (resp.charAt(--start) != ':')
+        while (resp.charAt(--start) != '"')
             if (start <= 0)
                 return 0;
         w = Integer.parseInt(resp.substring(start + 1, end));
