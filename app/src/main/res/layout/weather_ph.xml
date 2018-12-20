@@ -107,7 +107,8 @@
                     android:layout_alignParentTop="true"
                     android:paddingLeft="10dp"
                     android:textSize="54sp"
-                    android:text="" />
+                    android:text=""
+                    android:onClick="go_hold" />
 
                 <TextView
                     android:id="@+id/weather_in_unit"

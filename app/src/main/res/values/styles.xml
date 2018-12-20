@@ -39,4 +39,8 @@
         <item name="android:colorBackground">@color/fore</item>
     </style>
 
+    <style name="AtHome_Picker" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColorPrimary">@color/dialog_fore</item>
+    </style>
+
 </resources>

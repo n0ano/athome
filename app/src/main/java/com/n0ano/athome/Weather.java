@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
@@ -45,8 +48,6 @@ public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selec
 MainActivity act;
 
 private int period = PERIOD;        // Weather only changes once a minute
-
-private static int ecobee_thermos_checked;
 
 Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_wunder = new HashMap<String, String>();
@@ -92,8 +93,6 @@ private void init_data()
 
     data_ecobee.put("%1,actualTemperature", "in_temp");
     data_ecobee.put("actualHumidity", "in_humid");
-
-    ecobee_thermos_checked = 0;
 }
 
 private void get_info_wunder(String resp)
@@ -127,19 +126,34 @@ private void get_info_wunder(String resp)
 
 private void get_eco_thermos(String resp)
 {
-    String name;
-    ArrayList<String> thermos = new ArrayList<String>();
+    String name, id;
+    String mode, hmin, hmax, cmin, cmax, cdelta;
 
-    if (ecobee_thermos_checked++ != 0)
+    if (act.ecobee_data.size() > 0)
         return;
     int idx = 0;
     while ((name = act.parse.json_get("name", resp, ++idx)) != null) {
-Log.d("thermostat name - " + name);
-        thermos.add(name);
+        id = act.parse.json_get("identifier", resp, idx);
+        act.ecobee_data.add(new EcobeeData(name, id));
+Log.d("thermostat: " + name);
     }
-    act.ecobee_thermos = new String[--idx];
-    for (int i = 0; i < idx; ++i)
-        act.ecobee_thermos[i] = thermos.get(i);
+    --idx;
+    if ((resp = ecobee_query("includeSettings", "")) == null)
+        return;
+    for (int i = 0; i < idx; i++) {
+        mode = act.parse.json_get("hvacMode", resp, i + 1);
+        hmin = act.parse.json_get("heatRangeLow", resp, i + 1);
+        hmax = act.parse.json_get("heatRangeHigh", resp, i + 1);
+        cmin = act.parse.json_get("coolRangeLow", resp, i + 1);
+        cmax = act.parse.json_get("coolRangeHigh", resp, i + 1);
+        cdelta = act.parse.json_get("heatCoolMinDelta", resp, i + 1);
+        act.ecobee_data.get(i).set_range(mode,
+                                         Integer.parseInt(hmin),
+                                         Integer.parseInt(hmax),
+                                         Integer.parseInt(cmin),
+                                         Integer.parseInt(cmax),
+                                         Integer.parseInt(cdelta));
+    }
 }
 
 private void get_info_ecobee(String resp)
@@ -160,6 +174,7 @@ private void get_info_ecobee(String resp)
             data.put(key, val);
         }
     }
+    ecobee_getstate(act.ecobee_which);
 }
 
 private void get_wunder()
@@ -175,6 +190,15 @@ private void get_wunder()
         Log.d("get_wunder: no data for station " + act.wunder_id);
     else
         get_info_wunder(resp);
+}
+
+private String ecobee_param(String info, String id)
+{
+
+    String select = id.isEmpty() ? "registered" : "thermostats";
+    return "format=json&body={\"selection\":{\"selectionType\":\"" + select +
+           "\",\"selectionMatch\":\"" + id +
+           "\",\"" + info + "\":true}}";
 }
 
 //  The api token can be used to create a new PIN
@@ -242,13 +266,13 @@ private void ecobee_refresh()
     ecobee_token("refresh_token", act.ecobee_refresh, act.ecobee_api);
 }
 
-private String ecobee_query()
+private String ecobee_query(String info, String id)
 {
     String resp;
 
     resp = act.call_api("GET",
                                ECO_URL + ECO_DATA,
-                               ECO_QUERY,
+                               ecobee_param(info, id),
                                "Bearer " + act.ecobee_access,
                                null);
     String code = act.parse.json_get("code", resp, 1);
@@ -258,16 +282,123 @@ private String ecobee_query()
         return resp;
 }
 
+private void ecobee_test()
+{
+    String resp;
+    String get_settings = "format=json&body={\"selection\":{\"selectionType\":\"registered\",\"selectionMatch\":\"\",\"includeSettings\":true}}";
+
+    resp = act.call_api("GET",
+                               ECO_URL + ECO_DATA,
+                               get_settings,
+                               "Bearer " + act.ecobee_access,
+                               null);
+Log.d("settings(" + resp.length() + ") - " + resp);
+
+}
+
+private void ecobee_resume()
+{
+
+    if (act.ecobee_which < 0)
+        return;
+    EcobeeData dev = act.ecobee_data.get(act.ecobee_which);
+    String id = dev.get_id();
+    String body = "{" + "\n" +
+                  " \"selection\":{" + "\n" +
+                  "  \"selectionType\":\"thermostats\"," + "\n" +
+                  "  \"selectionMatch\":\"" + id + "\"" + "\n" +
+                  " }," + "\n" +
+                  " \"functions\":[" + "\n" +
+                  "  {" + "\n" +
+                  "   \"type\":\"resumeProgram\"," + "\n" +
+                  "   \"params\":{" + "\n" +
+                  "    \"resumeAll\":false" + "\n" +
+                  "   }" + "\n" +
+                  "  }" + "\n" +
+                  " ]" + "\n" +
+                  "}";
+    String resp = act.call_api("POST",
+                               ECO_URL + ECO_DATA,
+                               "format=json",
+                               "Bearer " + act.ecobee_access,
+                               body);
+}
+
+private void ecobee_hold(int heat, int type)
+{
+
+    if (act.ecobee_which < 0)
+        return;
+    EcobeeData dev = act.ecobee_data.get(act.ecobee_which);
+    String id = dev.get_id();
+    int cool = heat;
+    if (dev.get_mode().equals("auto"))
+        cool += dev.get_delta();
+    if (type == -1)
+        type = R.id.hold_temporary;
+    String hmode = (type == R.id.hold_temporary) ? "nextTransition" : "indefinite";
+Log.d("hold at " + heat + ", until " + hmode);
+    String body = "{" + "\n" +
+                  " \"selection\":{" + "\n" +
+                  "  \"selectionType\":\"thermostats\"," + "\n" +
+                  "  \"selectionMatch\":\"" + id + "\"" + "\n" +
+                  " }," + "\n" +
+                  " \"functions\":[" + "\n" +
+                  "  {" + "\n" +
+                  "   \"type\":\"setHold\"," + "\n" +
+                  "   \"params\":{" + "\n" +
+                  "    \"holdType\":\"" + hmode + "\"," + "\n" +
+                  "    \"heatHoldTemp\":" + heat + "," + "\n" +
+                  "    \"coolHoldTemp\":" + cool + "\n" +
+                  "   }" + "\n" +
+                  "  }" + "\n" +
+                  " ]" + "\n" +
+                  "}";
+    String resp = act.call_api("POST",
+                               ECO_URL + ECO_DATA,
+                               "format=json",
+                               "Bearer " + act.ecobee_access,
+                               body);
+}
+
 private void get_ecobee()
 {
     String resp;
 
-    if ((resp = ecobee_query()) == null) {
+    if ((resp = ecobee_query("includeRuntime", "")) == null) {
         ecobee_refresh();
-        if ((resp = ecobee_query()) == null)
+        if ((resp = ecobee_query("includeRuntime", "")) == null)
             return;
     }
     get_info_ecobee(resp);
+//ecobee_test();
+}
+
+private void ecobee_getstate(int idx)
+{
+
+    if (idx < 0)
+        return;
+    EcobeeData dev = act.ecobee_data.get(idx);
+    String resp = ecobee_query("includeEvents", dev.get_id());
+    if (resp == null)
+        return;
+    int mode = EcobeeData.HOLD_RUNNING;
+    if (act.parse.json_get("type", resp, idx).equals("hold"))
+        mode = act.parse.json_get("endDate", resp, idx).equals("2035-01-01") ?
+                        EcobeeData.HOLD_PERMANENT :
+                        EcobeeData.HOLD_TEMPORARY;
+    dev.set_hold(mode);
+}
+
+private int ecobee_temp_color()
+{
+
+    int color = act.getResources().getColor(R.color.colorPrimary);
+    if (act.ecobee_which >= 0)
+        if (act.ecobee_data.get(act.ecobee_which).get_hold() != EcobeeData.HOLD_RUNNING)
+            color = act.getResources().getColor(R.color.colorHilight);
+    return color;
 }
 
 private void detail_dialog()
@@ -288,13 +419,98 @@ private void detail_dialog()
     tv = (TextView) dialog.findViewById(R.id.detail_min_time);
     tv.setText(data.get("out_min_time"));
 
-    Button ok = (Button) dialog.findViewById(R.id.detail_ok);
+    Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
             dialog.dismiss();
         }
     });
+
+    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+    dialog.show();
+}
+
+private void hold_dialog()
+{
+
+    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.hold);
+
+    if (act.ecobee_which < 0)
+        return;
+
+    final EcobeeData dev = act.ecobee_data.get(act.ecobee_which);
+
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.hold_type);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.hold_status);
+    switch (dev.get_hold()) {
+
+    case EcobeeData.HOLD_RUNNING:
+        tv.setText("Running");
+        break;
+
+    case EcobeeData.HOLD_TEMPORARY:
+        tv.setText("Hold (temporary)");
+        rg.check(R.id.hold_temporary);
+        break;
+
+    case EcobeeData.HOLD_PERMANENT:
+        tv.setText("Hold (permanent)");
+        rg.check(R.id.hold_permanent);
+        break;
+
+
+    }
+
+    final NumberPicker np = (NumberPicker) dialog.findViewById(R.id.hold_temp);
+    np.setMinValue(dev.get_min()/10);
+    np.setMaxValue(dev.get_max()/10);
+    String t = data.get("in_temp");
+    int temp = Integer.parseInt(t.substring(0, t.length() - 2));
+    np.setValue(temp);
+    np.setWrapSelectorWheel(false);
+
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button resume = (Button) dialog.findViewById(R.id.resume);
+    resume.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+            new Thread(new Runnable() {
+                public void run() {
+                    ecobee_resume();
+                    ecobee_getstate(act.ecobee_which);
+                }
+            }).start();
+        }
+    });
+
+    Button hold = (Button) dialog.findViewById(R.id.hold);
+    hold.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final String t = np.getValue() + "0";
+            dialog.dismiss();
+            new Thread(new Runnable() {
+                public void run() {
+                    ecobee_hold(Integer.parseInt(t), rg.getCheckedRadioButtonId());
+                    ecobee_getstate(act.ecobee_which);
+                }
+            }).start();
+        }
+    });
+
+    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
     dialog.show();
 }
@@ -305,6 +521,12 @@ public void go_temp_detail(View v)
     int id = v.getId();
 Log.d("get temp detail for - " + ((id == R.id.weather_out_icon) ? "weather underground" : "ecoBee"));
     detail_dialog();
+}
+
+public void go_hold(View v)
+{
+
+    hold_dialog();
 }
 
 public void update()
@@ -332,8 +554,10 @@ public void update()
             if ((tv = (TextView) act.findViewById(R.id.weather_out_temp)) != null)
                 tv.setText(data.get("out_temp"));
 
-            if ((tv = (TextView) act.findViewById(R.id.weather_in_temp)) != null)
+            if ((tv = (TextView) act.findViewById(R.id.weather_in_temp)) != null) {
                 tv.setText(data.get("in_temp"));
+                tv.setTextColor(ecobee_temp_color());
+            }
 
             if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
                 iv.setRotation(Integer.valueOf(data.get("winddir")));

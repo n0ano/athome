@@ -57,11 +57,6 @@ public Outlets(final MainActivity act)
     startup();
 }
 
-private void get_tplink_devices()
-{
-
-}
-
 public void startup()
 {
 

@@ -265,6 +265,7 @@ private void ecobee_doauth(final String api, final String pin)
 
 private void ecobee_dialog()
 {
+    int nt;
 
     final Dialog dialog = start_dialog(R.layout.bar_ecobee);
 
@@ -277,11 +278,15 @@ private void ecobee_dialog()
     final EditText refresh_tv = (EditText) dialog.findViewById(R.id.ecobee_refresh);
     refresh_tv.setText(act.ecobee_refresh);
 
+    nt = act.ecobee_data.size();
+    String[] thermos = new String[nt];
+    for (int i = 0; i < nt; ++i)
+        thermos[i] = act.ecobee_data.get(i).get_name();
     final Spinner sv = (Spinner) dialog.findViewById(R.id.ecobee_which);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, act.ecobee_thermos);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, thermos);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     sv.setAdapter(adapter);
-    if (act.ecobee_thermos.length <= 0)
+    if (nt <= 0)
         act.ecobee_which = -1;
     ecobee_swhich = act.ecobee_which;
     if (act.ecobee_which >= 0)
@@ -327,7 +332,7 @@ private void ecobee_dialog()
             act.ecobee_refresh = refresh_tv.getText().toString();
             act.ecobee_which = ecobee_swhich;
             if (act.ecobee_which >= 0)
-                act.ecobee_name = act.ecobee_thermos[act.ecobee_which];
+                act.ecobee_name = act.ecobee_data.get(act.ecobee_which).get_name();
             pref.put_string("ecobee_api", act.ecobee_api);
             pref.put_string("ecobee_access", act.ecobee_access);
             pref.put_string("ecobee_refresh", act.ecobee_refresh);

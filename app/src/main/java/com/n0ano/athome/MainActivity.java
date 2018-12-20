@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -63,7 +64,7 @@ public String ecobee_refresh;
 public String ecobee_access;
 public int ecobee_which;
 public String ecobee_name;
-public String[] ecobee_thermos;
+public ArrayList<EcobeeData> ecobee_data;
 
 private String url;
 
@@ -241,7 +242,7 @@ private void restore_state()
     ecobee_refresh = pref.get_string("ecobee_refresh", "");
     ecobee_which = pref.get_int("ecobee_which", -1);
     ecobee_name = pref.get_string("ecobee_name", "");
-    ecobee_thermos = new String[0];
+    ecobee_data = new ArrayList<EcobeeData>();
 
     outlets_battery = pref.get_string("outlets_battery", "");
     outlets_batt_min = pref.get_int("outlets_batt_min", BATTERY_LOW);
@@ -500,6 +501,12 @@ public void go_temp_detail(View v)
 {
 
     weather.go_temp_detail(v);
+}
+
+public void go_hold(View v)
+{
+
+    weather.go_hold(v);
 }
 
 private boolean working()
