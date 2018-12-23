@@ -1,5 +1,12 @@
-1 - Internationalization.  Lots of work required here.
+1 - Null values for wind speed and rain when Weather underground
+	not configured.
 
-2 - Nest support.  Hard to do since Nest has closed their
+2 - Configurable refresh reates for eGauge and weather
+
+3 - User manual
+
+4 - Internationalization.  Lots of work required here.
+
+5 - Nest support.  Hard to do since Nest has closed their
 	developer network and I have no interest in trying
 	to reverse engineer their API.
