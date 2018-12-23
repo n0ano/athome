@@ -1,0 +1,5 @@
+1 - Internationalization.  Lots of work required here.
+
+2 - Nest support.  Hard to do since Nest has closed their
+	developer network and I have no interest in trying
+	to reverse engineer their API.

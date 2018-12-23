@@ -1,0 +1,13 @@
+Source for the Android AtHome app
+
+This is the git repository from the Android Studio
+development for the app.  The app is created with
+Android Studio 3.2.1.
+
+Personally, I've had `issues` when trying to import
+a current project into a working Android Studio
+development environment but hopefully that's just
+me.  This is just a verbose way of saying I probably
+won't be of much help if you have problems setting up
+a development environment, you're basically on your
+own for that.
