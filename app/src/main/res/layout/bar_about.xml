@@ -78,6 +78,13 @@
             android:paddingLeft="20dp"
 			android:text="Thermometer icon: Temperature by Bakunetsu Kaito from the Noun Project"
             android:textColor="@color/dialog_fore" />
+		<Button
+			android:id="@+id/about_manual"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="User Manual"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
 
 		</LinearLayout>
 

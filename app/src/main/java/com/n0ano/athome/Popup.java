@@ -24,6 +24,7 @@ public class Popup extends MainActivity
 {
 
 public final static String ECOBEE_REAUTH = "https://www.ecobee.com";
+public final static String ATHOME_MANUAL = "https://github.com/n0ano/athome/wiki/User-Manual";
 
 public final static int EGAUGE_NONE =       0;
 public final static int EGAUGE_TABLET =     1;
@@ -540,6 +541,15 @@ private void about_dialog()
 
     final TextView et = (TextView) dialog.findViewById(R.id.about_version);
     et.setText("Version: " + Version.VER_MAJOR + "." + Version.VER_MINOR + Version.VER_DEBUG);
+
+    Button bt = (Button) dialog.findViewById(R.id.about_manual);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.start_browser(ATHOME_MANUAL);
+            dialog.dismiss();
+        }
+    });
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
