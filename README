@@ -11,3 +11,17 @@ me.  This is just a verbose way of saying I probably
 won't be of much help if you have problems setting up
 a development environment, you're basically on your
 own for that.
+
+First build:
+If you clone this tree and try and build under Android
+Studio it will fail.  The problem is that I am too lazy
+to manually maintain version numbers (a critical part
+of the release mechanism for the Google Play store).
+I solve this problem by using a git post commit hook
+that generates a new version number after every commit.
+Since I don't want to have a modified version number
+file that's attached to every commit there is a template
+file, app/version.tmpl, that the post commit hook uses
+to create the actual version file.  All you have to do
+is copy this file to app/version.h and Android Studio
+will be happy.
