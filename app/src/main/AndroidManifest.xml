@@ -8,9 +8,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/house"
+        android:icon="@drawable/house_icon"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/house"
+        android:roundIcon="@drawable/house_icon"
         android:supportsRtl="true"
         android:theme="@style/AtHome">
         <activity
