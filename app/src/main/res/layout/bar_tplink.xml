@@ -66,19 +66,18 @@
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text="Password: "
-            android:textColor="@color/dialog_fore"
-			/>
+            android:textColor="@color/dialog_fore" />
 		<EditText
 			android:id="@+id/tplink_pwd"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
             android:textSize="14sp"
 			android:text=""
+            android:inputType="textPassword"
             android:textColor="@color/dialog_fore"
             android:backgroundTint="@color/dialog_fore"
 			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor"
-			/>
+            android:textCursorDrawable="@drawable/edit_cursor" />
 
 		</LinearLayout>
 
