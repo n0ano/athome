@@ -16,7 +16,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Weather"
+			android:text="eGauge"
             android:textSize="20dp"
             android:textColor="@color/dialog_fore" />
 
