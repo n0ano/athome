@@ -35,7 +35,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
-import com.n0ano.athome.Version;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

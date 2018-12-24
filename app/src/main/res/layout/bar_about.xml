@@ -41,7 +41,7 @@
 			android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:paddingLeft="10dp"
-			android:text=""
+			android:text="@string/app_version"
             android:textColor="@color/dialog_fore" />
 		<TextView
 			android:layout_width="wrap_content"

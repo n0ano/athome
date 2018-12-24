@@ -18,7 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
-import com.n0ano.athome.Version;
 
 public class Popup extends MainActivity
 {
@@ -538,9 +537,6 @@ private void about_dialog()
 {
 
     final Dialog dialog = start_dialog(R.layout.bar_about);
-
-    final TextView et = (TextView) dialog.findViewById(R.id.about_version);
-    et.setText("Version: " + Version.VER_MAJOR + "." + Version.VER_MINOR + Version.VER_DEBUG);
 
     Button bt = (Button) dialog.findViewById(R.id.about_manual);
     bt.setOnClickListener(new OnClickListener() {
