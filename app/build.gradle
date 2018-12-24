@@ -3,6 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
+            keyPassword 'Yg95sQPL'
+            storeFile file('/home/n0ano/AndroidKeystore/AtHome.jks')
+            storePassword 'GjqCoeAF'
+            keyAlias 'key0'
         }
     }
     compileSdkVersion 27
