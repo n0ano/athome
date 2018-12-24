@@ -538,6 +538,9 @@ public void update()
     if (period++ >= PERIOD) {
         data.put("in_temp", "--");
         data.put("out_temp", "--");
+        data.put("barometer", "--");
+        data.put("windspeed", "--");
+        data.put("rain", "--");
         get_wunder();
         get_ecobee();
         period = 1;
