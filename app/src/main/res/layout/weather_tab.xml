@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/weather_drop"
                 android:layout_alignParentRight="true"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 android:text="0.0 in" />
 
             <ImageView
