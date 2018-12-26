@@ -168,9 +168,15 @@ private void battery()
 
     boolean state = outlets_power.get_state();
     int chg = act.get_battery();
-    if (chg < act.outlets_batt_min && !state)
+    if (act.debug > 0)
+        Log.d("battery " + outlets_power.get_name() +
+                        (state ? ": on " : ": off ") + " => " +
+                        act.outlets_batt_min + " < " +
+                        chg + " > " +
+                        act.outlets_batt_max);
+    if ((chg < act.outlets_batt_min) && !state)
         x10.control(outlets_power, true);
-    else if (chg > act.outlets_batt_max && state)
+    else if ((chg > act.outlets_batt_max) && state)
         x10.control(outlets_power, false);
 }
 
