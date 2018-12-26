@@ -30,7 +30,7 @@ import java.util.Set;
 //
 public class Weather {
 
-private final static int PERIOD = 60;   // weather only changes once a minute
+public final static int PERIOD = 60;   // weather only changes once a minute
 
 private final static int MAX_BARO = 10; // barometer trends over 10 minutes
 
@@ -47,7 +47,7 @@ public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selec
 
 MainActivity act;
 
-private int period = PERIOD;        // Weather only changes once a minute
+public int period = PERIOD;        // Weather only changes once a minute
 
 Map<String, String> data = new HashMap<String, String>();
 Map<String, String> data_wunder = new HashMap<String, String>();
@@ -395,7 +395,7 @@ private int ecobee_temp_color()
 {
 
     int color = act.getResources().getColor(R.color.colorPrimary);
-    if (act.ecobee_which >= 0)
+    if (act.ecobee_which >= 0 && act.ecobee_which < act.ecobee_data.size())
         if (act.ecobee_data.get(act.ecobee_which).get_hold() != EcobeeData.HOLD_RUNNING)
             color = act.getResources().getColor(R.color.colorHilight);
     return color;

@@ -16,14 +16,14 @@ import java.net.URL;
 //
 public class Egauge {
 
-private final static int PERIOD = 10;   // check eGauge every 10 seconds
+public final static int PERIOD = 10;   // check eGauge every 10 seconds
 
 public final static String EGAUGE_API = "/cgi-bin/egauge-show";
 public final static String EGAUGE_QUERY = "I&a&n=1";
 
 MainActivity act;
 
-int period = 1;
+int period = PERIOD;
 
 int use_watt;
 int gen_watt;

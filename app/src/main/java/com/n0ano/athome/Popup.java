@@ -25,9 +25,10 @@ public class Popup extends MainActivity
 public final static String ECOBEE_REAUTH = "https://www.ecobee.com";
 public final static String ATHOME_MANUAL = "https://github.com/n0ano/athome/wiki/User-Manual";
 
-public final static int EGAUGE_NONE =       0;
-public final static int EGAUGE_TABLET =     1;
-public final static int EGAUGE_PHONE =      2;
+public final static int LAYOUT_NONE =       0;
+public final static int LAYOUT_TABLET =     1;
+public final static int LAYOUT_PHONE =      2;
+
 public final static int radio_egauge[] = {
     R.id.egauge_none,
     R.id.egauge_tablet,
@@ -39,9 +40,6 @@ public final static int layout_egauge[] = {
     R.layout.egauge_ph
 };
 
-public final static int WEATHER_NONE =      0;
-public final static int WEATHER_TABLET =    1;
-public final static int WEATHER_PHONE =     2;
 public final static int radio_weather[] = {
     R.id.weather_none,
     R.id.weather_tablet,
@@ -166,6 +164,9 @@ private void egauge_dialog()
     final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.egauge_layout);
     rg.check(radio_egauge[act.egauge_layout]);
 
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.egauge_progress);
+    cb.setChecked(act.egauge_progress != 0);
+
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
     et.setText(act.egauge_url);
 
@@ -175,8 +176,13 @@ private void egauge_dialog()
         public void onClick(View v) {
             act.egauge_layout = index_id(rg.getCheckedRadioButtonId(), radio_egauge);
             pref.put_int("egauge_layout", act.egauge_layout);
+
+            act.egauge_progress = (cb.isChecked() ? 1 : 0);
+            pref.put_int("egauge_progress", act.egauge_progress);
+
             act.egauge_url = et.getText().toString();
             pref.put_string("egauge_url", act.egauge_url);
+
             act.view_show(act.egauge_layout, Popup.layout_egauge, R.id.egauge_main);
             dialog.dismiss();
         }
@@ -353,6 +359,9 @@ private void weather_dialog()
     final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.weather_layout);
     rg.check(radio_weather[act.weather_layout]);
 
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.weather_progress);
+    cb.setChecked(act.weather_progress != 0);
+
     Button bv_how = (Button) dialog.findViewById(R.id.weather_ecobee);
     bv_how.setOnClickListener(new OnClickListener() {
         @Override
@@ -375,6 +384,10 @@ private void weather_dialog()
         public void onClick(View v) {
             act.weather_layout = index_id(rg.getCheckedRadioButtonId(), radio_weather);
             pref.put_int("weather_layout", act.weather_layout);
+
+            act.weather_progress = (cb.isChecked() ? 1 : 0);
+            pref.put_int("weather_progress", act.weather_progress);
+
             act.view_show(act.weather_layout, Popup.layout_weather, R.id.weather_main);
             dialog.dismiss();
         }

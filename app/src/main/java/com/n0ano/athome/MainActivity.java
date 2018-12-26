@@ -52,9 +52,11 @@ public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
 
 public int egauge_layout;
+public int egauge_progress;
 public String egauge_url;
 
 public int weather_layout;
+public int weather_progress;
 
 public String wunder_id;
 
@@ -207,6 +209,31 @@ public void start_browser(String uri)
     startActivity(intent);
 }
 
+public void set_progress()
+{
+    ImageView iv;
+
+    if (egauge_layout != Popup.LAYOUT_NONE)
+        if ((iv = (ImageView) findViewById(R.id.egauge_timeout)) != null)
+            if (egauge_progress > 0)
+                set_timeout(iv, egauge.period, Egauge.PERIOD);
+            else
+                iv.setVisibility(View.GONE);
+
+    if (weather_layout != Popup.LAYOUT_NONE) {
+        if ((iv = (ImageView) findViewById(R.id.weather_in_timeout)) != null)
+            if (weather_progress > 0)
+                set_timeout(iv, weather.period, Weather.PERIOD);
+            else
+                iv.setVisibility(View.GONE);
+        if ((iv = (ImageView) findViewById(R.id.weather_out_timeout)) != null)
+            if (weather_progress > 0)
+                set_timeout(iv, weather.period, Weather.PERIOD);
+            else
+                iv.setVisibility(View.GONE);
+    }
+}
+
 public void view_show(int view_id, int[] ids, int main)
 {
     int id;
@@ -220,6 +247,7 @@ public void view_show(int view_id, int[] ids, int main)
     parent.removeView(v);
     v = getLayoutInflater().inflate(id, parent, false);
     parent.addView(v, index);
+    set_progress();
 }
 
 private void restore_state()
@@ -228,11 +256,11 @@ private void restore_state()
     Preferences pref = new Preferences(this);
 
     egauge_layout = pref.get_int("egauge_layout", 1);
-    view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
+    egauge_progress = pref.get_int("egauge_progress", 1);
     egauge_url = pref.get_string("egauge_url", "");
 
     weather_layout = pref.get_int("weather_layout", 1);
-    view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
+    weather_progress = pref.get_int("weather_progress", 1);
 
     wunder_id = pref.get_string("wunder_id", "");
 
@@ -527,6 +555,9 @@ private void doit()
     this.outlets = outlets;
 
     this.running = true;
+
+    view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
+    view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
 
     new Thread(new Runnable() {
         public void run() {
