@@ -119,12 +119,12 @@ private void get_wunder()
 
     String resp = act.call_api("GET",
                                WUNDER_URL + WUNDER_API,
-                               WUNDER_STATION + act.wunder_id + WUNDER_QUERY,
+                               WUNDER_STATION + act.weather_id + WUNDER_QUERY,
                                "",
                                null);
 //Log.d("under:" + resp);
     if (resp.isEmpty() || resp.contains("<conds></conds>"))
-        Log.d("get_wunder: no data for station " + act.wunder_id);
+        Log.d("get_wunder: no data for station " + act.weather_id);
     else
         get_info_wunder(resp);
 }

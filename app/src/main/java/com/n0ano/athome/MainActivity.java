@@ -58,7 +58,7 @@ public String egauge_url;
 public int weather_layout;
 public int weather_progress;
 
-public String wunder_id;
+public String weather_id;
 
 public String ecobee_api;
 public String ecobee_refresh;
@@ -258,7 +258,7 @@ private void restore_state()
     weather_layout = pref.get_int("weather_layout", 1);
     weather_progress = pref.get_int("weather_progress", 1);
 
-    wunder_id = pref.get_string("wunder_id", "");
+    weather_id = pref.get_string("wunder_id", "");
 
     ecobee_api = pref.get_string("ecobee_api", "");
     ecobee_access = pref.get_string("ecobee_access", "");

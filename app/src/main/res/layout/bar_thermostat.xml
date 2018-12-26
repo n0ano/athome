@@ -82,31 +82,44 @@
         </LinearLayout>
 
 	<LinearLayout
-		android:layout_width="match_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp" >
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text="Station ID: "
-            android:textColor="@color/dialog_fore" />
-		<EditText
-			android:id="@+id/weather_id"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text=""
+        <Button
+            android:id="@+id/weather_ecobee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="ecoBee Configuration"
             android:textColor="@color/dialog_fore"
-            android:backgroundTint="@color/dialog_fore"
-			android:paddingLeft="5dp"
-            android:textCursorDrawable="@drawable/edit_cursor" />
+            android:background="@color/buttonBack" />
 
-		</LinearLayout>
+        </LinearLayout>
+
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <Button
+            android:id="@+id/weather_under"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Weather Underground Configuration"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/buttonBack" />
+
+        </LinearLayout>
 
 	<LinearLayout
 		android:gravity="right"

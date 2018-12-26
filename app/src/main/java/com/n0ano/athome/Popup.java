@@ -90,6 +90,10 @@ public boolean menu_click(int item)
         weather_dialog();
         return true;
 
+    case R.id.action_ecobee:
+        ecobee_dialog();
+        return true;
+
     case R.id.action_outlets:
         outlets_dialog();
         return true;
@@ -184,25 +188,6 @@ private void egauge_dialog()
             pref.put_string("egauge_url", act.egauge_url);
 
             act.view_show(act.egauge_layout, Popup.layout_egauge, R.id.egauge_main);
-            dialog.dismiss();
-        }
-    });
-}
-
-private void wunder_dialog()
-{
-
-    final Dialog dialog = start_dialog(R.layout.bar_wunder);
-
-    final EditText et = (EditText) dialog.findViewById(R.id.wunder_id);
-    et.setText(act.wunder_id);
-
-    Button ok = (Button) dialog.findViewById(R.id.ok);
-    ok.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            act.wunder_id = et.getText().toString();
-            pref.put_string("wunder_id", act.wunder_id);
             dialog.dismiss();
         }
     });
@@ -362,21 +347,8 @@ private void weather_dialog()
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.weather_progress);
     cb.setChecked(act.weather_progress != 0);
 
-    Button bv_how = (Button) dialog.findViewById(R.id.weather_ecobee);
-    bv_how.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            ecobee_dialog();
-        }
-    });
-
-    Button bv_auth = (Button) dialog.findViewById(R.id.weather_under);
-    bv_auth.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            wunder_dialog();
-        }
-    });
+    final EditText et = (EditText) dialog.findViewById(R.id.weather_id);
+    et.setText(act.weather_id);
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
@@ -387,6 +359,9 @@ private void weather_dialog()
 
             act.weather_progress = (cb.isChecked() ? 1 : 0);
             pref.put_int("weather_progress", act.weather_progress);
+
+            act.weather_id = et.getText().toString();
+            pref.put_string("wunder_id", act.weather_id);
 
             act.view_show(act.weather_layout, Popup.layout_weather, R.id.weather_main);
             dialog.dismiss();
