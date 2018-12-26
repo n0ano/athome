@@ -232,7 +232,7 @@ private void ecobee_dopin(final String api)
 
     new Thread(new Runnable() {
         public void run() {
-            final String pin = act.weather.ecobee_get_pin(api);
+            final String pin = act.ecobee.ecobee_get_pin(api);
             runOnUiThread(new Runnable() {
                 public void run() {
                     ecobee_doauth(api, pin);
@@ -262,7 +262,7 @@ private void ecobee_doauth(final String api, final String pin)
             pref.put_string("ecobee_api", act.ecobee_api);
             new Thread(new Runnable() {
                 public void run() {
-                    act.weather.ecobee_authorize(act.ecobee_api);
+                    act.ecobee.ecobee_authorize(act.ecobee_api);
                 }
             }).start();
         }

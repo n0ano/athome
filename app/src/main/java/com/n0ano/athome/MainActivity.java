@@ -84,6 +84,7 @@ int outlets_batt_max;
 int outlets_batt_level;
 
 Weather weather;
+Ecobee ecobee;
 Egauge egauge;
 Outlets outlets;
 
@@ -221,12 +222,7 @@ public void set_progress()
                 iv.setVisibility(View.GONE);
 
     if (weather_layout != Popup.LAYOUT_NONE) {
-        if ((iv = (ImageView) findViewById(R.id.weather_in_timeout)) != null)
-            if (weather_progress > 0)
-                set_timeout(iv, weather.period, Weather.PERIOD);
-            else
-                iv.setVisibility(View.GONE);
-        if ((iv = (ImageView) findViewById(R.id.weather_out_timeout)) != null)
+        if ((iv = (ImageView) findViewById(R.id.weather_timeout)) != null)
             if (weather_progress > 0)
                 set_timeout(iv, weather.period, Weather.PERIOD);
             else
@@ -533,7 +529,7 @@ public void go_temp_detail(View v)
 public void go_hold(View v)
 {
 
-    weather.go_hold(v);
+    ecobee.go_hold(v);
 }
 
 private boolean working()
@@ -547,6 +543,9 @@ private void doit()
 
     final Weather weather = new Weather(this);
     this.weather = weather;
+
+    final Ecobee ecobee = new Ecobee(this);
+    this.ecobee = ecobee;
 
     final Egauge egauge = new Egauge( this);
     this.egauge = egauge;
@@ -565,6 +564,9 @@ private void doit()
 
                 if (weather != null)
                     weather.update();
+
+                if (ecobee != null)
+                    ecobee.update();
 
                 if (egauge != null && egauge_layout != 0)
                     egauge.update();

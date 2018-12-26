@@ -13,8 +13,7 @@
         android:id="@+id/weather"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content" >
 
         <RelativeLayout
             android:id="@+id/weather"
@@ -32,90 +31,40 @@
                 >
 
                 <ImageView
-                    android:id="@+id/weather_out_timeout"
+                    android:id="@+id/weather_timeout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:paddingTop="10dp"
+                    android:paddingRight="5dp"
                     android:src="@drawable/timeout_10" />
                 <ImageView
-                    android:id="@+id/weather_out_icon"
+                    android:id="@+id/weather_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/weather_out_timeout"
+                    android:layout_toRightOf="@id/weather_timeout"
                     android:layout_alignParentTop="true"
                     android:paddingTop="10dp"
-                    android:paddingLeft="5dp"
                     android:src="@drawable/outside"
                     android:onClick="go_temp_detail" />
 
                 <TextView
-                    android:id="@+id/weather_out_temp"
+                    android:id="@+id/weather_temp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@id/weather_out_icon"
+                    android:layout_toRightOf="@id/weather_icon"
                     android:paddingLeft="10dp"
                     android:textSize="54sp"
                     android:text="" />
 
                 <TextView
-                    android:id="@+id/weather_out_unit"
+                    android:id="@+id/weather_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/weather_out_temp"
-                    android:layout_toRightOf="@id/weather_out_temp"
-                    android:textSize="32sp"
-                    android:paddingLeft="10dp"
-                    android:text="&#xb0;F" />
-
-                </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/weather_in"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/weather_out"
-                android:layout_below="@id/weather_out"
-                >
-
-                <ImageView
-                    android:id="@+id/weather_in_timeout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:paddingTop="10dp"
-                    android:src="@drawable/timeout_10" />
-                <ImageView
-                    android:id="@+id/weather_in_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/weather_in_timeout"
-                    android:layout_alignParentTop="true"
-                    android:paddingTop="10dp"
-                    android:paddingLeft="5dp"
-                    android:src="@drawable/inside"
-                    android:onClick="go_temp_detail" />
-
-                <TextView
-                    android:id="@+id/weather_in_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/weather_in_icon"
-                    android:layout_alignParentTop="true"
-                    android:paddingLeft="10dp"
-                    android:textSize="54sp"
-                    android:text=""
-                    android:onClick="go_hold" />
-
-                <TextView
-                    android:id="@+id/weather_in_unit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/weather_in_temp"
-                    android:layout_toRightOf="@id/weather_in_temp"
+                    android:layout_alignBottom="@id/weather_temp"
+                    android:layout_toRightOf="@id/weather_temp"
                     android:textSize="32sp"
                     android:paddingLeft="10dp"
                     android:text="&#xb0;F" />
@@ -193,11 +142,6 @@
                 android:text="0.0 in" />
 
             </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
 
         </LinearLayout>
 
