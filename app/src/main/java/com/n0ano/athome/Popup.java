@@ -28,35 +28,22 @@ public final static int LAYOUT_NONE =       0;
 public final static int LAYOUT_TABLET =     1;
 public final static int LAYOUT_PHONE =      2;
 
-public final static int radio_egauge[] = {
-    R.id.egauge_none,
-    R.id.egauge_tablet,
-    R.id.egauge_phone
-};
 public final static int layout_egauge[] = {
-    R.layout.egauge,
+    R.layout.egauge,                       
     R.layout.egauge_tab,
-    R.layout.egauge_ph
+    R.layout.egauge_ph  
 };
 
-public final static int radio_weather[] = {
-    R.id.weather_none,
-    R.id.weather_tablet,
-    R.id.weather_phone
-};
 public final static int layout_weather[] = {
-    R.layout.weather,
+    R.layout.weather,                       
     R.layout.weather_tab,
-    R.layout.weather_ph
+    R.layout.weather_ph  
 };
 
-public final static int radio_thermostat[] = {
-    R.id.thermostat_none,
-    R.id.thermostat_show
-};
 public final static int layout_thermostat[] = {
-    R.layout.thermostat_hidden,
-    R.layout.thermostats_table
+    R.layout.thermostat_hidden,                       
+    R.layout.thermostats_table,
+    R.layout.thermostats_table  
 };
 
 MainActivity act;
@@ -88,6 +75,10 @@ public boolean menu_click(int item)
 
     switch (item) {
 
+    case R.id.action_display:
+        display_dialog();
+        return true;
+
     case R.id.action_egauge:
         egauge_dialog();
         return true;
@@ -102,10 +93,6 @@ public boolean menu_click(int item)
 
     case R.id.action_outlets:
         outlets_dialog();
-        return true;
-
-    case R.id.action_developer:
-        developer_dialog();
         return true;
 
     case R.id.action_about:
@@ -166,13 +153,65 @@ public void device_dialog(final OutletsDevice dev)
     });
 }
 
+private void display_dialog()
+{
+    int i;
+    String name, pname;
+
+    final Dialog dialog = start_dialog(R.layout.bar_display);
+
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.display_layout);
+    rg.check((act.display_layout == LAYOUT_TABLET) ?
+                    R.id.display_tablet :
+                    R.id.display_phone);
+
+    final CheckBox bt_egauge = (CheckBox) dialog.findViewById(R.id.display_egauge);
+    bt_egauge.setChecked(act.egauge_layout != LAYOUT_NONE);
+
+    final CheckBox bt_weather = (CheckBox) dialog.findViewById(R.id.display_weather);
+    bt_weather.setChecked(act.weather_layout != LAYOUT_NONE);
+
+    final CheckBox bt_thermostat = (CheckBox) dialog.findViewById(R.id.display_thermostat);
+    bt_thermostat.setChecked(act.thermostat_layout != LAYOUT_NONE);
+
+    Button db = (Button) dialog.findViewById(R.id.display_developer);
+    db.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            developer_dialog();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.display_layout = (rg.getCheckedRadioButtonId() == R.id.display_tablet) ?
+                                            LAYOUT_TABLET :
+                                            LAYOUT_PHONE;
+            pref.put_int("display_layout", act.display_layout);
+
+            act.egauge_layout = (bt_egauge.isChecked() ? act.display_layout : LAYOUT_NONE);
+            pref.put_int("egauge_layout", act.egauge_layout);
+
+            act.weather_layout = (bt_weather.isChecked() ? act.display_layout : LAYOUT_NONE);
+            pref.put_int("weather_layout", act.weather_layout);
+
+            act.thermostat_layout = (bt_thermostat.isChecked() ? act.display_layout : LAYOUT_NONE);
+            pref.put_int("thermostat_layout", act.thermostat_layout);
+
+            act.show_views();
+            if (act.thermostat_layout != LAYOUT_NONE)
+                act.thermostat.init_view();
+            dialog.dismiss();
+        }
+    });
+}
+
 private void egauge_dialog()
 {
 
     final Dialog dialog = start_dialog(R.layout.bar_egauge);
-
-    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.egauge_layout);
-    rg.check(radio_egauge[act.egauge_layout]);
 
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.egauge_progress);
     cb.setChecked(act.egauge_progress != 0);
@@ -184,16 +223,13 @@ private void egauge_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.egauge_layout = index_id(rg.getCheckedRadioButtonId(), radio_egauge);
-            pref.put_int("egauge_layout", act.egauge_layout);
-
             act.egauge_progress = (cb.isChecked() ? 1 : 0);
             pref.put_int("egauge_progress", act.egauge_progress);
 
             act.egauge_url = et.getText().toString();
             pref.put_string("egauge_url", act.egauge_url);
 
-            act.view_show(act.egauge_layout, Popup.layout_egauge, R.id.egauge_main);
+            act.show_views();
             dialog.dismiss();
         }
     });
@@ -315,9 +351,6 @@ private void weather_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_weather);
 
-    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.weather_layout);
-    rg.check(radio_weather[act.weather_layout]);
-
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.weather_progress);
     cb.setChecked(act.weather_progress != 0);
 
@@ -328,16 +361,13 @@ private void weather_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.weather_layout = index_id(rg.getCheckedRadioButtonId(), radio_weather);
-            pref.put_int("weather_layout", act.weather_layout);
-
             act.weather_progress = (cb.isChecked() ? 1 : 0);
             pref.put_int("weather_progress", act.weather_progress);
 
             act.weather_id = et.getText().toString();
             pref.put_string("wunder_id", act.weather_id);
 
-            act.view_show(act.weather_layout, Popup.layout_weather, R.id.weather_main);
+            act.show_views();
             dialog.dismiss();
         }
     });
@@ -349,9 +379,6 @@ private void thermostat_dialog()
     String name, pname;
 
     final Dialog dialog = start_dialog(R.layout.bar_thermostat);
-
-    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.thermostat_layout);
-    rg.check(radio_thermostat[act.thermostat_layout]);
 
     Button eb = (Button) dialog.findViewById(R.id.thermostat_ecobee);
     eb.setOnClickListener(new OnClickListener() {
@@ -366,12 +393,6 @@ private void thermostat_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.thermostat_layout = index_id(rg.getCheckedRadioButtonId(), radio_thermostat);
-            pref.put_int("thermostat_layout", act.thermostat_layout);
-
-            act.view_show(act.thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
-            if (act.thermostat_layout != R.id.thermostat_none)
-                act.thermostat.init_view();
             dialog.dismiss();
         }
     });

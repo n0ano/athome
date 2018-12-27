@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
 
+public int display_layout;
+
 public int egauge_layout;
 public int egauge_progress;
 public String egauge_url;
@@ -212,12 +214,13 @@ public void set_progress()
 {
     ImageView iv;
 
-    if (egauge_layout != Popup.LAYOUT_NONE)
+    if (egauge_layout != Popup.LAYOUT_NONE) {
         if ((iv = (ImageView) findViewById(R.id.egauge_timeout)) != null)
             if (egauge_progress > 0)
                 set_timeout(iv, egauge.period, Egauge.PERIOD);
             else
                 iv.setVisibility(View.GONE);
+    }
 
     if (weather_layout != Popup.LAYOUT_NONE) {
         if ((iv = (ImageView) findViewById(R.id.weather_timeout)) != null)
@@ -244,10 +247,20 @@ public void view_show(int view_id, int[] ids, int main)
     set_progress();
 }
 
+public void show_views()
+{
+
+    view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
+    view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
+    view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
+}
+
 private void restore_state()
 {
 
     Preferences pref = new Preferences(this);
+
+    display_layout = pref.get_int("display_layout", Popup.LAYOUT_TABLET);
 
     egauge_layout = pref.get_int("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get_int("egauge_progress", 1);
@@ -551,9 +564,7 @@ private void doit()
 
     this.running = true;
 
-    view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
-    view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
-    view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
+    show_views();
 
     new Thread(new Runnable() {
         public void run() {

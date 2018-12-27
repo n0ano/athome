@@ -23,39 +23,6 @@
         </LinearLayout>
 
 	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text="Layout: "
-            android:textColor="@color/dialog_fore" />
-		<RadioGroup
-            android:id="@+id/thermostat_layout"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" >
-            <RadioButton
-                android:id="@+id/thermostat_none"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="None" />
-            <RadioButton
-                android:id="@+id/thermostat_show"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show" />
-            </RadioGroup>
-
-		</LinearLayout>
-
-	<LinearLayout
 		android:gravity="center"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"

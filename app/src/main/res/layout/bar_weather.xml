@@ -22,44 +22,6 @@
 
         </LinearLayout>
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text="Layout: "
-            android:textColor="@color/dialog_fore" />
-		<RadioGroup
-            android:id="@+id/weather_layout"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" >
-            <RadioButton
-                android:id="@+id/weather_none"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="None" />
-            <RadioButton
-                android:id="@+id/weather_tablet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tablet" />
-            <RadioButton
-                android:id="@+id/weather_phone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone" />
-            </RadioGroup>
-
-		</LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

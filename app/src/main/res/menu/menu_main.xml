@@ -4,6 +4,12 @@
     tools:context="com.n0ano.athome.MainActivity">
 
     <item
+        android:id="@+id/action_display"
+        android:orderInCategory="100"
+        android:title="Display"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_egauge"
         android:orderInCategory="100"
         android:title="eGauge"
@@ -25,12 +31,6 @@
         android:id="@+id/action_outlets"
         android:orderInCategory="100"
         android:title="Outlets"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_developer"
-        android:orderInCategory="101"
-        android:title="Developer"
         app:showAsAction="never" />
 
     <item
