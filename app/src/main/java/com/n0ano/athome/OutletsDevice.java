@@ -41,7 +41,7 @@ private TextView tv_name;
 public OutletsDevice(String name, int id, String code, View view)
 {
 
-Log.d("device " + name + " = " + code + id);
+Log.d("outlet " + name + " = " + code + id);
     this.name = name;
     this.type = TYPE_X10;
     this.index = id;
@@ -74,35 +74,27 @@ Log.d("device " + name + " = " + code);
     this.hold = false;
 }
 
-public String get_name()
-{
+public String get_name() { return name; }
 
-    return name;
-}
+public int get_type() { return this.type; }
 
-public int get_type()
-{
+public int get_index() { return index; }
 
-    return this.type;
-}
+public void set_index(int index) { this.index = index; }
 
-public int get_index()
-{
+public String get_code() { return code; }
 
-    return index;
-}
+public String get_url() { return this.url; }
 
-public void set_index(int index)
-{
+public View get_view() { return view; }
 
-    this.index = index;
-}
+public void set_view(View view) { this.view = view; }
 
-public String get_code()
-{
+public boolean get_hold() { return this.hold; }
 
-    return code;
-}
+public void set_hold(boolean hold) { this.hold = hold; }
+
+public boolean get_state() { return this.state; }
 
 public String get_dev_code()
 {
@@ -136,42 +128,6 @@ public String get_tname()
         return "?";
 
     }
-}
-
-public String get_url()
-{
-
-    return this.url;
-}
-
-public View get_view()
-{
-
-    return view;
-}
-
-public void set_view(View view)
-{
-
-    this.view = view;
-}
-
-public boolean get_hold()
-{
-
-    return this.hold;
-}
-
-public void set_hold(boolean hold)
-{
-
-    this.hold = hold;
-}
-
-public boolean get_state()
-{
-
-    return this.state;
 }
 
 public void set_state(final boolean state, MainActivity act)

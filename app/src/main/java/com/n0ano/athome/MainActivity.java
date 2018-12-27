@@ -60,12 +60,10 @@ public int weather_progress;
 
 public String weather_id;
 
+public int thermostat_layout;
 public String ecobee_api;
 public String ecobee_refresh;
 public String ecobee_access;
-public int ecobee_which;
-public String ecobee_name;
-public ArrayList<EcobeeData> ecobee_data;
 
 private String url;
 
@@ -84,7 +82,7 @@ int outlets_batt_max;
 int outlets_batt_level;
 
 Weather weather;
-Ecobee ecobee;
+Thermostat thermostat;
 Egauge egauge;
 Outlets outlets;
 
@@ -251,21 +249,19 @@ private void restore_state()
 
     Preferences pref = new Preferences(this);
 
-    egauge_layout = pref.get_int("egauge_layout", 1);
+    egauge_layout = pref.get_int("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get_int("egauge_progress", 1);
     egauge_url = pref.get_string("egauge_url", "");
 
-    weather_layout = pref.get_int("weather_layout", 1);
+    weather_layout = pref.get_int("weather_layout", Popup.LAYOUT_TABLET);
     weather_progress = pref.get_int("weather_progress", 1);
 
     weather_id = pref.get_string("wunder_id", "");
 
+    thermostat_layout = pref.get_int("thermostat_layout", Popup.LAYOUT_TABLET);
     ecobee_api = pref.get_string("ecobee_api", "");
     ecobee_access = pref.get_string("ecobee_access", "");
     ecobee_refresh = pref.get_string("ecobee_refresh", "");
-    ecobee_which = pref.get_int("ecobee_which", -1);
-    ecobee_name = pref.get_string("ecobee_name", "");
-    ecobee_data = new ArrayList<EcobeeData>();
 
     outlets_battery = pref.get_string("outlets_battery", "");
     outlets_batt_min = pref.get_int("outlets_batt_min", BATTERY_LOW);
@@ -529,7 +525,7 @@ public void go_temp_detail(View v)
 public void go_hold(View v)
 {
 
-    ecobee.go_hold(v);
+    thermostat.go_hold(v);
 }
 
 private boolean working()
@@ -544,8 +540,8 @@ private void doit()
     final Weather weather = new Weather(this);
     this.weather = weather;
 
-    final Ecobee ecobee = new Ecobee(this);
-    this.ecobee = ecobee;
+    final Thermostat thermostat = new Thermostat(this);
+    this.thermostat = thermostat;
 
     final Egauge egauge = new Egauge( this);
     this.egauge = egauge;
@@ -557,6 +553,7 @@ private void doit()
 
     view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
     view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
+    view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
 
     new Thread(new Runnable() {
         public void run() {
@@ -565,8 +562,8 @@ private void doit()
                 if (weather != null)
                     weather.update();
 
-                if (ecobee != null)
-                    ecobee.update();
+                if (thermostat != null)
+                    thermostat.update();
 
                 if (egauge != null && egauge_layout != 0)
                     egauge.update();

@@ -22,7 +22,6 @@ import com.n0ano.athome.Log;
 public class Popup extends MainActivity
 {
 
-public final static String ECOBEE_REAUTH = "https://www.ecobee.com";
 public final static String ATHOME_MANUAL = "https://github.com/n0ano/athome/wiki/User-Manual";
 
 public final static int LAYOUT_NONE =       0;
@@ -51,9 +50,16 @@ public final static int layout_weather[] = {
     R.layout.weather_ph
 };
 
-MainActivity act;
+public final static int radio_thermostat[] = {
+    R.id.thermostat_none,
+    R.id.thermostat_show
+};
+public final static int layout_thermostat[] = {
+    R.layout.thermostat_hidden,
+    R.layout.thermostats_table
+};
 
-private int ecobee_swhich;
+MainActivity act;
 
 private int batt_pos;
 
@@ -90,8 +96,8 @@ public boolean menu_click(int item)
         weather_dialog();
         return true;
 
-    case R.id.action_ecobee:
-        ecobee_dialog();
+    case R.id.action_thermostat:
+        thermostat_dialog();
         return true;
 
     case R.id.action_outlets:
@@ -205,7 +211,7 @@ private void ecobee_how()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.start_browser(ECOBEE_REAUTH);
+            act.start_browser(Ecobee.ECO_URL);
             dialog.dismiss();
         }
     });
@@ -217,7 +223,7 @@ private void ecobee_dopin(final String api)
 
     new Thread(new Runnable() {
         public void run() {
-            final String pin = act.ecobee.ecobee_get_pin(api);
+            final String pin = act.thermostat.ecobee.ecobee_get_pin(api);
             runOnUiThread(new Runnable() {
                 public void run() {
                     ecobee_doauth(api, pin);
@@ -247,7 +253,7 @@ private void ecobee_doauth(final String api, final String pin)
             pref.put_string("ecobee_api", act.ecobee_api);
             new Thread(new Runnable() {
                 public void run() {
-                    act.ecobee.ecobee_authorize(act.ecobee_api);
+                    act.thermostat.ecobee.ecobee_authorize(act.ecobee_api);
                 }
             }).start();
         }
@@ -268,33 +274,6 @@ private void ecobee_dialog()
 
     final EditText refresh_tv = (EditText) dialog.findViewById(R.id.ecobee_refresh);
     refresh_tv.setText(act.ecobee_refresh);
-
-    nt = act.ecobee_data.size();
-    String[] thermos = new String[nt];
-    for (int i = 0; i < nt; ++i)
-        thermos[i] = act.ecobee_data.get(i).get_name();
-    final Spinner sv = (Spinner) dialog.findViewById(R.id.ecobee_which);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, thermos);
-    adapter.setDropDownViewResource(R.layout.text_spinner);
-    sv.setAdapter(adapter);
-    if (nt <= 0)
-        act.ecobee_which = -1;
-    ecobee_swhich = act.ecobee_which;
-    if (act.ecobee_which >= 0)
-        sv.setSelection(ecobee_swhich = act.ecobee_which);
-    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ecobee_swhich = position;
-            //Log.d("which item - " + (String) parent.getItemAtPosition(position));
-        }
-        
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            // TODO Auto-generated method stub
-        }
-
-    });
 
     Button bv_how = (Button) dialog.findViewById(R.id.ecobee_how);
     bv_how.setOnClickListener(new OnClickListener() {
@@ -321,14 +300,9 @@ private void ecobee_dialog()
             act.ecobee_api = api_tv.getText().toString();
             act.ecobee_access = access_tv.getText().toString();
             act.ecobee_refresh = refresh_tv.getText().toString();
-            act.ecobee_which = ecobee_swhich;
-            if (act.ecobee_which >= 0)
-                act.ecobee_name = act.ecobee_data.get(act.ecobee_which).get_name();
             pref.put_string("ecobee_api", act.ecobee_api);
             pref.put_string("ecobee_access", act.ecobee_access);
             pref.put_string("ecobee_refresh", act.ecobee_refresh);
-            pref.put_int("ecobee_which", act.ecobee_which);
-            pref.put_string("ecobee_name", act.ecobee_name);
             dialog.dismiss();
         }
     });
@@ -364,6 +338,40 @@ private void weather_dialog()
             pref.put_string("wunder_id", act.weather_id);
 
             act.view_show(act.weather_layout, Popup.layout_weather, R.id.weather_main);
+            dialog.dismiss();
+        }
+    });
+}
+
+private void thermostat_dialog()
+{
+    int i;
+    String name, pname;
+
+    final Dialog dialog = start_dialog(R.layout.bar_thermostat);
+
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.thermostat_layout);
+    rg.check(radio_thermostat[act.thermostat_layout]);
+
+    Button eb = (Button) dialog.findViewById(R.id.thermostat_ecobee);
+    eb.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ecobee_dialog();
+            dialog.dismiss();
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.thermostat_layout = index_id(rg.getCheckedRadioButtonId(), radio_thermostat);
+            pref.put_int("thermostat_layout", act.thermostat_layout);
+
+            act.view_show(act.thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
+            if (act.thermostat_layout != R.id.thermostat_none)
+                act.thermostat.init_view();
             dialog.dismiss();
         }
     });

@@ -16,7 +16,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Weather"
+			android:text="Thermostat"
             android:textSize="20dp"
             android:textColor="@color/dialog_fore" />
 
@@ -38,84 +38,37 @@
 			android:text="Layout: "
             android:textColor="@color/dialog_fore" />
 		<RadioGroup
-            android:id="@+id/weather_layout"
+            android:id="@+id/thermostat_layout"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" >
             <RadioButton
-                android:id="@+id/weather_none"
+                android:id="@+id/thermostat_none"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="None" />
             <RadioButton
-                android:id="@+id/weather_tablet"
+                android:id="@+id/thermostat_show"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tablet" />
-            <RadioButton
-                android:id="@+id/weather_phone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone" />
+                android:text="Show" />
             </RadioGroup>
 
 		</LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
-
-        <CheckBox
-            android:id="@+id/weather_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text=" Progress bar"
-            android:textColor="@color/dialog_fore" />
-
-        </LinearLayout>
-
 	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:gravity="center"
 		android:orientation="horizontal"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingTop="20dp" >
 
         <Button
-            android:id="@+id/weather_ecobee"
+            android:id="@+id/thermostat_ecobee"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="ecoBee Configuration"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/buttonBack" />
-
-        </LinearLayout>
-
-	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
-
-        <Button
-            android:id="@+id/weather_under"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Weather Underground Configuration"
             android:textColor="@color/dialog_fore"
             android:background="@color/buttonBack" />
 

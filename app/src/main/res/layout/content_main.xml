@@ -27,7 +27,7 @@
 
             <include layout="@layout/weather_tab" />
 
-            <include layout="@layout/thermostat_show" />
+            <include layout="@layout/thermostats_table" />
 
             <include layout="@layout/outlets_table" />
 

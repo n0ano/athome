@@ -16,9 +16,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_ecobee"
+        android:id="@+id/action_thermostat"
         android:orderInCategory="100"
-        android:title="ecoBee"
+        android:title="Thermostat"
         app:showAsAction="never" />
 
     <item
