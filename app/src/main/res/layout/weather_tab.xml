@@ -63,11 +63,11 @@
                     android:id="@+id/weather_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/weather_temp"
+                    android:layout_alignTop="@id/weather_temp"
                     android:layout_toRightOf="@id/weather_temp"
                     android:textSize="32sp"
-                    android:paddingLeft="10dp"
-                    android:text="&#xb0;F" />
+                    android:paddingLeft="5dp"
+                    android:text="&#xb0;" />
 
                 </RelativeLayout>
 
