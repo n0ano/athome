@@ -45,7 +45,7 @@ public static String get(int idx)
     if (log_full) {
         idx += Log.log_next;
         if (idx >= LOG_SIZE)
-            idx = 0;
+            idx -= LOG_SIZE;
     }
     return Log.log_buf[idx];
 }
