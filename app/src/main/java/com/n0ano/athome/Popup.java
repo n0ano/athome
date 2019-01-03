@@ -75,8 +75,8 @@ public boolean menu_click(int item)
 
     switch (item) {
 
-    case R.id.action_display:
-        display_dialog();
+    case R.id.action_general:
+        general_dialog();
         return true;
 
     case R.id.action_egauge:
@@ -153,28 +153,28 @@ public void device_dialog(final OutletsDevice dev)
     });
 }
 
-private void display_dialog()
+private void general_dialog()
 {
     int i;
     String name, pname;
 
-    final Dialog dialog = start_dialog(R.layout.bar_display);
+    final Dialog dialog = start_dialog(R.layout.bar_general);
 
-    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.display_layout);
-    rg.check((act.display_layout == LAYOUT_TABLET) ?
-                    R.id.display_tablet :
-                    R.id.display_phone);
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.general_layout);
+    rg.check((act.general_layout == LAYOUT_TABLET) ?
+                    R.id.general_tablet :
+                    R.id.general_phone);
 
-    final CheckBox bt_egauge = (CheckBox) dialog.findViewById(R.id.display_egauge);
+    final CheckBox bt_egauge = (CheckBox) dialog.findViewById(R.id.general_egauge);
     bt_egauge.setChecked(act.egauge_layout != LAYOUT_NONE);
 
-    final CheckBox bt_weather = (CheckBox) dialog.findViewById(R.id.display_weather);
+    final CheckBox bt_weather = (CheckBox) dialog.findViewById(R.id.general_weather);
     bt_weather.setChecked(act.weather_layout != LAYOUT_NONE);
 
-    final CheckBox bt_thermostat = (CheckBox) dialog.findViewById(R.id.display_thermostat);
+    final CheckBox bt_thermostat = (CheckBox) dialog.findViewById(R.id.general_thermostat);
     bt_thermostat.setChecked(act.thermostat_layout != LAYOUT_NONE);
 
-    Button db = (Button) dialog.findViewById(R.id.display_developer);
+    Button db = (Button) dialog.findViewById(R.id.general_developer);
     db.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -186,18 +186,18 @@ private void display_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.display_layout = (rg.getCheckedRadioButtonId() == R.id.display_tablet) ?
+            act.general_layout = (rg.getCheckedRadioButtonId() == R.id.general_tablet) ?
                                             LAYOUT_TABLET :
                                             LAYOUT_PHONE;
-            pref.put_int("display_layout", act.display_layout);
+            pref.put_int("general_layout", act.general_layout);
 
-            act.egauge_layout = (bt_egauge.isChecked() ? act.display_layout : LAYOUT_NONE);
+            act.egauge_layout = (bt_egauge.isChecked() ? act.general_layout : LAYOUT_NONE);
             pref.put_int("egauge_layout", act.egauge_layout);
 
-            act.weather_layout = (bt_weather.isChecked() ? act.display_layout : LAYOUT_NONE);
+            act.weather_layout = (bt_weather.isChecked() ? act.general_layout : LAYOUT_NONE);
             pref.put_int("weather_layout", act.weather_layout);
 
-            act.thermostat_layout = (bt_thermostat.isChecked() ? act.display_layout : LAYOUT_NONE);
+            act.thermostat_layout = (bt_thermostat.isChecked() ? act.general_layout : LAYOUT_NONE);
             pref.put_int("thermostat_layout", act.thermostat_layout);
 
             act.show_views();

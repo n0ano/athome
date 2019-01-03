@@ -4,7 +4,7 @@
     tools:context="com.n0ano.athome.MainActivity">
 
     <item
-        android:id="@+id/action_display"
+        android:id="@+id/action_general"
         android:orderInCategory="100"
         android:title="Display"
         app:showAsAction="never" />

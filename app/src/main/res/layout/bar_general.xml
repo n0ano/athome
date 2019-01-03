@@ -38,16 +38,16 @@
 			android:text="Layout: "
             android:textColor="@color/dialog_fore" />
 		<RadioGroup
-            android:id="@+id/display_layout"
+            android:id="@+id/general_layout"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" >
             <RadioButton
-                android:id="@+id/display_tablet"
+                android:id="@+id/general_tablet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tablet" />
             <RadioButton
-                android:id="@+id/display_phone"
+                android:id="@+id/general_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Phone" />
@@ -64,7 +64,7 @@
         android:paddingRight="10dp" >
 
         <CheckBox
-            android:id="@+id/display_egauge"
+            android:id="@+id/general_egauge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
@@ -85,7 +85,7 @@
         android:paddingRight="10dp" >
 
         <CheckBox
-            android:id="@+id/display_weather"
+            android:id="@+id/general_weather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
@@ -106,7 +106,7 @@
         android:paddingRight="10dp" >
 
         <CheckBox
-            android:id="@+id/display_thermostat"
+            android:id="@+id/general_thermostat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
@@ -126,7 +126,7 @@
 		android:paddingTop="20dp" >
 
         <Button
-            android:id="@+id/display_developer"
+            android:id="@+id/general_developer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="10dp"

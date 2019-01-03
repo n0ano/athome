@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
 
-public int display_layout;
+public int general_layout;
 
 public int egauge_layout;
 public int egauge_progress;
@@ -260,7 +260,7 @@ private void restore_state()
 
     Preferences pref = new Preferences(this);
 
-    display_layout = pref.get_int("display_layout", Popup.LAYOUT_TABLET);
+    general_layout = pref.get_int("general_layout", Popup.LAYOUT_TABLET);
 
     egauge_layout = pref.get_int("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get_int("egauge_progress", 1);
