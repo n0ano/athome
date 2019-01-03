@@ -32,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
@@ -288,6 +290,7 @@ private void restore_state()
     tplink_pwd = pref.get_string("tplink_pwd", "");
 
     debug = pref.get_int("debug", 0);
+    Log.cfg(debug);
 }
 
 private void test_parse()
@@ -381,8 +384,7 @@ public String call_api(String type, String uri, String params, String auth, Stri
     HttpURLConnection con = null;
     String res = "";
 
-    if (debug > 0)
-        Log.d(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body);
+    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body);
     if (!params.equals(""))
         uri = uri + "?" + params;
     try {
@@ -414,6 +416,7 @@ public String call_api(String type, String uri, String params, String auth, Stri
         if (con != null)
             con.disconnect();
     }
+    Log.s("  => " + res);
     return res;
 }
 
@@ -457,6 +460,57 @@ public void close_url(BufferedReader inp)
     } catch (Exception e) {
         Log.d("close_url failed - " + e);
     }
+}
+
+public void show_log()
+{
+    String line;
+    TextView tv;
+
+    Log.d("Show log");
+    this.running = false;
+    setContentView(R.layout.log);
+
+    Button bt = findViewById(R.id.log_return);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            setContentView(R.layout.activity_main);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            doit();
+        }
+    });
+
+    bt = findViewById(R.id.log_clear);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.clear();
+        }
+    });
+
+    TableLayout tl = (TableLayout) findViewById(R.id.log_table);
+    tl.removeAllViews();
+    TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+    params.setMargins(0, 0, 0, 0); /* left, top, right, bottom */
+    int max = Log.size();
+    for (int i = 0; i < max; i++) {
+        line = Log.get(i);
+        View v = View.inflate(this, R.layout.log_line, null);
+        tv = (TextView) v.findViewById(R.id.line_no);
+        tv.setText(i + ":");
+        tv = (TextView) v.findViewById(R.id.line_text);
+        tv.setText(line);
+        tl.addView(v, params);
+    }
+}
+
+public void go_log_return()
+{
+
+    Log.d("Log return");
+    setContentView(R.layout.activity_main);
 }
 
 public void set_timeout(ImageView v, int p, int maxp)

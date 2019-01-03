@@ -182,6 +182,15 @@ private void general_dialog()
         }
     });
 
+    Button lb = (Button) dialog.findViewById(R.id.general_log);
+    lb.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.show_log();
+            dialog.dismiss();
+        }
+    });
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
@@ -544,6 +553,7 @@ private void developer_dialog()
         public void onClick(View v) {
             act.debug = (cb.isChecked() ? 1 : 0);
             pref.put_int("debug", act.debug);
+            Log.cfg(act.debug);
             act.outlets_batt_level = Integer.parseInt(level.getText().toString());
             dialog.dismiss();
         }

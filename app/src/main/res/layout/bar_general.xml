@@ -119,10 +119,10 @@
         </LinearLayout>
 
 	<LinearLayout
-		android:gravity="center"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
 		android:paddingTop="20dp" >
 
         <Button
@@ -132,6 +132,25 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="Developer options"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/buttonBack" />
+
+        </LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+		android:paddingTop="20dp" >
+
+        <Button
+            android:id="@+id/general_log"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Log buffer"
             android:textColor="@color/dialog_fore"
             android:background="@color/buttonBack" />
 
