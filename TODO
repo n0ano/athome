@@ -7,3 +7,9 @@
 - Nest support.  Hard to do since Nest has closed their
 	developer network and I have no interest in trying
 	to reverse engineer their API.
+
+- X10 WM100 support.  QR code on my device:
+	{
+	  "appkey":"26d884ce-9f25-948537",
+	  "uid":"Xim8Am5m2GsFvcGdHfvvUkyDTyz7YonqD5"
+	}
