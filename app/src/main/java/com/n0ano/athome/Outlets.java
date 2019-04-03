@@ -95,7 +95,8 @@ public void init_view()
         v.setTag(dev);
         v.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                go_control(v);
+                OutletsDevice dev = (OutletsDevice) v.getTag();
+                go_control(dev, -1);
             }
         });
         v.setOnLongClickListener(new View.OnLongClickListener() {
@@ -119,20 +120,24 @@ Log.d("long press on " + dev.get_name());
 
 }
 
-private void go_control(View v)
+private void go_control(OutletsDevice dev, int toggle)
 {
+    boolean new_state;
 
-    OutletsDevice dev = (OutletsDevice) v.getTag();
     if (dev.get_hold())
         return;
+    if (toggle < 0)
+        new_state = (dev.get_state() ? false : true);
+    else
+        new_state = (toggle == 0 ? false : true);
     switch (dev.get_type()) {
 
     case OutletsDevice.TYPE_X10:
-        x10.control(dev, dev.get_state() ? false : true);
+        x10.control(dev, new_state);
         break;
 
     case OutletsDevice.TYPE_TPLINK:
-        tplink.control(dev, dev.get_state() ? false : true);
+        tplink.control(dev, new_state);
         break;
 
     default:
@@ -168,16 +173,18 @@ private void battery()
 
     boolean state = outlets_power.get_state();
     int chg = act.get_battery();
-    if (act.debug > 0)
-        Log.d("battery " + outlets_power.get_name() +
-                        (state ? ": on " : ": off ") + " => " +
-                        act.outlets_batt_min + " < " +
-                        chg + " > " +
-                        act.outlets_batt_max);
+    if ((act.debug > 0) ||
+        (chg < act.outlets_batt_min) ||
+        (chg > act.outlets_batt_max))
+            Log.d("battery " + outlets_power.get_name() +
+                            (state ? ": on " : ": off ") + " => " +
+                            act.outlets_batt_min + " < " +
+                            chg + " > " +
+                            act.outlets_batt_max);
     if ((chg < act.outlets_batt_min) && !state)
-        x10.control(outlets_power, true);
+        go_control(outlets_power, 1);
     else if ((chg > act.outlets_batt_max) && state)
-        x10.control(outlets_power, false);
+        go_control(outlets_power, 0);
 }
 
 public void update()
