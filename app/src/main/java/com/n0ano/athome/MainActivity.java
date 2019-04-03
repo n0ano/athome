@@ -487,6 +487,10 @@ public void show_log()
         @Override
         public void onClick(View v) {
             Log.clear();
+            setContentView(R.layout.activity_main);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            doit();
         }
     });
 
@@ -498,10 +502,20 @@ public void show_log()
     for (int i = 0; i < max; i++) {
         line = Log.get(i);
         View v = View.inflate(this, R.layout.log_line, null);
+        v.setTag(i);
+        v.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View lv) {
+                int i = (int)lv.getTag();
+                String l = Log.get(i);
+                popup.log_detail_dialog(i, l);
+            }
+        });
         tv = (TextView) v.findViewById(R.id.line_no);
         tv.setText(i + ":");
         tv = (TextView) v.findViewById(R.id.line_text);
-        tv.setText(line);
+        int len = (line.length() < Log.LOG_BRIEF) ? line.length() : Log.LOG_BRIEF;
+        tv.setText(line.substring(0, len));
         tl.addView(v, params);
     }
 }

@@ -13,6 +13,7 @@ package com.n0ano.athome;
 public class Log {
 
 static final int LOG_SIZE = 128;
+static final int LOG_BRIEF = 60;    // length of shortened log line to display
 
 static boolean LOG = true;
 static final String TAG = "DDD";

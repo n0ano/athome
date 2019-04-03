@@ -153,6 +153,19 @@ public void device_dialog(final OutletsDevice dev)
     });
 }
 
+public void log_detail_dialog(int i, String l)
+{
+    TextView tv;
+
+    final Dialog dialog = start_dialog(R.layout.bar_log_detail);
+
+    tv = (TextView) dialog.findViewById(R.id.log_lineno);
+    tv.setText(":" + i);
+
+    tv = (TextView) dialog.findViewById(R.id.log_detail);
+    tv.setText(l);
+}
+
 private void general_dialog()
 {
     int i;
