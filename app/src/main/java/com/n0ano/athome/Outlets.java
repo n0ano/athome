@@ -168,16 +168,16 @@ public void set_power(String name)
 private void battery()
 {
 
-    if (outlets_power == null || outlets_power.get_hold())
+    if (outlets_power == null || outlets_power.get_hold()) {
+        Log.s("battery - no control");
         return;
+    }
 
     boolean state = outlets_power.get_state();
     int chg = act.get_battery();
-    if ((act.debug > 0) ||
-        (chg < act.outlets_batt_min) ||
-        (chg > act.outlets_batt_max))
-            Log.d("battery " + outlets_power.get_name() +
-                            (state ? ": on " : ": off ") + " => " +
+    if (act.debug > 0)
+            Log.s("battery: " + outlets_power.get_name() +
+                            (state ? "(on)" : "(off)") + " => " +
                             act.outlets_batt_min + " < " +
                             chg + " > " +
                             act.outlets_batt_max);

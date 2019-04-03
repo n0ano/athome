@@ -410,7 +410,7 @@ public String call_api(String type, String uri, String params, String auth, Stri
             response.append(line).append('\n');
         res = response.toString();
     } catch (Exception e) {
-        Log.d("read failed - " + e);
+        Log.s("read failed - " + e);
         res = "";
     } finally {
         if (con != null)
