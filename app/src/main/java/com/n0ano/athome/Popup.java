@@ -457,10 +457,10 @@ private void outlets_dialog()
     });
 
     final TextView min = (TextView) dialog.findViewById(R.id.outlets_batt_min);
-    min.setText(Integer.toString(act.outlets_batt_min));
+    min.setText(Common.i2a(act.outlets_batt_min));
 
     final TextView max = (TextView) dialog.findViewById(R.id.outlets_batt_max);
-    max.setText(Integer.toString(act.outlets_batt_max));
+    max.setText(Common.i2a(act.outlets_batt_max));
 
     Button bv_how = (Button) dialog.findViewById(R.id.outlets_x10);
     bv_how.setOnClickListener(new OnClickListener() {
@@ -488,9 +488,9 @@ private void outlets_dialog()
                 act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
             pref.put_string("outlets_battery", act.outlets_battery);
-            act.outlets_batt_min = Integer.parseInt(min.getText().toString());
+            act.outlets_batt_min = Common.a2i(min.getText().toString());
             pref.put_int("outlets_batt_min", act.outlets_batt_min);
-            act.outlets_batt_max = Integer.parseInt(max.getText().toString());
+            act.outlets_batt_max = Common.a2i(max.getText().toString());
             pref.put_int("outlets_batt_max", act.outlets_batt_max);
             dialog.dismiss();
         }
@@ -558,16 +558,31 @@ private void developer_dialog()
     cb.setChecked(act.debug != 0);
 
     final TextView level = (TextView) dialog.findViewById(R.id.outlets_batt_level);
-    level.setText(Integer.toString(act.outlets_batt_level));
+    level.setText(Common.i2a(act.outlets_batt_level));
+Log.d("level - " + act.outlets_batt_level + " - " + level.getText().toString());
+
+    final TextView uri = (TextView) dialog.findViewById(R.id.log_uri);
+    uri.setText(act.log_uri);
+
+    final TextView params = (TextView) dialog.findViewById(R.id.log_params);
+    params.setText(act.log_params);
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            act.outlets_batt_level = Common.a2i(level.getText().toString());
+            pref.put_int("outlets_batt_level", act.outlets_batt_level);
+
+            act.log_uri = uri.getText().toString();
+            pref.put_string("log_uri", act.log_uri);
+            act.log_params = params.getText().toString();
+            pref.put_string("log_params", act.log_params);
+
             act.debug = (cb.isChecked() ? 1 : 0);
             pref.put_int("debug", act.debug);
-            Log.cfg(act.debug);
-            act.outlets_batt_level = Integer.parseInt(level.getText().toString());
+            Log.cfg(act.debug, act.log_uri, act.log_params);
+
             dialog.dismiss();
         }
     });

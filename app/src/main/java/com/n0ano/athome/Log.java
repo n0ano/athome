@@ -15,8 +15,11 @@ public class Log {
 static final int LOG_SIZE = 128;
 static final int LOG_BRIEF = 60;    // length of shortened log line to display
 
-static boolean LOG = true;
+static boolean LOG = false;
 static final String TAG = "DDD";
+
+static String uri = "";
+static String params = "";
 
 static String log_buf[] = new String[LOG_SIZE];
 static int log_next = 0;
@@ -27,11 +30,18 @@ static boolean log_full = false;
 //   Note: Enable logging if this is a debug build.  The main activity
 //         must call this routine explicitly to enable this check.
 //
-public static void cfg(int debug)
+public static void cfg(int debug, String http_uri, String http_params)
 {
 
-    if (debug > 0)
+    if (debug > 0) {
         LOG = true;
+        uri = http_uri;
+        params = http_params;
+    } else {
+        LOG = false;
+        uri = "";
+        params = "";
+    }
 }
 
 public static int size()
@@ -58,7 +68,7 @@ public static void clear()
     Log.log_full = false;
 }
 
-public static void s(String string)
+public static void s(String string, MainActivity act)
 {
 
     Log.log_buf[Log.log_next++] = string.replace("\n", "\\n");
@@ -67,6 +77,7 @@ public static void s(String string)
         Log.log_next = 0;
         Log.log_full = true;
     }
+    act.stream_log(string);
 }
 
 public static void i(String string)

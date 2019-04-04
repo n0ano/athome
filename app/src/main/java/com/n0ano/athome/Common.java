@@ -5,4 +5,16 @@ package com.n0ano.athome;
 //
 public class Common {
 
+public static int a2i(String num)
+{
+
+    return Integer.parseInt(num);
+}
+
+public static String i2a(int num)
+{
+
+    return Integer.toString(num);
+}
+
 }

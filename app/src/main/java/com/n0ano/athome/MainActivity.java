@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -73,6 +74,9 @@ private String url;
 
 int degree = 0;
 int debug = 0;
+
+String log_uri = "";
+String log_params = "";
 
 String x10_url;
 String x10_jwt;
@@ -289,8 +293,11 @@ private void restore_state()
     tplink_user = pref.get_string("tplink_user", "");
     tplink_pwd = pref.get_string("tplink_pwd", "");
 
+    log_uri = pref.get_string("log_uri", "");
+    log_params = pref.get_string("log_params", "");
+
     debug = pref.get_int("debug", 0);
-    Log.cfg(debug);
+    Log.cfg(debug, log_uri, log_params);
 }
 
 private void test_parse()
@@ -372,6 +379,13 @@ private void test_parse()
     Log.d("Parsing test ended");
 }
 
+public void stream_log(String line)
+{
+
+    if (log_uri.equals(""))
+        return;
+    call_api_nolog("GET", log_uri, log_params + URLEncoder.encode(line), "", null);
+}
 
 /*
  *  call an HTTP(S) uri to get a response.  Note that this will return
@@ -379,12 +393,11 @@ private void test_parse()
  *      of data you might be better off using the open_url/read_url/close_url
  *      interface available right below this one.
  */
-public String call_api(String type, String uri, String params, String auth, String body)
+public String call_api_nolog(String type, String uri, String params, String auth, String body)
 {
     HttpURLConnection con = null;
     String res = "";
 
-    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body);
     if (!params.equals(""))
         uri = uri + "?" + params;
     try {
@@ -410,13 +423,24 @@ public String call_api(String type, String uri, String params, String auth, Stri
             response.append(line).append('\n');
         res = response.toString();
     } catch (Exception e) {
-        Log.s("read failed - " + e);
         res = "";
     } finally {
         if (con != null)
             con.disconnect();
     }
-    Log.s("  => " + res);
+    return res;
+}
+
+/*
+ *  call an HTTP(S) uri to get a response and log the request & response
+ */
+public String call_api(String type, String uri, String params, String auth, String body)
+{
+    HttpURLConnection con = null;
+    String res = "";
+
+    res = call_api_nolog(type, uri, params, auth, body);
+    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body + " ==> " + res, this);
     return res;
 }
 

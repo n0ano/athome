@@ -67,6 +67,66 @@
 		</LinearLayout>
 
 	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Log URI: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/log_uri"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Log params: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/log_params"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
 		android:gravity="right"
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"

@@ -51,7 +51,7 @@ private int get_value(String name, String resp)
         while (resp.charAt(--start) != '"')
             if (start <= 0)
                 return 0;
-        w = Integer.parseInt(resp.substring(start + 1, end));
+        w = Common.a2i(resp.substring(start + 1, end));
     }
     return w;
 }

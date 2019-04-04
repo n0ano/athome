@@ -169,7 +169,7 @@ private void battery()
 {
 
     if (outlets_power == null || outlets_power.get_hold()) {
-        Log.s("battery - no control");
+        Log.s("battery - no control", act);
         return;
     }
 
@@ -180,7 +180,7 @@ private void battery()
                             (state ? "(on)" : "(off)") + " => " +
                             act.outlets_batt_min + " < " +
                             chg + " > " +
-                            act.outlets_batt_max);
+                            act.outlets_batt_max, act);
     if ((chg < act.outlets_batt_min) && !state)
         go_control(outlets_power, 1);
     else if ((chg > act.outlets_batt_max) && state)
