@@ -393,16 +393,19 @@ public void stream_log(String line)
  *      of data you might be better off using the open_url/read_url/close_url
  *      interface available right below this one.
  */
-public String call_api_nolog(String type, String uri, String params, String auth, String body)
+public Tuple<String> call_api_nolog(String type, String uri, String params, String auth, String body)
 {
     HttpURLConnection con = null;
     String res = "";
+    String except = null;
 
     if (!params.equals(""))
         uri = uri + "?" + params;
     try {
         URL url = new URL(uri);
         con = (HttpURLConnection) url.openConnection();
+        con.setConnectTimeout(1000);
+        con.setReadTimeout(1000);
         if (type.equals("POST"))
             con.setDoOutput(true);
         if (!auth.equals(""))
@@ -422,13 +425,17 @@ public String call_api_nolog(String type, String uri, String params, String auth
         for (String line; (line = inp.readLine()) != null; )
             response.append(line).append('\n');
         res = response.toString();
+    } catch (java.net.SocketTimeoutException e) {
+        except = e.toString();
+        res = "";
     } catch (Exception e) {
+        except = e.toString();
         res = "";
     } finally {
         if (con != null)
             con.disconnect();
     }
-    return res;
+    return new Tuple<String>(except, res);
 }
 
 /*
@@ -437,11 +444,12 @@ public String call_api_nolog(String type, String uri, String params, String auth
 public String call_api(String type, String uri, String params, String auth, String body)
 {
     HttpURLConnection con = null;
-    String res = "";
 
-    res = call_api_nolog(type, uri, params, auth, body);
-    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body + " ==> " + res, this);
-    return res;
+    Tuple<String>res = call_api_nolog(type, uri, params, auth, body);
+    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body + " ==> " +
+        ((res.first() == null) ?  res.second() : "[" + res.first() + "]"),
+        this);
+    return res.second();
 }
 
 public BufferedReader open_url(String url, String auth)
