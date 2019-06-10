@@ -10,7 +10,7 @@
         android:id="@+id/outlet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/outlet_off" />
+        android:src="@drawable/outlet_off_red" />
 
     <TextView
         android:id="@+id/outlet_name"

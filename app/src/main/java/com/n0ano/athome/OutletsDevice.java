@@ -137,9 +137,9 @@ public void set_state(final boolean state, MainActivity act)
     this.state = state;
 //Log.d(name + "(" + code + index + ") set state to " + (state ? "on, " : "off, ") + (hold ? "holding" : "normal"));
     if (hold)
-        draw = state ? R.drawable.outlet_on_red : R.drawable.outlet_off_red;
+        draw = state ? R.drawable.outlet_on_blue : R.drawable.outlet_off_blue;
     else
-        draw = state ? R.drawable.outlet_on : R.drawable.outlet_off;
+        draw = state ? R.drawable.outlet_on_green : R.drawable.outlet_off_red;
     act.runOnUiThread(new Runnable() {
         public void run() {
             icon.setImageResource(draw);
