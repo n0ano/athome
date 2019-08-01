@@ -18,8 +18,8 @@ public class Egauge {
 
 public final static int PERIOD = 10;   // check eGauge every 10 seconds
 
-public final static String EGAUGE_API = "/cgi-bin/egauge-show";
-public final static String EGAUGE_QUERY = "I&a&n=1";
+public final static String EGAUGE_API = "/cgi-bin/egauge";
+public final static String EGAUGE_QUERY = "tot&inst";
 
 MainActivity act;
 
@@ -42,16 +42,17 @@ private int get_value(String name, String resp)
 {
     int w = 0;
 
-    int end = resp.indexOf("\">" + name + "</cname>");
-    if (end >= 0) {
-        while (resp.charAt(--end) != '.')
-            if (end <= 0)
-                return 0;
-        int start = end;
-        while (resp.charAt(--start) != '"')
-            if (start <= 0)
-                return 0;
-        w = Common.a2i(resp.substring(start + 1, end));
+    int start = resp.indexOf("n=\"" + name + "\">");
+    if (start >= 0) {
+        start = resp.indexOf("<i>", start);
+        if (start < 0)
+            return w;
+        start += 3;
+        int end = resp.indexOf(".", start);
+        if (end < 0)
+            return w;
+Log.d("data - " + resp.substring(start, end));
+        w = Common.a2i(resp.substring(start, end));
     }
     return w;
 }
@@ -89,8 +90,8 @@ public void update()
                                    EGAUGE_QUERY,
                                    "",
                                    null);
-        use_watt = get_value("use", resp);
-        gen_watt = get_value("gen", resp);
+        use_watt = get_value("Total Usage", resp);
+        gen_watt = get_value("Total Generation", resp);
         period = 1;
     }
 
