@@ -50,7 +50,8 @@ public static int size()
     return Log.log_full ? LOG_SIZE : Log.log_next;
 }
 
-public static String get(int idx)
+public synchronized
+static String get(int idx)
 {
 
     if (log_full) {
@@ -61,14 +62,16 @@ public static String get(int idx)
     return Log.log_buf[idx];
 }
 
-public static void clear()
+public synchronized
+static void clear()
 {
 
     Log.log_next = 0;
     Log.log_full = false;
 }
 
-public static void s(String string, MainActivity act)
+public synchronized
+static void s(String string, MainActivity act)
 {
 
     Log.log_buf[Log.log_next++] = string.replace("\n", "\\n");

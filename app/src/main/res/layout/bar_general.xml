@@ -118,43 +118,41 @@
 
         </LinearLayout>
 
-	<LinearLayout
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/general_developer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
         android:paddingLeft="10dp"
-		android:paddingTop="20dp" >
+        android:paddingRight="10dp"
+        android:text="Developer options"
+        android:textColor="@color/dialog_fore"
+        android:background="@color/buttonBack" />
 
-        <Button
-            android:id="@+id/general_developer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Developer options"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/buttonBack" />
-
-        </LinearLayout>
-
-	<LinearLayout
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/general_log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:paddingLeft="10dp"
-		android:paddingTop="20dp" >
+        android:paddingRight="10dp"
+        android:text="Log buffer"
+        android:textColor="@color/dialog_fore"
+        android:background="@color/buttonBack" />
 
-        <Button
-            android:id="@+id/general_log"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Log buffer"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/buttonBack" />
-
-        </LinearLayout>
+    <Button
+        android:id="@+id/general_config"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Configuration"
+        android:textColor="@color/dialog_fore"
+        android:background="@color/buttonBack" />
 
 	<LinearLayout
 		android:gravity="right"

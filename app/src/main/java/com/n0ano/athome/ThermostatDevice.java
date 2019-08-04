@@ -41,7 +41,7 @@ private View view;
 public ThermostatDevice(String name, int id, String code, View view)
 {
 
-Log.d("Thermostat(" + id + ")" + name + " = " + code);
+    Log.d("Thermostat(" + id + ")" + name + " = " + code);
     this.name = name;
     this.index = id;
     this.code = code;

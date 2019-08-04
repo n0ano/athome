@@ -1,42 +1,26 @@
 package com.n0ano.athome;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.n0ano.athome.Log;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -46,13 +30,15 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity
 {
 
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
+
+Preferences pref;
 
 public int general_layout;
 
@@ -104,13 +90,16 @@ protected void onCreate(Bundle state)
 {
 
     super.onCreate(state);
-    Log.d("MainActivity: onCreate");
 
     setContentView(R.layout.activity_main);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    popup = new Popup(this);
+    pref = new Preferences(this);
+    debug = pref.get("debug", 0);
+        Log.cfg(debug, "", "");
+    popup = new Popup(this, pref);
+    Log.d("MainActivity: onCreate");
 }
 
 @Override
@@ -245,6 +234,8 @@ public void view_show(int view_id, int[] ids, int main)
         view_id = 0;
     id = ids[view_id];
     View v = findViewById(main);
+    if (v == null)
+        return;
     ViewGroup parent = (ViewGroup) v.getParent();
     int index = parent.indexOfChild(v);
     parent.removeView(v);
@@ -264,39 +255,37 @@ public void show_views()
 private void restore_state()
 {
 
-    Preferences pref = new Preferences(this);
+    general_layout = pref.get("general_layout", Popup.LAYOUT_TABLET);
 
-    general_layout = pref.get_int("general_layout", Popup.LAYOUT_TABLET);
+    egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
+    egauge_progress = pref.get("egauge_progress", 1);
+    egauge_url = pref.get("egauge_url", "");
 
-    egauge_layout = pref.get_int("egauge_layout", Popup.LAYOUT_TABLET);
-    egauge_progress = pref.get_int("egauge_progress", 1);
-    egauge_url = pref.get_string("egauge_url", "");
+    weather_layout = pref.get("weather_layout", Popup.LAYOUT_TABLET);
+    weather_progress = pref.get("weather_progress", 1);
 
-    weather_layout = pref.get_int("weather_layout", Popup.LAYOUT_TABLET);
-    weather_progress = pref.get_int("weather_progress", 1);
+    weather_id = pref.get("wunder_id", "");
 
-    weather_id = pref.get_string("wunder_id", "");
+    thermostat_layout = pref.get("thermostat_layout", Popup.LAYOUT_TABLET);
+    ecobee_api = pref.get("ecobee_api", "");
+    ecobee_access = pref.get("ecobee_access", "");
+    ecobee_refresh = pref.get("ecobee_refresh", "");
 
-    thermostat_layout = pref.get_int("thermostat_layout", Popup.LAYOUT_TABLET);
-    ecobee_api = pref.get_string("ecobee_api", "");
-    ecobee_access = pref.get_string("ecobee_access", "");
-    ecobee_refresh = pref.get_string("ecobee_refresh", "");
+    outlets_battery = pref.get("outlets_battery", "");
+    outlets_batt_min = pref.get("outlets_batt_min", BATTERY_LOW);
+    outlets_batt_max = pref.get("outlets_batt_max", BATTERY_HIGH);
+    outlets_batt_level = pref.get("outlets_batt_level", 0);
 
-    outlets_battery = pref.get_string("outlets_battery", "");
-    outlets_batt_min = pref.get_int("outlets_batt_min", BATTERY_LOW);
-    outlets_batt_max = pref.get_int("outlets_batt_max", BATTERY_HIGH);
-    outlets_batt_level = pref.get_int("outlets_batt_level", 0);
+    x10_url = pref.get("x10_url", "");
+    x10_jwt = pref.get("x10_jwt", "none");
 
-    x10_url = pref.get_string("x10_url", "");
-    x10_jwt = pref.get_string("x10_jwt", "none");
+    tplink_user = pref.get("tplink_user", "");
+    tplink_pwd = pref.get("tplink_pwd", "");
 
-    tplink_user = pref.get_string("tplink_user", "");
-    tplink_pwd = pref.get_string("tplink_pwd", "");
+    log_uri = pref.get("log_uri", "");
+    log_params = pref.get("log_params", "");
 
-    log_uri = pref.get_string("log_uri", "");
-    log_params = pref.get_string("log_params", "");
-
-    debug = pref.get_int("debug", 0);
+    debug = pref.get("debug", 0);
     Log.cfg(debug, log_uri, log_params);
 }
 
@@ -446,7 +435,8 @@ public String call_api(String type, String uri, String params, String auth, Stri
     HttpURLConnection con = null;
 
     Tuple<String>res = call_api_nolog(type, uri, params, auth, body);
-    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth + ", body - " + body + " ==> " +
+    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth +
+        ", body - " + body + " ==> " +
         ((res.first() == null) ?  res.second() : "[" + res.first() + "]"),
         this);
     return res.second();
@@ -549,6 +539,93 @@ public void show_log()
         int len = (line.length() < Log.LOG_BRIEF) ? line.length() : Log.LOG_BRIEF;
         tv.setText(line.substring(0, len));
         tl.addView(v, params);
+    }
+}
+
+private String cfg_param(String key)
+{
+
+    return key + ": " + pref.get(key, "") + "\n";
+}
+
+private void set_cfg(String cfg)
+{
+    String key, value;
+
+    Log.d("Set new configuration");
+    try {
+        JSONObject json = new JSONObject(cfg);
+        for (Iterator itr = json.keys(); itr.hasNext();) {
+            key = (String)itr.next();
+            value = json.getString(key);
+            pref.put(key, value);
+        }
+    } catch (Exception e) {
+        Log.d("JSON format error " + e);
+    }
+    restore_state();
+}
+
+public void show_cfg()
+{
+    String line;
+    TextView tv;
+
+    Log.d("Show cfg");
+    this.running = false;
+    setContentView(R.layout.config);
+
+    Button bt = findViewById(R.id.cfg_return);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            setContentView(R.layout.activity_main);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            doit();
+        }
+    });
+
+    final EditText et = (EditText) findViewById(R.id.cfg_table);
+    bt = findViewById(R.id.cfg_set);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            set_cfg(et.getText().toString());
+            setContentView(R.layout.activity_main);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            doit();
+        }
+    });
+
+    JSONObject cfg = new JSONObject();
+    try {
+        cfg.put("debug", pref.get("debug", ""));
+        cfg.put("egauge_layout", pref.get("egauge_layout", ""));
+        cfg.put("egauge_progress", pref.get("egauge_progress", ""));
+        cfg.put("general_layout", pref.get("general_layout", ""));
+        cfg.put("outlets_batt_level", pref.get("outlets_batt_level", ""));
+        cfg.put("outlets_batt_max", pref.get("outlets_batt_max", ""));
+        cfg.put("outlets_batt_min", pref.get("outlets_batt_min", ""));
+        cfg.put("thermostat_layout", pref.get("thermostat_layout", ""));
+        cfg.put("weather_layout", pref.get("weather_layout", ""));
+        cfg.put("weather_progress", pref.get("weather_progress", ""));
+        cfg.put("ecobee_access", pref.get("ecobee_access", ""));
+        cfg.put("ecobee_api", pref.get("ecobee_api", ""));
+        cfg.put("ecobee_refresh", pref.get("ecobee_refresh", ""));
+        cfg.put("egauge_url", pref.get("egauge_url", ""));
+        cfg.put("log_params", pref.get("log_params", ""));
+        cfg.put("log_uri", pref.get("log_uri", ""));
+        cfg.put("outlets_battery", pref.get("outlets_battery", ""));
+        cfg.put("tplink_pwd", pref.get("tplink_pwd", ""));
+        cfg.put("tplink_user", pref.get("tplink_user", ""));
+        cfg.put("wunder_id", pref.get("wunder_id", ""));
+        cfg.put("x10_jwt", pref.get("x10_jwt", ""));
+        cfg.put("x10_url", pref.get("x10_url", ""));
+        et.setText(cfg.toString(2));
+    } catch (Exception e) {
+        Log.d("JSON error " + e);
     }
 }
 

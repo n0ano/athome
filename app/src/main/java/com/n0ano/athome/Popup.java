@@ -52,11 +52,11 @@ private int batt_pos;
 
 Preferences pref;
 
-public Popup(MainActivity act)
+public Popup(MainActivity act, Preferences pref)
 {
 
     this.act = act;
-    pref = new Preferences(act);
+    this.pref = pref;
 }
 
 private int index_id(int index, int[] ids)
@@ -204,6 +204,15 @@ private void general_dialog()
         }
     });
 
+    Button cfg = (Button) dialog.findViewById(R.id.general_config);
+    cfg.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.show_cfg();
+            dialog.dismiss();
+        }
+    });
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
@@ -211,16 +220,16 @@ private void general_dialog()
             act.general_layout = (rg.getCheckedRadioButtonId() == R.id.general_tablet) ?
                                             LAYOUT_TABLET :
                                             LAYOUT_PHONE;
-            pref.put_int("general_layout", act.general_layout);
+            pref.put("general_layout", act.general_layout);
 
             act.egauge_layout = (bt_egauge.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put_int("egauge_layout", act.egauge_layout);
+            pref.put("egauge_layout", act.egauge_layout);
 
             act.weather_layout = (bt_weather.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put_int("weather_layout", act.weather_layout);
+            pref.put("weather_layout", act.weather_layout);
 
             act.thermostat_layout = (bt_thermostat.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put_int("thermostat_layout", act.thermostat_layout);
+            pref.put("thermostat_layout", act.thermostat_layout);
 
             act.show_views();
             if (act.thermostat_layout != LAYOUT_NONE)
@@ -246,10 +255,10 @@ private void egauge_dialog()
         @Override
         public void onClick(View v) {
             act.egauge_progress = (cb.isChecked() ? 1 : 0);
-            pref.put_int("egauge_progress", act.egauge_progress);
+            pref.put("egauge_progress", act.egauge_progress);
 
             act.egauge_url = et.getText().toString();
-            pref.put_string("egauge_url", act.egauge_url);
+            pref.put("egauge_url", act.egauge_url);
 
             act.show_views();
             dialog.dismiss();
@@ -308,7 +317,7 @@ private void ecobee_doauth(final String api, final String pin)
         public void onClick(View v) {
             dialog.dismiss();
             act.ecobee_api = api;
-            pref.put_string("ecobee_api", act.ecobee_api);
+            pref.put("ecobee_api", act.ecobee_api);
             new Thread(new Runnable() {
                 public void run() {
                     act.thermostat.ecobee.ecobee_authorize(act.ecobee_api);
@@ -358,9 +367,9 @@ private void ecobee_dialog()
             act.ecobee_api = api_tv.getText().toString();
             act.ecobee_access = access_tv.getText().toString();
             act.ecobee_refresh = refresh_tv.getText().toString();
-            pref.put_string("ecobee_api", act.ecobee_api);
-            pref.put_string("ecobee_access", act.ecobee_access);
-            pref.put_string("ecobee_refresh", act.ecobee_refresh);
+            pref.put("ecobee_api", act.ecobee_api);
+            pref.put("ecobee_access", act.ecobee_access);
+            pref.put("ecobee_refresh", act.ecobee_refresh);
             dialog.dismiss();
         }
     });
@@ -384,10 +393,10 @@ private void weather_dialog()
         @Override
         public void onClick(View v) {
             act.weather_progress = (cb.isChecked() ? 1 : 0);
-            pref.put_int("weather_progress", act.weather_progress);
+            pref.put("weather_progress", act.weather_progress);
 
             act.weather_id = et.getText().toString();
-            pref.put_string("wunder_id", act.weather_id);
+            pref.put("wunder_id", act.weather_id);
 
             act.show_views();
             dialog.dismiss();
@@ -487,11 +496,11 @@ private void outlets_dialog()
             else
                 act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
-            pref.put_string("outlets_battery", act.outlets_battery);
+            pref.put("outlets_battery", act.outlets_battery);
             act.outlets_batt_min = Common.a2i(min.getText().toString());
-            pref.put_int("outlets_batt_min", act.outlets_batt_min);
+            pref.put("outlets_batt_min", act.outlets_batt_min);
             act.outlets_batt_max = Common.a2i(max.getText().toString());
-            pref.put_int("outlets_batt_max", act.outlets_batt_max);
+            pref.put("outlets_batt_max", act.outlets_batt_max);
             dialog.dismiss();
         }
     });
@@ -514,9 +523,9 @@ private void x10_dialog()
         @Override
         public void onClick(View v) {
             act.x10_url = et.getText().toString();
-            pref.put_string("x10_url", act.x10_url);
+            pref.put("x10_url", act.x10_url);
             act.x10_jwt = jt.getText().toString();
-            pref.put_string("x10_jwt", act.x10_jwt);
+            pref.put("x10_jwt", act.x10_jwt);
             dialog.dismiss();
             act.outlets.startup();
         }
@@ -540,9 +549,9 @@ private void tplink_dialog()
         @Override
         public void onClick(View v) {
             act.tplink_user = ut.getText().toString();
-            pref.put_string("tplink_user", act.tplink_user);
+            pref.put("tplink_user", act.tplink_user);
             act.tplink_pwd = pt.getText().toString();
-            pref.put_string("tplink_pwd", act.tplink_pwd);
+            pref.put("tplink_pwd", act.tplink_pwd);
             dialog.dismiss();
             act.outlets.startup();
         }
@@ -559,7 +568,6 @@ private void developer_dialog()
 
     final TextView level = (TextView) dialog.findViewById(R.id.outlets_batt_level);
     level.setText(Common.i2a(act.outlets_batt_level));
-Log.d("level - " + act.outlets_batt_level + " - " + level.getText().toString());
 
     final TextView uri = (TextView) dialog.findViewById(R.id.log_uri);
     uri.setText(act.log_uri);
@@ -572,15 +580,15 @@ Log.d("level - " + act.outlets_batt_level + " - " + level.getText().toString());
         @Override
         public void onClick(View v) {
             act.outlets_batt_level = Common.a2i(level.getText().toString());
-            pref.put_int("outlets_batt_level", act.outlets_batt_level);
+            pref.put("outlets_batt_level", act.outlets_batt_level);
 
             act.log_uri = uri.getText().toString();
-            pref.put_string("log_uri", act.log_uri);
+            pref.put("log_uri", act.log_uri);
             act.log_params = params.getText().toString();
-            pref.put_string("log_params", act.log_params);
+            pref.put("log_params", act.log_params);
 
             act.debug = (cb.isChecked() ? 1 : 0);
-            pref.put_int("debug", act.debug);
+            pref.put("debug", act.debug);
             Log.cfg(act.debug, act.log_uri, act.log_params);
 
             dialog.dismiss();
@@ -614,7 +622,6 @@ private void about_dialog()
 private void ecobee_get(Dialog dialog, String api)
 {
 
-Log.d("ecobee_get() api - " + api);
     return;
 }
 

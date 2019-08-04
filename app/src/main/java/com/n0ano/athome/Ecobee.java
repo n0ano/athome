@@ -121,10 +121,9 @@ public String ecobee_get_pin(String api)
                                "",
                                null);
     act.ecobee_access = act.parse.json_get("code", resp, 1);
-    Preferences pref = new Preferences(act);
-    pref.put_string("ecobee_access", act.ecobee_access);
+    Preferences pref = act.pref;
+    pref.put("ecobee_access", act.ecobee_access);
     String pin = act.parse.json_get("ecobeePin", resp, 1);
-Log.d("ecobee get pin for api - " + api + " = " + pin + "/" + act.ecobee_access);
     return pin;
 }
 
@@ -144,10 +143,9 @@ private void ecobee_token(String type, String code, String api)
         return;
     act.ecobee_access = act.parse.json_get("access_token", resp, 1);
     act.ecobee_refresh = act.parse.json_get("refresh_token", resp, 1);
-    Preferences pref = new Preferences(act);
-    pref.put_string("ecobee_access", act.ecobee_access);
-    pref.put_string("ecobee_refresh", act.ecobee_refresh);
-Log.d("ecoBee tokens access/refresh - " + act.ecobee_access + "/" + act.ecobee_refresh);
+    Preferences pref = act.pref;
+    pref.put("ecobee_access", act.ecobee_access);
+    pref.put("ecobee_refresh", act.ecobee_refresh);
     return;
 }
 
@@ -222,7 +220,6 @@ public void ecobee_hold(int heat, ThermostatDevice dev)
     if (dev.get_mode().equals("auto"))
         cool += dev.get_c_delta();
     String hmode = (type == Thermostat.HOLD_TEMPORARY) ? "nextTransition" : "indefinite";
-Log.d("hold at " + heat + ", until " + hmode);
     String body = "{" + "\n" +
                   " \"selection\":{" + "\n" +
                   "  \"selectionType\":\"thermostats\"," + "\n" +

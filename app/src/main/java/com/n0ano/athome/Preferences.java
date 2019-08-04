@@ -16,6 +16,9 @@ public static final int MAX_RECENT = 10;
 
 private final String PREF_NAME = "AtHome_Preferences";
 
+private static final int PREF_INT =     0;
+private static final int PREF_STRING =  1;
+
 private SharedPreferences pref;
 Activity my_act;
 
@@ -30,45 +33,49 @@ public Preferences(Activity act)
 	pref = act.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 }
 
-public String get_string(String key, String def)
+public int get(String key, int def)
 {
 
-	return pref.getString(key, def);
+    String str = pref.getString(key, Integer.toString(def));
+    if (str.isEmpty())
+        return 0;
+    return Integer.parseInt(str);
 }
 
-public void put_string(String key, String value)
+public boolean get(String key, boolean def)
+{
+
+    String str = pref.getString(key, (def ? "true" : "false"));
+    return str.equals("true");
+}
+
+public String get(String key, String def)
+{
+
+    return pref.getString(key, def);
+}
+
+public void put(String key, int value)
+{
+
+	SharedPreferences.Editor editor = pref.edit();
+	editor.putString(key, Integer.toString(value));
+	editor.commit();
+}
+
+public void put(String key, boolean value)
+{
+
+	SharedPreferences.Editor editor = pref.edit();
+	editor.putString(key, (value ? "true" : "false"));
+	editor.commit();
+}
+
+public void put(String key, String value)
 {
 
 	SharedPreferences.Editor editor = pref.edit();
 	editor.putString(key, value);
-	editor.commit();
-}
-
-public int get_int(String key, int def)
-{
-
-	return pref.getInt(key, def);
-}
-
-public void put_int(String key, int value)
-{
-
-	SharedPreferences.Editor editor = pref.edit();
-	editor.putInt(key, value);
-	editor.commit();
-}
-
-public boolean get_boolean(String key, boolean def)
-{
-
-	return pref.getBoolean(key, def);
-}
-
-public void put_boolean(String key, boolean value)
-{
-
-	SharedPreferences.Editor editor = pref.edit();
-	editor.putBoolean(key, value);
 	editor.commit();
 }
 

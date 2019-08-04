@@ -77,6 +77,8 @@ public void init_view()
 
     set_power(act.outlets_battery);
     TableLayout tl = (TableLayout) act.findViewById(R.id.outlets_table);
+    if (tl == null)
+        return;
     tl.removeAllViews();
     TableRow tr = null;
     TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
@@ -102,10 +104,9 @@ public void init_view()
         v.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 OutletsDevice dev = (OutletsDevice) v.getTag();
-Log.d("long press on " + dev.get_name());
                 //dev.set_hold(!dev.get_hold());
                 //dev.set_state(dev.get_state(), act);
-                Popup popup = new Popup(act);
+                Popup popup = act.popup;
                 popup.device_dialog(dev);
                 return true;
             }

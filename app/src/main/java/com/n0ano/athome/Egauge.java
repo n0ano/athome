@@ -51,7 +51,6 @@ private int get_value(String name, String resp)
         int end = resp.indexOf(".", start);
         if (end < 0)
             return w;
-Log.d("data - " + resp.substring(start, end));
         w = Common.a2i(resp.substring(start, end));
     }
     return w;
