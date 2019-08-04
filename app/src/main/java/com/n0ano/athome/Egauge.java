@@ -78,6 +78,19 @@ private String k_watts(int w)
     }
 }
 
+private int gen_icon(int watts)
+{
+    int w_max = 6000;
+
+    if (watts > (w_max * 0.75))
+        return R.drawable.panel_green;
+    if (watts > (w_max * 0.25))
+        return R.drawable.panel_cyan;
+    if (watts >= 0)
+        return R.drawable.panel_white;
+    return R.drawable.panel_red;
+}
+
 public void update()
 {
 
@@ -113,6 +126,8 @@ public void update()
 
             if ((tv = (TextView) act.findViewById(R.id.panel_watt)) != null)
                 tv.setText(k_watts(gen_watt));
+            if ((iv = (ImageView) act.findViewById(R.id.panel_image)) != null)
+                iv.setImageResource(gen_icon(gen_watt));
 
             if ((iv = (ImageView) act.findViewById(R.id.grid_arrow)) != null)
                 set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
