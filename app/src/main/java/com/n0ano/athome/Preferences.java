@@ -16,6 +16,8 @@ public static final int MAX_RECENT = 10;
 
 private final String PREF_NAME = "AtHome_Preferences";
 
+private final int PREF_VERSION = 2;
+
 private static final int PREF_INT =     0;
 private static final int PREF_STRING =  1;
 
@@ -31,6 +33,35 @@ public Preferences(Activity act)
 
 	my_act = act;
 	pref = act.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    switch (get("pref_version", 0)) {
+
+    default:
+    case 0:
+        cfg_v0_v2();
+        break;
+
+    case PREF_VERSION:
+        break;
+
+    }
+}
+
+private void cfg_v0_v2()
+{
+
+    Log.d("Convert preferences to version " + PREF_VERSION);
+	put("debug", pref.getInt("debug", 0));
+	put("egauge_layout", pref.getInt("egauge_layout", Popup.LAYOUT_TABLET));
+	put("egauge_progress", pref.getInt("egauge_progress", 1));
+	put("general_layout", pref.getInt("general_layout", Popup.LAYOUT_TABLET));
+	put("outlets_batt_level", pref.getInt("outlets_batt_level", 0));
+	put("outlets_batt_max", pref.getInt("outlets_batt_max", MainActivity.BATTERY_HIGH));
+	put("outlets_batt_min", pref.getInt("outlets_batt_min", MainActivity.BATTERY_LOW));
+	put("thermostat_layout", pref.getInt("thermostat_layout", Popup.LAYOUT_TABLET));
+	put("weather_layout", pref.getInt("weather_layout", Popup.LAYOUT_TABLET));
+	put("weather_progress", pref.getInt("weather_progress", 1));
+
+    put("pref_version", PREF_VERSION);
 }
 
 public int get(String key, int def)

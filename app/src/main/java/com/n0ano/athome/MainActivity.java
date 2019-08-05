@@ -656,6 +656,7 @@ public void show_cfg()
         cfg.put("log_params", pref.get("log_params", ""));
         cfg.put("log_uri", pref.get("log_uri", ""));
         cfg.put("outlets_battery", pref.get("outlets_battery", ""));
+        cfg.put("pref_version", pref.get("pref_version", ""));
         cfg.put("remote_server", pref.get("remote_server", ""));
         cfg.put("tplink_pwd", pref.get("tplink_pwd", ""));
         cfg.put("tplink_user", pref.get("tplink_user", ""));
