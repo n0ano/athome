@@ -38,6 +38,10 @@ public class MainActivity extends AppCompatActivity
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
 
+private final static String CONFIG_URI = "/cgi-bin/athome/config";
+private final static String CONFIG_LOAD =  "load";
+private final static String CONFIG_SAVE =  "save";
+
 Preferences pref;
 
 public int general_layout;
@@ -566,6 +570,26 @@ private void set_cfg(String cfg)
     restore_state();
 }
 
+public void remote_doit(String type, String url, String cfg)
+{
+
+    pref.put("remote_server", url);
+    if (type.equals(CONFIG_SAVE)) {
+        call_api("POST", url + CONFIG_URI, type, "", cfg);
+    } else {
+        String resp = call_api("GET", url + CONFIG_URI, type, "", null);
+        set_cfg(resp.substring(1));
+        runOnUiThread(new Runnable() {
+            public void run() {
+                setContentView(R.layout.activity_main);
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                doit();
+            }
+        });
+    }
+}
+
 public void show_cfg()
 {
     String line;
@@ -599,6 +623,22 @@ public void show_cfg()
         }
     });
 
+    bt = findViewById(R.id.cfg_save);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            popup.remote_server(CONFIG_SAVE, et.getText().toString());
+        }
+    });
+
+    bt = findViewById(R.id.cfg_load);
+    bt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            popup.remote_server(CONFIG_LOAD, "");
+        }
+    });
+
     JSONObject cfg = new JSONObject();
     try {
         cfg.put("debug", pref.get("debug", ""));
@@ -611,13 +651,12 @@ public void show_cfg()
         cfg.put("thermostat_layout", pref.get("thermostat_layout", ""));
         cfg.put("weather_layout", pref.get("weather_layout", ""));
         cfg.put("weather_progress", pref.get("weather_progress", ""));
-        cfg.put("ecobee_access", pref.get("ecobee_access", ""));
         cfg.put("ecobee_api", pref.get("ecobee_api", ""));
-        cfg.put("ecobee_refresh", pref.get("ecobee_refresh", ""));
         cfg.put("egauge_url", pref.get("egauge_url", ""));
         cfg.put("log_params", pref.get("log_params", ""));
         cfg.put("log_uri", pref.get("log_uri", ""));
         cfg.put("outlets_battery", pref.get("outlets_battery", ""));
+        cfg.put("remote_server", pref.get("remote_server", ""));
         cfg.put("tplink_pwd", pref.get("tplink_pwd", ""));
         cfg.put("tplink_user", pref.get("tplink_user", ""));
         cfg.put("wunder_id", pref.get("wunder_id", ""));

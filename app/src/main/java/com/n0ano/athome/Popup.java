@@ -596,6 +596,31 @@ private void developer_dialog()
     });
 }
 
+public void remote_server(final String type, final String cfg)
+{
+
+    final Dialog dialog = start_dialog(R.layout.bar_remote);
+
+    TextView tv = (TextView)dialog.findViewById(R.id.remote_title);
+    tv.setText("Remote server - " + type);
+
+    final EditText et = (EditText)dialog.findViewById(R.id.remote_url);
+    et.setText(pref.get("remote_server", ""));
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+            new Thread(new Runnable() {
+                public void run() {
+                    act.remote_doit(type, et.getText().toString(), cfg);
+                }
+            }).start();
+        }
+    });
+}
+
 private void about_dialog()
 {
 
