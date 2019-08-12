@@ -19,32 +19,14 @@
             android:paddingTop="10dp"
             android:paddingLeft="5dp"
             android:src="@drawable/inside" />
-        <RelativeLayout
-            android:id="@+id/thermostat"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
 
-            <TextView
-                android:id="@+id/thermostat_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="10dp"
-                android:textSize="54sp"
-                android:text="" />
-            <TextView
-                android:id="@+id/thermostat_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/thermostat_temp"
-                android:layout_toRightOf="@id/thermostat_temp"
-                android:textSize="32sp"
-                android:paddingLeft="5dp"
-                android:text="&#xb0;" />
-
-            </RelativeLayout>
+        <com.n0ano.athome.GaugeView
+            android:id="@+id/thermostat_temp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="10dp" />
 
         </LinearLayout>
         <TextView

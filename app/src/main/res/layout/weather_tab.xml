@@ -49,25 +49,13 @@
                     android:src="@drawable/outside"
                     android:onClick="go_temp_detail" />
 
-                <TextView
+                <com.n0ano.athome.GaugeView
                     android:id="@+id/weather_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
                     android:layout_alignParentTop="true"
                     android:layout_toRightOf="@id/weather_icon"
-                    android:paddingLeft="10dp"
-                    android:textSize="54sp"
-                    android:text="" />
-
-                <TextView
-                    android:id="@+id/weather_unit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/weather_temp"
-                    android:layout_toRightOf="@id/weather_temp"
-                    android:textSize="32sp"
-                    android:paddingLeft="5dp"
-                    android:text="&#xb0;" />
+                    android:paddingLeft="10dp" />
 
                 </RelativeLayout>
 

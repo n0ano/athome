@@ -184,9 +184,10 @@ public void update()
         public void run() {
             TextView tv;
             ImageView iv;
+            GaugeView gv;
 
-            if ((tv = (TextView) act.findViewById(R.id.weather_temp)) != null)
-                tv.setText(data.get("tempf"));
+            if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null)
+                gv.set_value(data.get("tempf"));
 
             if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
                 iv.setRotation(Integer.valueOf(data.get("winddir")));

@@ -232,11 +232,11 @@ public void update()
                 for (int i = 0; i < max_devices; i++) {
                     ThermostatDevice dev = thermostat_adapter.getItem(i);
                     View v = dev.get_view();
-                    TextView tv = (TextView) v.findViewById(R.id.thermostat_temp);
-                    tv.setText(dev.get_temp());
-                    tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ?
-                                            act.getResources().getColor(R.color.fore) :
-                                            act.getResources().getColor(R.color.hold));
+                    GaugeView gv = (GaugeView) v.findViewById(R.id.thermostat_temp);
+                    gv.set_value(dev.get_temp());
+//                    tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ?
+//                                            act.getResources().getColor(R.color.fore) :
+//                                            act.getResources().getColor(R.color.hold));
                 }
             }
         });
