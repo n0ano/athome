@@ -178,11 +178,12 @@ public void init_view()
     params.setMargins(0, 40, 0, 0); /* left, top, right, bottom */
 
     TableRow tr = null;
-    int row = 2;
     int max_devices = thermostat_adapter.getCount();
+    int rows = ((act.general_layout == Popup.LAYOUT_PHONE) ? 1 : 2);
+    int row = rows;
     for (i = 0; i < max_devices; i++) {
         ThermostatDevice dev = thermostat_adapter.getItem(i);
-        if (++row > 2) {
+        if (++row > rows) {
             row = 1;
             if (tr != null)
                 tl.addView(tr, params);
