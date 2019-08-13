@@ -22,14 +22,27 @@ public class GaugeView extends View {
 
 private Context ctx;
 
+private int w;
+private int h;
+private int cx;
+private int cy;
+
+private float density;
+
 private Paint dial_paint;
+private Paint deg_paint;
 private Paint value_paint;
 private Paint num_paint;
 private Paint hilo_paint;
 
 private int margin;
-private int hilo_w;
-private int dial_w;
+
+private float dial_w;
+private float hilo_w;
+private float tick_max;
+private float tick_min;
+private float deg_size;
+private float tick_size;
 
 private float current;
 private float low_a;
@@ -49,9 +62,16 @@ public GaugeView(Context ctx, AttributeSet attrs)
 
 	this.ctx = ctx;
 
+    density = getResources().getDisplayMetrics().density;
     margin = 20;
-    hilo_w = 6;
-    dial_w = 2;
+
+    dial_w = 1 * density;
+    hilo_w = 14 * density;
+    deg_size = 32 * density;
+    tick_size = 10 * density;
+    tick_max = 8 * density;
+    tick_min = -40 * density;
+
     min_deg = 20f;
     max_deg = 100f;
     cur_value = 1000;
@@ -59,28 +79,19 @@ public GaugeView(Context ctx, AttributeSet attrs)
     cur_max = -1000;
     reset_minmax = true;
 
-	dial_paint = new Paint();
-    dial_paint.setAntiAlias(true);
-    dial_paint.setColor(0xffffffff);
-	dial_paint.setStyle(Paint.Style.STROKE);
-    dial_paint.setStrokeWidth(dial_w * 2);
+	dial_paint = brush(0xff00ffff, dial_w * 2);
 
-	value_paint = new Paint();
-    value_paint.setAntiAlias(true);
-    value_paint.setColor(0xffffffff);
-	value_paint.setStyle(Paint.Style.STROKE);
-    value_paint.setTextSize(32f);
+    deg_paint = brush(0xffffffff, dial_w * 2);
 
-	num_paint = new Paint();
-    num_paint.setAntiAlias(true);
-    num_paint.setColor(0xffffffff);
-	num_paint.setStyle(Paint.Style.STROKE);
+	value_paint = brush(0xffffffff, 1);
+	value_paint.setStyle(Paint.Style.FILL);
+    value_paint.setTextSize(deg_size);
 
-    hilo_paint = new Paint();
-    hilo_paint.setAntiAlias(true);
-    hilo_paint.setColor(0xff00ff00);
-	hilo_paint.setStyle(Paint.Style.STROKE);
-    hilo_paint.setStrokeWidth(hilo_w * 2);
+	num_paint = brush(0xff00ffff, 1);
+	num_paint.setStyle(Paint.Style.FILL);
+    num_paint.setTextSize(tick_size);
+
+    hilo_paint = brush(0xff00ff00, hilo_w * 2);
 }
 
 @Override
@@ -88,8 +99,10 @@ public void onDraw(Canvas canvas)
 {
 	super.onDraw(canvas);
 
-	int w = getMeasuredWidth();
-	int h = getMeasuredHeight();
+	w = getMeasuredWidth();
+	h = getMeasuredHeight();
+    cx = w/2;
+    cy = h/2;
 
 //Paint bkg = new Paint();
 //bkg.setStyle(Paint.Style.FILL);
@@ -97,20 +110,33 @@ public void onDraw(Canvas canvas)
 //bkg.setColor(0xff000000);
 //canvas.drawRect(0, 0, w, h, bkg);
 
-    float r = (float)(margin + dial_w);
-
     // draw high/low arc
     if (cur_min != 1000)
-        min_max(w, h, r, canvas, hilo_paint);
+        hilo(canvas, hilo_paint);
 
     // draw dial
-    dial(w, h, (int)r, 20, 100, 8, canvas, dial_paint, num_paint);
+    dial(20, 100, 8, canvas, dial_paint, num_paint);
 
     // draw current value tick
     if (cur_value != 1000) {
-        canvas.drawText(String.format("%.1f", cur_value), (w/2) - 30, (h/2) + 8, value_paint);
-        line((w/2) - (margin + dial_w) + 8, (w/2) - (margin + dial_w) - 40, deg2angle(cur_value), w/2, h/2, canvas, dial_paint);
+        pointer(w, h, margin, cur_value, canvas, value_paint, deg_paint);
     }
+}
+
+public void set_dimensions(int tick_max, int tick_min, int hilo_w, int deg_size, int tick_size)
+{
+
+    this.tick_max = tick_max;
+    this.tick_min = tick_min;
+
+    this.hilo_w = hilo_w;
+    hilo_paint.setStrokeWidth(hilo_w);
+
+    this.deg_size = deg_size;
+    value_paint.setTextSize(deg_size);
+
+    this.tick_size = tick_size;
+    num_paint.setTextSize(tick_size);
 }
 
 public void set_value(float val)
@@ -148,6 +174,17 @@ public void set_value(String val)
     } 
 }
 
+private Paint brush(int color, float width)
+{
+
+    Paint p = new Paint();
+    p.setAntiAlias(true);
+	p.setStyle(Paint.Style.STROKE);
+    p.setColor(color);
+    p.setStrokeWidth(width);
+    return p;
+}
+
 private float deg2angle(float deg)
 {
 
@@ -158,10 +195,10 @@ private float deg2angle(float deg)
     return ((deg - min_deg)/(max_deg - min_deg) * 270f) + (90 + 45);
 }
 
-private void min_max(int w, int h, float r, Canvas c, Paint p)
+private void hilo(Canvas c, Paint p)
 {
 
-    float off = r + (dial_w + hilo_w);
+    float off = margin + (dial_w*2) + hilo_w;
     Shader grad = new LinearGradient(0, 0, w, h/2, Color.BLUE, Color.RED, Shader.TileMode.MIRROR);
     hilo_paint.setShader(grad);
     float start = deg2angle(cur_min);
@@ -169,52 +206,63 @@ private void min_max(int w, int h, float r, Canvas c, Paint p)
     c.drawArc(off, off, (float)(w - off), (float)(h - off), start, angle, false, p);
 }
 
-private void dial(int w, int h, int m, int min, int max, int ticks, Canvas c, Paint p, Paint num_p)
+private void dial(int min, int max, int ticks, Canvas c, Paint p, Paint num_p)
 {
-    float a;
+    float a, tw;
+    String num;
 
+    float m = margin + dial_w;
+    float l = 10 * density;
     c.drawArc(m, m, w - m, h - m, 90 + 45, 270, false, p);
     int delta = (max - min) / ticks;
     do {
-        line((w/2) - m, (w/2) - m - 10, deg2angle(min), w/2, h/2, c, p);
+        num = Integer.toString(min);
+        tw = num_p.measureText(num);
+        line(cx - m, cx - m - l, deg2angle(min), c, p);
         Path path = new Path();
         a = deg2angle(min);
-        if (min > 99) {
-            path.moveTo(polar_x((w/2) - m - 34, a) + (w/2), polar_y((w/2) - m - 34, a) + (w/2));
-            path.lineTo(polar_x((w/2) - m - 12, a) + (w/2), polar_y((w/2) - m - 12, a) + (w/2));
-        } else if (a > 260 && a < 280) {
-            path.moveTo((w/2) - 10, m + 20);
-            path.lineTo((w/2) + 10, m + 20);
+        if (a > 260 && a < 280) {
+            path.moveTo(cx - (tw/2), m + l + tick_size);
+            path.lineTo(cx + (tw/2), m + l + tick_size);
         } else if (a < 270) {
-            path.moveTo(polar_x((w/2) - m - 12, a) + (w/2), polar_y((w/2) - m - 12, a) + (w/2));
-            path.lineTo(w/2, w/2);
+            path.moveTo(polar_x(cx - m - l, a), polar_y(cx - m - l, a));
+            path.lineTo(cx, cx);
         } else {
-            path.moveTo(polar_x((w/2) - m - 26, a) + (w/2), polar_y((w/2) - m - 26, a) + (w/2));
-            path.lineTo(polar_x((w/2) - m - 12, a) + (w/2), polar_y((w/2) - m - 12, a) + (w/2));
+            path.moveTo(polar_x(cx - m - l - tw, a), polar_y(cx - m - l - tw, a));
+            path.lineTo(polar_x(cx - m - l, a), polar_y(cx - m - l, a));
         }
-        c.drawTextOnPath(Integer.toString(min), path, 0, 4, num_p);
+        c.drawTextOnPath(num, path, 0, 4, num_p);
         min += delta;
     } while (ticks-- > 0);
 }
 
-private void line(float max, float min, float a, int off_x, int off_y, Canvas c, Paint p)
+private void pointer(int w, int h, int m, float v, Canvas c, Paint dp, Paint pp)
 {
 
-    c.drawLine(polar_x(max, a) + off_x, polar_y(max, a) + off_y,
-               polar_x(min, a) + off_x, polar_y(min, a) + off_y,
+    String deg = String.format("%.1f", v);
+    float tw = dp.measureText(deg);
+    c.drawText(deg, cx - (tw/2), cy + 8, dp);
+    line(cx - (m + dial_w) + tick_max, cx - (m + dial_w) + tick_min, deg2angle(v), c, pp);
+}
+
+private void line(float max, float min, float a, Canvas c, Paint p)
+{
+
+    c.drawLine(polar_x(max, a), polar_y(max, a),
+               polar_x(min, a), polar_y(min, a),
                p);
 }
 
 private float polar_x(float r, float a)
 {
 
-    return (float)(r * cos(Math.toRadians(a)));
+    return (float)((r * cos(Math.toRadians(a))) + cx);
 }
 
 private float polar_y(float r, float a)
 {
 
-    return (float)(r * sin(Math.toRadians(a)));
+    return (float)((r * sin(Math.toRadians(a))) + cx);
 }
 
 }
