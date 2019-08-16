@@ -48,6 +48,7 @@ public int general_layout;
 
 public int egauge_layout;
 public int egauge_progress;
+public boolean egauge_clock;
 public String egauge_url;
 
 public int weather_layout;
@@ -252,7 +253,15 @@ public void show_views()
 {
 
     view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
+    final ClockView cv = (ClockView)findViewById(R.id.clock_view);
+    if (cv != null) {
+        ImageView h_img = (ImageView)findViewById(R.id.house_image);
+        h_img.setVisibility(egauge_clock ? View.GONE :    View.VISIBLE);
+        cv.setVisibility(egauge_clock    ? View.VISIBLE : View.GONE);
+    }
+
     view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
+
     view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
 }
 
@@ -264,6 +273,7 @@ private void restore_state()
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);
     egauge_url = pref.get("egauge_url", "");
+    egauge_clock = pref.get("egauge_clock", false);
 
     weather_layout = pref.get("weather_layout", Popup.LAYOUT_TABLET);
     weather_progress = pref.get("weather_progress", 1);
@@ -642,6 +652,7 @@ public void show_cfg()
     JSONObject cfg = new JSONObject();
     try {
         cfg.put("debug", pref.get("debug", ""));
+        cfg.put("egauge_clock", pref.get("egauge_clock", ""));
         cfg.put("egauge_layout", pref.get("egauge_layout", ""));
         cfg.put("egauge_progress", pref.get("egauge_progress", ""));
         cfg.put("general_layout", pref.get("general_layout", ""));
@@ -764,6 +775,19 @@ private boolean working()
     return this.running;
 }
 
+private void clock()
+{
+
+    final ClockView cv = (ClockView)findViewById(R.id.clock_view);
+    if (cv == null)
+        return;
+    runOnUiThread(new Runnable() {
+        public void run() {
+            cv.update();
+        }
+    });
+}
+
 private void doit()
 {
 
@@ -786,6 +810,8 @@ private void doit()
     new Thread(new Runnable() {
         public void run() {
             while (working()) {
+
+                clock();
 
                 if (weather != null)
                     weather.update();

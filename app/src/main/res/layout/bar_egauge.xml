@@ -43,14 +43,43 @@
 
         </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="House image: "
+            android:textColor="@color/dialog_fore" />
+        <RadioGroup
+            android:id="@+id/general_house"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            <RadioButton
+                android:id="@+id/egauge_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Icon" />
+            <RadioButton
+                android:id="@+id/egauge_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clock" />
+            </RadioGroup>
+        </LinearLayout>
+
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="horizontal"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+        android:paddingRight="10dp" >
 
 		<TextView
 			android:layout_width="wrap_content"

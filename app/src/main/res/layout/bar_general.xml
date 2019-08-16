@@ -4,181 +4,196 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical" >
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="10dp" >
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Display"
-            android:textSize="20dp"
-            android:textColor="@color/dialog_fore" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp" >
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-		>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Display"
+                    android:textSize="20dp"
+                    android:textColor="@color/dialog_fore" />
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-            android:textSize="14sp"
-			android:text="Layout: "
-            android:textColor="@color/dialog_fore" />
-		<RadioGroup
-            android:id="@+id/general_layout"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" >
-            <RadioButton
-                android:id="@+id/general_tablet"
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="Layout: "
+                    android:textColor="@color/dialog_fore" />
+                <RadioGroup
+                    android:id="@+id/general_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+                    <RadioButton
+                        android:id="@+id/general_tablet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tablet" />
+                    <RadioButton
+                        android:id="@+id/general_phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phone" />
+                    </RadioGroup>
+
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" >
+
+                <CheckBox
+                    android:id="@+id/general_egauge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text=" eGauge enabled"
+                    android:textColor="@color/dialog_fore" />
+
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" >
+
+                <CheckBox
+                    android:id="@+id/general_weather"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text=" Weather enabled"
+                    android:textColor="@color/dialog_fore" />
+
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" >
+
+                <CheckBox
+                    android:id="@+id/general_thermostat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text=" Thermostat enabled"
+                    android:textColor="@color/dialog_fore" />
+
+                </LinearLayout>
+
+            <Button
+                android:id="@+id/general_developer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tablet" />
-            <RadioButton
-                android:id="@+id/general_phone"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Developer options"
+                android:textColor="@color/dialog_fore"
+                android:background="@color/buttonBack" />
+
+            <Button
+                android:id="@+id/general_log"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phone" />
-            </RadioGroup>
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Log buffer"
+                android:textColor="@color/dialog_fore"
+                android:background="@color/buttonBack" />
 
-		</LinearLayout>
+            <Button
+                android:id="@+id/general_config"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Configuration"
+                android:textColor="@color/dialog_fore"
+                android:background="@color/buttonBack" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+            <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingRight="30dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp" >
 
-        <CheckBox
-            android:id="@+id/general_egauge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text=" eGauge enabled"
-            android:textColor="@color/dialog_fore" />
+                <Button
+                    android:id="@+id/cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="30dp"
+                    android:text="Cancel"
+                    android:textColor="@color/dialog_fore"
+                    android:background="@color/dialog_back" />
+                <Button
+                    android:id="@+id/ok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ok"
+                    android:textColor="@color/dialog_fore"
+                    android:background="@color/dialog_back" />
 
-        </LinearLayout>
+                </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+            </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/general_weather"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text=" Weather enabled"
-            android:textColor="@color/dialog_fore" />
+        </ScrollView>
 
-        </LinearLayout>
+    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
-
-        <CheckBox
-            android:id="@+id/general_thermostat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text=" Thermostat enabled"
-            android:textColor="@color/dialog_fore" />
-
-        </LinearLayout>
-
-    <Button
-        android:id="@+id/general_developer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="Developer options"
-        android:textColor="@color/dialog_fore"
-        android:background="@color/buttonBack" />
-
-    <Button
-        android:id="@+id/general_log"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="Log buffer"
-        android:textColor="@color/dialog_fore"
-        android:background="@color/buttonBack" />
-
-    <Button
-        android:id="@+id/general_config"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="Configuration"
-        android:textColor="@color/dialog_fore"
-        android:background="@color/buttonBack" />
-
-	<LinearLayout
-		android:gravity="right"
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:paddingRight="30dp"
-		android:paddingTop="20dp"
-		android:paddingBottom="20dp" >
-
-		<Button
-			android:id="@+id/cancel"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingRight="30dp"
-			android:text="Cancel"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
-		<Button
-			android:id="@+id/ok"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Ok"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
-
-		</LinearLayout>
-
-</LinearLayout>

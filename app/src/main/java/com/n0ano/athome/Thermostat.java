@@ -180,7 +180,7 @@ public void init_view()
     TableRow tr = null;
     int max_devices = thermostat_adapter.getCount();
     int rows = ((act.general_layout == Popup.LAYOUT_PHONE) ? 1 : 2);
-    int row = rows;
+    int row =  rows;
     for (i = 0; i < max_devices; i++) {
         ThermostatDevice dev = thermostat_adapter.getItem(i);
         if (++row > rows) {

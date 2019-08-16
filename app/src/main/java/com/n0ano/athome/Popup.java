@@ -247,6 +247,10 @@ private void egauge_dialog()
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.egauge_progress);
     cb.setChecked(act.egauge_progress != 0);
 
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.general_house);
+    rg.check(act.egauge_clock ? R.id.egauge_clock :
+                                R.id.egauge_icon);
+
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
     et.setText(act.egauge_url);
 
@@ -256,6 +260,9 @@ private void egauge_dialog()
         public void onClick(View v) {
             act.egauge_progress = (cb.isChecked() ? 1 : 0);
             pref.put("egauge_progress", act.egauge_progress);
+
+            act.egauge_clock = ((rg.getCheckedRadioButtonId() == R.id.egauge_clock) ?  true : false);
+            pref.put("egauge_clock", act.egauge_clock);
 
             act.egauge_url = et.getText().toString();
             pref.put("egauge_url", act.egauge_url);
