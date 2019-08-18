@@ -2,11 +2,15 @@ package com.n0ano.athome;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.res.Resources;
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -34,6 +38,10 @@ public final static int PERIOD = 60;   // weather only changes once a minute
 
 private final static int MAX_BARO = 10; // barometer trends over 10 minutes
 
+private final static int MINMAX_NONE =  0;  // No min/max data yet
+private final static int MINMAX_VALID = 1;  // min/max data available
+private final static int MINMAX_SET =   2;  // min/max data set in GaugeView
+
 public final static String WUNDER_URL = "https://stationdata.wunderground.com";
 public final static String WUNDER_API = "/cgi-bin/stationlookup";
 public final static String WUNDER_STATION = "station=";
@@ -49,6 +57,7 @@ ArrayList<Float> baro_hist = new ArrayList<Float>();
 Float baro_cum = 0.0f;
 Float baro_avg = 0.0f;
 int baro_icon;
+int minmax = MINMAX_NONE;
 
 // Weather: class constructor
 //
@@ -112,6 +121,9 @@ private void get_info_wunder(String resp)
         baro_icon = R.drawable.barometer_down;
     else
         baro_icon = R.drawable.barometer;
+
+    if (minmax == MINMAX_NONE)
+        minmax = MINMAX_VALID;
 }
 
 private void get_wunder()
@@ -186,8 +198,13 @@ public void update()
             ImageView iv;
             GaugeView gv;
 
-            if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null)
+            if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null) {
+                if (minmax == MINMAX_VALID) {
+                    minmax = MINMAX_SET;
+                    gv.set_minmax(data.get("mintemp"), data.get("maxtemp"));
+                }
                 gv.set_value(data.get("tempf"));
+            }
 
             if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
                 iv.setRotation(Integer.valueOf(data.get("winddir")));

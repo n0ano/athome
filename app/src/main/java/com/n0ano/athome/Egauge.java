@@ -1,7 +1,10 @@
 package com.n0ano.athome;
 
 import android.app.Activity;
+import android.content.res.Resources;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
@@ -27,6 +30,8 @@ int period = PERIOD;
 
 int use_watt;
 int gen_watt;
+
+int width = 0;
 
 // Egauge: class constructor
 //
@@ -127,6 +132,28 @@ public void update()
         public void run() {
             TextView tv;
             ImageView iv;
+
+int disp_x = Resources.getSystem().getDisplayMetrics().widthPixels;
+int disp_y = Resources.getSystem().getDisplayMetrics().heightPixels;
+//Log.d("display = " + disp_x + "x" + disp_y);
+
+LinearLayout ll = (LinearLayout)act.findViewById(R.id.egauge);
+//Logandroid and.d("layout = " + ll.getWidth() + "x" + ll.getHeight() + " => " + disp_x + "x" + disp_y);
+
+//ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
+//ViewGroup.LayoutParams vp = vv.getLayoutParams();
+//Log.d("clock = " + vp.width + "x" + vp.height);
+
+if (width == 0 && disp_x < 1000) {
+    width = 180;
+    ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
+    if (vv != null) {
+        ViewGroup.LayoutParams vp = vv.getLayoutParams();
+        vp.width = width;
+        vp.height = width;
+        vv.setLayoutParams(vp);
+    }
+}
 
             int grid_watt = gen_watt - use_watt;
 

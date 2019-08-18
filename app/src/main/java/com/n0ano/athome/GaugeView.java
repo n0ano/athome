@@ -149,14 +149,12 @@ public void set_value(float val)
         cur_max = val;
     Calendar c = Calendar.getInstance();
     int h = c.get(Calendar.HOUR_OF_DAY);
-    int m = c.get(Calendar.MINUTE);
-    int s = c.get(Calendar.SECOND);
-    if ((h == 0) && (m == 0) && (s == 0) && reset_minmax) {
+    if ((h == 0) && reset_minmax) {
 Log.d("reset min/max");
         reset_minmax = false;
         cur_min = val;
         cur_max = val;
-    } else {
+    } else if (h > 0) {
         reset_minmax = true;
     }
     invalidate();
@@ -171,6 +169,25 @@ public void set_value(String val)
 
     } catch (Exception e) {
         Log.d("Temp: bad float - " + val);
+    } 
+}
+
+public void set_minmax(float min, float max)
+{
+
+    cur_min = min;
+    cur_max = max;
+}
+
+public void set_minmax(String min, String max)
+{
+
+    try {
+        cur_min = Float.valueOf(min);
+        cur_max = Float.valueOf(max);
+
+    } catch (Exception e) {
+        Log.d("Temp: bad float for min/max - " + min + "/" + max);
     } 
 }
 
