@@ -128,6 +128,66 @@
 
                 </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="Display on time"
+                    android:textColor="@color/dialog_fore" />
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/general_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text=""
+                    android:hint="        "
+                    android:inputType="time"
+                    android:textColor="@color/dialog_fore"
+                    android:backgroundTint="@color/dialog_fore"
+                    android:paddingLeft="5dp"
+                    android:textCursorDrawable="@drawable/edit_cursor" />
+
+                </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="Display off time"
+                    android:textColor="@color/dialog_fore" />
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/general_off"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text=""
+                    android:hint="        "
+                    android:inputType="time"
+                    android:textColor="@color/dialog_fore"
+                    android:backgroundTint="@color/dialog_fore"
+                    android:paddingLeft="5dp"
+                    android:textCursorDrawable="@drawable/edit_cursor" />
+
+                </LinearLayout>
+
             <Button
                 android:id="@+id/general_developer"
                 android:layout_width="wrap_content"
