@@ -187,6 +187,12 @@ private void general_dialog()
     final CheckBox bt_thermostat = (CheckBox) dialog.findViewById(R.id.general_thermostat);
     bt_thermostat.setChecked(act.thermostat_layout != LAYOUT_NONE);
 
+    final EditText et_on = (EditText) dialog.findViewById(R.id.general_on);
+    et_on.setText(act.encode_time(act.on_time));
+
+    final EditText et_off = (EditText) dialog.findViewById(R.id.general_off);
+    et_off.setText(act.encode_time(act.off_time));
+
     Button db = (Button) dialog.findViewById(R.id.general_developer);
     db.setOnClickListener(new OnClickListener() {
         @Override
@@ -230,6 +236,11 @@ private void general_dialog()
 
             act.thermostat_layout = (bt_thermostat.isChecked() ? act.general_layout : LAYOUT_NONE);
             pref.put("thermostat_layout", act.thermostat_layout);
+
+            act.on_time = act.decode_time(et_on.getText().toString());
+            pref.put("general_on", act.on_time);
+            act.off_time = act.decode_time(et_off.getText().toString());
+            pref.put("general_off", act.off_time);
 
             act.show_views();
             if (act.thermostat_layout != LAYOUT_NONE)

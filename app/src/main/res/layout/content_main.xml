@@ -35,4 +35,13 @@
 
         </ScrollView>
 
+    <TextView
+        android:id="@+id/blank_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal"
+        android:text=""
+        android:onClick="display_toggle"
+        android:visibility="gone" />
+
 </android.support.constraint.ConstraintLayout>

@@ -1,11 +1,13 @@
 package com.n0ano.athome;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -27,9 +29,11 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity
@@ -90,6 +94,11 @@ boolean running;
 public Parse parse = new Parse();
 public Popup popup;
 
+private boolean screen = true;
+private int screen_bright = -1;
+public int on_time = -1;       // (hour * 100) + minute, -1 = none
+public int off_time = -1;      // (hour * 100) + minute, -1 = none
+
 @Override
 protected void onCreate(Bundle state)
 {
@@ -99,6 +108,23 @@ protected void onCreate(Bundle state)
     setContentView(R.layout.activity_main);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+    try {
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        screen_bright = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS);
+
+        Field titleField = Toolbar.class.getDeclaredField("mTitleTextView");
+        titleField.setAccessible(true);
+        TextView barTitleView = (TextView) titleField.get(toolbar);
+        barTitleView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("title clicked");
+                display_toggle(null);
+            }
+        });
+    } catch (Exception e) {
+        Log.d("tool bar exception " + e);
+    }
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
@@ -231,6 +257,28 @@ public void set_progress()
     }
 }
 
+public void display_toggle(View V)
+{
+
+    display(!screen);
+}
+
+public void display(final boolean onoff)
+{
+
+    final ContentResolver resolver = this.getApplicationContext().getContentResolver();
+    runOnUiThread(new Runnable() {
+        public void run() {
+            screen = onoff;
+            Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, onoff ? screen_bright : 0);
+            View view = (View) findViewById(R.id.text_scroll);
+            view.setVisibility(onoff ? View.VISIBLE : View.GONE);
+            view = (View) findViewById(R.id.blank_view);
+            view.setVisibility(onoff ? View.GONE : View.VISIBLE);
+        }
+    });
+}
+
 public void view_show(int view_id, int[] ids, int main)
 {
     int id;
@@ -265,10 +313,33 @@ public void show_views()
     view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
 }
 
+public String encode_time(int t)
+{
+
+    if (t < 0)
+        return "";
+    int hr = t / 100;
+    t -= hr * 100;
+    return String.valueOf(hr) + ":" + String.format("%02d", t);
+}
+public int decode_time(String t)
+{
+
+    if (t.isEmpty())
+        return -1;
+    int idx = t.indexOf(":");
+    if (idx < 0)
+        return Integer.parseInt(t);
+    else
+        return (Integer.parseInt(t.substring(0, idx)) * 100) + Integer.parseInt(t.substring(idx + 1));
+}
+
 private void restore_state()
 {
 
     general_layout = pref.get("general_layout", Popup.LAYOUT_TABLET);
+    on_time = pref.get("general_on", -1);
+    off_time = pref.get("general_off", -1);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);
@@ -777,6 +848,13 @@ private boolean working()
 
 private void clock()
 {
+
+    Calendar cal = Calendar.getInstance();
+    int time = (cal.get(Calendar.HOUR_OF_DAY) * 100) + cal.get(Calendar.MINUTE);
+    if (off_time >= 0 && time == off_time && screen)
+        display(false);
+    else if (on_time >= 0 && time == on_time && !screen)
+        display(true);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv == null)
