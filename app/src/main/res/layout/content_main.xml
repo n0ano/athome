@@ -10,7 +10,7 @@
     tools:showIn="@layout/activity_main">
 
     <ScrollView
-        android:id="@+id/text_scroll"
+        android:id="@+id/scroll_view"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -35,13 +35,23 @@
 
         </ScrollView>
 
-    <TextView
+    <ImageView
         android:id="@+id/blank_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="center_horizontal"
-        android:text=""
         android:onClick="display_toggle"
         android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/saver_view1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/saver_view2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="visible" />
 
 </android.support.constraint.ConstraintLayout>

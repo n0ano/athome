@@ -1,21 +1,28 @@
 package com.n0ano.athome;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -101,8 +108,26 @@ public Popup popup;
 
 private boolean screen = true;
 private int screen_bright = -1;
-public int on_time = -1;       // (hour * 100) + minute, -1 = none
-public int off_time = -1;      // (hour * 100) + minute, -1 = none
+private int ss_counter = 0;
+private int ss_state = Common.SAVER_PAUSE;
+private int ss_duration = 2000;
+private int ss_viewid = 0;
+private View[] ss_views = new View[2];
+
+private Animation ss_fadein;
+private Animation ss_fadeout;
+
+public int ss_start = 0;        // seconds, 0 = none
+public int ss_delay = 0;        // seconds
+public int ss_type = 0;
+
+public String ss_host = "";
+public String ss_server = "";
+public String ss_user = "";
+public String ss_pwd = "";
+
+public int on_time = -1;        // (hour * 100) + minute, -1 = none
+public int off_time = -1;       // (hour * 100) + minute, -1 = none
 
 @Override
 protected void onCreate(Bundle state)
@@ -130,12 +155,35 @@ protected void onCreate(Bundle state)
     } catch (Exception e) {
         Log.d("tool bar exception " + e);
     }
+
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
         Log.cfg(debug, "", "");
+
     popup = new Popup(this, pref);
+
+    ss_views[0] = (View) findViewById(R.id.saver_view1);
+    ss_views[1] = (View) findViewById(R.id.saver_view2);
+    ss_fadein = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
+    ss_fadeout = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
+
+    display(true);
+
     Log.d("MainActivity: onCreate");
+}
+
+@Override
+public boolean dispatchTouchEvent(MotionEvent ev)
+{
+
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        boolean eat = (ss_state == Common.SAVER_SHOW);
+        screen_saver(Common.SAVER_RESET);
+        if (eat)
+            return false;
+    }
+    return super.dispatchTouchEvent(ev);
 }
 
 @Override
@@ -282,16 +330,134 @@ public void display(final boolean onoff)
                 Log.d("can't change brightness " + e);
                 Toast.makeText(getApplicationContext(), "Can't change brightness - permissions?", Toast.LENGTH_LONG).show();
             }
-            View view = (View) findViewById(R.id.text_scroll);
+            View view = (View) findViewById(R.id.scroll_view);
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
+            view.setAlpha(1.0f);
             view = (View) findViewById(R.id.toolbar);
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
             view = (View) findViewById(R.id.blank_view);
             view.setVisibility(onoff ? View.GONE : View.VISIBLE);
-            MenuItem icon = menu_bar.findItem(R.id.action_display);
-            icon.setIcon(onoff ? R.drawable.light_on : R.drawable.light_off);
+            ss_views[0].setVisibility(View.GONE);
+            ss_views[0].setAlpha(0.0f);
+            ss_views[1].setVisibility(View.GONE);
+            ss_views[1].setAlpha(0.0f);
+            if (menu_bar != null) {
+                MenuItem icon = menu_bar.findItem(R.id.action_display);
+                icon.setIcon(onoff ? R.drawable.light_on : R.drawable.light_off);
+            }
         }
     });
+}
+
+//
+// Cross fade from start to end
+//
+private void ss_xfade(final View start, final View end)
+{
+
+    end.setAlpha(0.0f);
+    end.setVisibility(View.VISIBLE);
+    end.animate()
+       .alpha(1.0f)
+       .setDuration(ss_duration)
+       .setListener(null);
+
+    start.animate()
+         .alpha(0.0f)
+         .setDuration(ss_duration)
+         .setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    start.setVisibility(View.GONE);
+                }
+            });
+}
+
+public void do_fade(View start, View end)
+{
+
+    ss_xfade(start, end);
+}
+
+private int ss_width()
+{
+
+    View v = (View)findViewById(R.id.scroll_view);
+    return v.getWidth();
+}
+
+private int ss_height()
+{
+
+    View v = (View)findViewById(R.id.scroll_view);
+    return v.getHeight();
+}
+
+private void saver_fade()
+{
+
+    int old = ss_viewid;
+    ss_viewid ^= 1;
+    //
+    //  ImageGet will call do_fade once the new image is loaded
+    //
+    ImageGet ig = new ImageGet(this, ss_server, ss_user, ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
+    ig.start();
+}
+
+public void saver_start()
+{
+
+Log.d("saver: start");
+    ss_state = Common.SAVER_SHOW;
+    ss_counter = ss_delay;
+    ss_views[0].setVisibility(View.GONE);
+    ss_views[0].setAlpha(0.0f);
+    ss_views[1].setVisibility(View.GONE);
+    ss_views[1].setAlpha(0.0f);
+    ss_viewid = 0;
+    //
+    //  ImageGet will call do_fade once the new image is loaded
+    //
+    ImageGet ig = new ImageGet(this, ss_server, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+    ig.start();
+}
+
+public void screen_saver(int tick)
+{
+
+    switch (tick) {
+
+    case Common.SAVER_PAUSE:
+Log.d("saver paused");
+        ss_state = Common.SAVER_PAUSE;
+        break;
+
+    case Common.SAVER_TICK:
+        if (ss_state != Common.SAVER_PAUSE) {
+            if (--ss_counter == 0) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        ss_counter = ss_delay;
+                        if (ss_state == Common.SAVER_SHOW)
+                            saver_fade();
+                        else
+                            saver_start();
+                    }
+                });
+            }
+        }
+        break;
+
+    case Common.SAVER_RESET:
+Log.d("saver - reset to " + ss_start + " seconds, state - " + ss_state);
+        if (ss_state == Common.SAVER_SHOW)
+            display(screen);
+        ss_counter = ss_start;
+        ss_state = ((ss_start == 0) ? Common.SAVER_PAUSE : Common.SAVER_RUN);
+        break;
+
+    }
 }
 
 public void view_show(int view_id, int[] ids, int main)
@@ -355,6 +521,15 @@ private void restore_state()
     general_layout = pref.get("general_layout", Popup.LAYOUT_TABLET);
     on_time = pref.get("general_on", -1);
     off_time = pref.get("general_off", -1);
+
+    ss_start = pref.get("ss_start", 0);
+    ss_delay = pref.get("ss_delay", 0);
+    ss_type = pref.get("ss_type", 0);
+    ss_host = pref.get("ss_host", "");
+    ss_server = pref.get("ss_server", "");
+    ss_user = pref.get("ss_user", "");
+    ss_pwd = pref.get("ss_pwd", "");
+    screen_saver(Common.SAVER_RESET);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);
@@ -872,6 +1047,8 @@ private void clock()
         display(false);
     else if (on_time >= 0 && time == on_time && !screen)
         display(true);
+
+    screen_saver(Common.SAVER_TICK);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv == null)

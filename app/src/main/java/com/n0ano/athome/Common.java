@@ -5,6 +5,12 @@ package com.n0ano.athome;
 //
 public class Common {
 
+public final static int SAVER_RESET =   0;
+public final static int SAVER_TICK =    1;
+public final static int SAVER_PAUSE =   2;
+public final static int SAVER_RUN =     3;
+public final static int SAVER_SHOW =    4;
+
 public static int a2i(String num)
 {
 
