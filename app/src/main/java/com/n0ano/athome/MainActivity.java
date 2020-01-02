@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity
 
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
+public final static int OUTLETS_COLS = 3;
 
 private final static String CONFIG_URI = "/cgi-bin/athome/config";
 private final static String CONFIG_LOAD =  "load";
@@ -83,6 +84,7 @@ String tplink_user;
 String tplink_pwd;
 
 String outlets_battery = "";
+int outlets_cols;
 int outlets_batt_min;
 int outlets_batt_max;
 int outlets_batt_level;
@@ -370,6 +372,7 @@ private void restore_state()
     ecobee_refresh = pref.get("ecobee_refresh", "");
 
     outlets_battery = pref.get("outlets_battery", "");
+    outlets_cols = pref.get("outlets_cols", OUTLETS_COLS);
     outlets_batt_min = pref.get("outlets_batt_min", BATTERY_LOW);
     outlets_batt_max = pref.get("outlets_batt_max", BATTERY_HIGH);
     outlets_batt_level = pref.get("outlets_batt_level", 0);
@@ -740,6 +743,7 @@ public void show_cfg()
         cfg.put("egauge_layout", pref.get("egauge_layout", ""));
         cfg.put("egauge_progress", pref.get("egauge_progress", ""));
         cfg.put("general_layout", pref.get("general_layout", ""));
+        cfg.put("outlets_cols", pref.get("outlets_cols", ""));
         cfg.put("outlets_batt_level", pref.get("outlets_batt_level", ""));
         cfg.put("outlets_batt_max", pref.get("outlets_batt_max", ""));
         cfg.put("outlets_batt_min", pref.get("outlets_batt_min", ""));

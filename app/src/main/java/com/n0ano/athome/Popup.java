@@ -493,6 +493,9 @@ private void outlets_dialog()
 
     });
 
+    final TextView cols = (TextView) dialog.findViewById(R.id.outlets_cols);
+    cols.setText(Common.i2a(act.outlets_cols));
+
     final TextView min = (TextView) dialog.findViewById(R.id.outlets_batt_min);
     min.setText(Common.i2a(act.outlets_batt_min));
 
@@ -525,6 +528,8 @@ private void outlets_dialog()
                 act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
             pref.put("outlets_battery", act.outlets_battery);
+            act.outlets_cols = Common.a2i(cols.getText().toString());
+            pref.put("outlets_cols", act.outlets_cols);
             act.outlets_batt_min = Common.a2i(min.getText().toString());
             pref.put("outlets_batt_min", act.outlets_batt_min);
             act.outlets_batt_max = Common.a2i(max.getText().toString());
