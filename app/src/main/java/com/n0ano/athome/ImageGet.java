@@ -57,6 +57,7 @@ public void run()
         Authenticator.setDefault(new CustomAuthenticator(user, pwd));
 		in_rdr = new URL(url).openStream();
         bitmap = BitmapFactory.decodeStream(in_rdr);
+        in_rdr.close();
 	} catch (Exception e) {
 		Log.d("get image failed - " + e);
 		return;
