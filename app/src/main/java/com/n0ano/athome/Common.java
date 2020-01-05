@@ -23,4 +23,11 @@ public static String i2a(int num)
     return Integer.toString(num);
 }
 
+public static String suffix(String str)
+{
+
+    int idx = str.lastIndexOf(":");
+    return (idx >= 0) ? str.substring(idx) : "";
+}
+
 }

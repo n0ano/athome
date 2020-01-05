@@ -21,17 +21,20 @@ private String server;
 private String user;
 private String pwd;
 
+private String type;
+
 private View img_start;
 private ImageView img_end;
 
 private int max_w;
 private int max_h;
 
-public ImageGet(MainActivity act, String server, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
+public ImageGet(MainActivity act, String server, String type, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
 {
 
     this.act = act;
     this.server = server;
+    this.type = type;
     this.user = user;
     this.pwd = pwd;
     this.max_w = max_w;
@@ -48,7 +51,7 @@ public void run()
 
 	try {
         url = server +
-                CGI_BIN +
+                CGI_BIN + type +
                 "?get" +
                 "&host=" + act.ss_host +
                 "&w=" + max_w +

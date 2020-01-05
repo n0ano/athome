@@ -632,12 +632,12 @@ private void screen_dialog()
     final EditText ss_delay = (EditText) dialog.findViewById(R.id.screen_delay);
     ss_delay.setText(act.ss_start > 0 ? Common.i2a(act.ss_delay) : "");
 
-    final Spinner ss_type = (Spinner) dialog.findViewById(R.id.screen_type);
+    final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, ss_types);
     adapter.setDropDownViewResource(R.layout.text_spinner);
-    ss_type.setAdapter(adapter);
-    ss_type.setSelection(type_pos = act.ss_type);
-    ss_type.setOnItemSelectedListener(new OnItemSelectedListener() {
+    ss_fade.setAdapter(adapter);
+    ss_fade.setSelection(type_pos = act.ss_fade);
+    ss_fade.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             type_pos = position;
@@ -668,6 +668,7 @@ private void screen_dialog()
         public void onClick(View v) {
             act.ss_host = et_host.getText().toString();
             pref.put("ss_host", act.ss_host);
+            act.ss_type = Common.suffix(act.ss_host);
             act.ss_server = et_server.getText().toString();
             pref.put("ss_server", act.ss_server);
             act.ss_user = et_user.getText().toString();
@@ -689,8 +690,8 @@ private void screen_dialog()
                 }
                 pref.put("ss_delay", act.ss_delay);
             }
-            act.ss_type = type_pos;
-            pref.put("ss_type", act.ss_type);
+            act.ss_fade = type_pos;
+            pref.put("ss_fade", act.ss_fade);
             act.screen_saver(Common.SAVER_RESET);
 
             end_dialog(dialog);
