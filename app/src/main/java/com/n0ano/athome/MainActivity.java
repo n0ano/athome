@@ -122,7 +122,7 @@ public int ss_delay = 0;        // seconds
 public int ss_fade = 0;
 
 public String ss_host = "";
-public String ss_type = "";
+public String ss_list = "";
 public String ss_server = "";
 public String ss_user = "";
 public String ss_pwd = "";
@@ -402,7 +402,7 @@ private void saver_fade()
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, ss_server, ss_type, ss_user, ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
+    ImageGet ig = new ImageGet(this, ss_server, ss_list, ss_user, ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
     ig.start();
 }
 
@@ -420,7 +420,7 @@ Log.d("saver: start");
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, ss_server, ss_type, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+    ImageGet ig = new ImageGet(this, ss_server, ss_list, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
     ig.start();
 }
 
@@ -527,7 +527,7 @@ private void restore_state()
     ss_delay = pref.get("ss_delay", 0);
     ss_fade = pref.get("ss_fade", 0);
     ss_host = pref.get("ss_host", "");
-    ss_type = Common.suffix(ss_host);
+    ss_list = Common.suffix(ss_host);
     ss_server = pref.get("ss_server", "");
     ss_user = pref.get("ss_user", "");
     ss_pwd = pref.get("ss_pwd", "");

@@ -27,7 +27,14 @@ public static String suffix(String str)
 {
 
     int idx = str.lastIndexOf(":");
-    return (idx >= 0) ? str.substring(idx) : "";
+    return (idx >= 0) ? str.substring(idx + 1) : "";
+}
+
+public static String base(String str)
+{
+
+    int idx = str.lastIndexOf(":");
+    return (idx >= 0) ? str.substring(0, idx) : str;
 }
 
 }

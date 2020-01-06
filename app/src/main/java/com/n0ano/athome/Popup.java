@@ -668,7 +668,7 @@ private void screen_dialog()
         public void onClick(View v) {
             act.ss_host = et_host.getText().toString();
             pref.put("ss_host", act.ss_host);
-            act.ss_type = Common.suffix(act.ss_host);
+            act.ss_list = Common.suffix(act.ss_host);
             act.ss_server = et_server.getText().toString();
             pref.put("ss_server", act.ss_server);
             act.ss_user = et_user.getText().toString();
