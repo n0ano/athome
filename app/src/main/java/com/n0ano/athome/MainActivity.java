@@ -111,6 +111,7 @@ private int screen_bright = -1;
 private int ss_counter = 0;
 private int ss_state = Common.SAVER_PAUSE;
 private int ss_duration = 2000;
+private int ss_offset = 0;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
 
@@ -156,6 +157,8 @@ protected void onCreate(Bundle state)
     } catch (Exception e) {
         Log.d("tool bar exception " + e);
     }
+    ViewGroup.LayoutParams params = toolbar.getLayoutParams();
+    ss_offset = params.height;
 
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     pref = new Preferences(this);
@@ -178,6 +181,8 @@ protected void onCreate(Bundle state)
 public boolean dispatchTouchEvent(MotionEvent ev)
 {
 
+    if (ev.getY() < ss_offset)
+        return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
         boolean eat = (ss_state == Common.SAVER_SHOW);
         screen_saver(Common.SAVER_RESET);

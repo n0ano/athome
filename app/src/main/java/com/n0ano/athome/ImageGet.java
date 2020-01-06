@@ -87,7 +87,7 @@ private void get_meta(InputStream in)
 
         case 'T':       // title
             str = str.substring(0);
-            Log.d("F:" + str);
+            Log.d("T:" + str);
             break;
 
         default:        // unknown tag
