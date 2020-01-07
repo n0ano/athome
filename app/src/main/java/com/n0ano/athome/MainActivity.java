@@ -110,13 +110,10 @@ private boolean screen = true;
 private int screen_bright = -1;
 private int ss_counter = 0;
 private int ss_state = Common.SAVER_PAUSE;
-private int ss_duration = 2000;
 private int ss_offset = 0;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
-
-private Animation ss_fadein;
-private Animation ss_fadeout;
+private SS_Faders ss_faders;
 
 public int ss_start = 0;        // seconds, 0 = none
 public int ss_delay = 0;        // seconds
@@ -169,8 +166,8 @@ protected void onCreate(Bundle state)
 
     ss_views[0] = (View) findViewById(R.id.saver_view1);
     ss_views[1] = (View) findViewById(R.id.saver_view2);
-    ss_fadein = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
-    ss_fadeout = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
+
+    ss_faders = new SS_Faders();
 
     display(true);
 
@@ -355,57 +352,10 @@ public void display(final boolean onoff)
     });
 }
 
-//
-// Cross fade from start to end
-//
-private void ss_xfade(final View start, final View end)
-{
-
-    end.setAlpha(0.0f);
-    end.setVisibility(View.VISIBLE);
-    end.animate()
-       .alpha(1.0f)
-       .setDuration(ss_duration)
-       .setListener(null);
-
-    start.animate()
-         .alpha(0.0f)
-         .setDuration(ss_duration)
-         .setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    start.setVisibility(View.GONE);
-                }
-            });
-}
-
-private void ss_fadeup(final View start, final View end)
-{
-
-    end.setTranslationY(ss_height());
-    end.setVisibility(View.VISIBLE);
-    end.animate()
-       .translationYBy(-ss_height())
-       .setDuration(ss_duration)
-       .setListener(null);
-
-    start.animate()
-         .translationYBy(-ss_height())
-         .setDuration(ss_duration)
-         .setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    start.setTranslationY(0);
-                    start.setVisibility(View.GONE);
-                }
-            });
-}
-
 public void do_fade(View start, View end)
 {
 
-    ss_xfade(start, end);
-    //ss_fadeup(start, end);
+    ss_faders.fade(ss_fade, start, end, ss_width(), ss_height());
 }
 
 private int ss_width()

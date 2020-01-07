@@ -50,11 +50,6 @@ MainActivity act;
 
 private int batt_pos;
 private int type_pos;
-String[] ss_types = {
-    "fade",
-    "slide_up",
-    "slide_down"
-};
 public final static int SS_START = 30;
 public final static int SS_DELAY = 30;
 
@@ -633,7 +628,7 @@ private void screen_dialog()
     ss_delay.setText(act.ss_start > 0 ? Common.i2a(act.ss_delay) : "");
 
     final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, ss_types);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, SS_Faders.types);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     ss_fade.setAdapter(adapter);
     ss_fade.setSelection(type_pos = act.ss_fade);
