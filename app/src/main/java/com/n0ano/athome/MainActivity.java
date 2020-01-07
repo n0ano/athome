@@ -109,7 +109,7 @@ public Popup popup;
 private boolean screen = true;
 private int screen_bright = -1;
 private int ss_counter = 0;
-private int ss_state = Common.SAVER_PAUSE;
+private int ss_state = Common.SAVER_BLOCKED;
 private int ss_offset = 0;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
@@ -181,7 +181,7 @@ public boolean dispatchTouchEvent(MotionEvent ev)
     if (ev.getY() < ss_offset)
         return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-        boolean eat = (ss_state == Common.SAVER_SHOW);
+        boolean eat = (ss_state == Common.SAVER_SHOWING);
         screen_saver(Common.SAVER_RESET);
         if (eat)
             return false;
@@ -377,6 +377,8 @@ private void saver_fade()
 
     int old = ss_viewid;
     ss_viewid ^= 1;
+    ss_counter = ss_delay;
+
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
@@ -384,45 +386,74 @@ private void saver_fade()
     ig.start();
 }
 
+public void saver_click()
+{
+
+    saver_start();
+}
+
 public void saver_start()
 {
 
 Log.d("saver: start");
-    ss_state = Common.SAVER_SHOW;
-    ss_counter = ss_delay;
-    ss_views[0].setVisibility(View.GONE);
-    ss_views[0].setAlpha(1.0f);
-    ss_views[0].setScaleX(1.0f);
-    ss_views[0].setScaleY(1.0f);
-    ss_views[1].setVisibility(View.GONE);
-    ss_views[1].setAlpha(1.0f);
-    ss_views[1].setScaleX(1.0f);
-    ss_views[1].setScaleY(1.0f);
-    ss_viewid = 0;
-    //
-    //  ImageGet will call do_fade once the new image is loaded
-    //
-    ImageGet ig = new ImageGet(this, ss_server, ss_list, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
-    ig.start();
+    if (ss_state == Common.SAVER_COUNTING) {
+        ss_state = Common.SAVER_SHOWING;
+        ss_counter = ss_delay;
+        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+        icon.setIcon(R.drawable.play);
+
+        ss_views[0].setVisibility(View.GONE);
+        ss_views[0].setAlpha(1.0f);
+        ss_views[0].setScaleX(1.0f);
+        ss_views[0].setScaleY(1.0f);
+        ss_views[1].setVisibility(View.GONE);
+        ss_views[1].setAlpha(1.0f);
+        ss_views[1].setScaleX(1.0f);
+        ss_views[1].setScaleY(1.0f);
+        ss_viewid = 0;
+        //
+        //  ImageGet will call do_fade once the new image is loaded
+        //
+        ImageGet ig = new ImageGet(this, ss_server, ss_list, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+        ig.start();
+    } else {
+        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+        if (ss_state == Common.SAVER_FROZEN) {
+            ss_state = Common.SAVER_SHOWING;
+            ss_counter = ss_delay;
+            icon.setIcon(R.drawable.play);
+            saver_fade();
+        } else {
+            ss_state = Common.SAVER_FROZEN;
+            icon.setIcon(R.drawable.pause);
+        }
+    }
 }
 
 public void screen_saver(int tick)
 {
 
+    if (ss_state == Common.SAVER_FROZEN)
+        return;
+
     switch (tick) {
 
-    case Common.SAVER_PAUSE:
+    case Common.SAVER_BLOCK:
 Log.d("saver paused");
-        ss_state = Common.SAVER_PAUSE;
+        ss_state = Common.SAVER_BLOCKED;
+        break;
+
+    case Common.SAVER_FREEZE:
+        ss_state = ((ss_state == Common.SAVER_FROZEN) ? Common.SAVER_SHOWING : Common.SAVER_FROZEN);
         break;
 
     case Common.SAVER_TICK:
-        if (ss_state != Common.SAVER_PAUSE) {
+        if (ss_state != Common.SAVER_BLOCKED) {
             if (--ss_counter == 0) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         ss_counter = ss_delay;
-                        if (ss_state == Common.SAVER_SHOW)
+                        if (ss_state == Common.SAVER_SHOWING)
                             saver_fade();
                         else
                             saver_start();
@@ -434,10 +465,13 @@ Log.d("saver paused");
 
     case Common.SAVER_RESET:
 Log.d("saver - reset to " + ss_start + " seconds, state - " + ss_state);
-        if (ss_state == Common.SAVER_SHOW)
+        if (ss_state == Common.SAVER_SHOWING) {
+            MenuItem icon = menu_bar.findItem(R.id.action_saver);
+            icon.setIcon(R.drawable.monitor);
             display(screen);
+        }
         ss_counter = ss_start;
-        ss_state = ((ss_start == 0) ? Common.SAVER_PAUSE : Common.SAVER_RUN);
+        ss_state = ((ss_start == 0) ? Common.SAVER_BLOCKED : Common.SAVER_COUNTING);
         break;
 
     }

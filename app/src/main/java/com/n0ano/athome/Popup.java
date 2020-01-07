@@ -79,7 +79,7 @@ public boolean menu_click(int item)
     switch (item) {
 
     case R.id.action_saver:
-        act.saver_start();
+        act.saver_click();
         return true;
 
     case R.id.action_display:
@@ -134,7 +134,7 @@ private Dialog start_dialog(int id)
 
     dialog.show();
 
-    act.screen_saver(Common.SAVER_PAUSE);
+    act.screen_saver(Common.SAVER_BLOCK);
 
     return dialog;
 }
