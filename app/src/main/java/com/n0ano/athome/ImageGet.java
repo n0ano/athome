@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -26,10 +28,12 @@ private String pwd;
 private String list;
 
 private View img_start;
-private ImageView img_end;
+private View img_end;
 
 private int max_w;
 private int max_h;
+
+private String title = null;
 
 public ImageGet(MainActivity act, String server, String list, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
 {
@@ -42,7 +46,7 @@ public ImageGet(MainActivity act, String server, String list, String user, Strin
     this.max_w = max_w;
     this.max_h = max_h;
     this.img_start = img_start;
-    this.img_end = (ImageView)img_end;
+    this.img_end = img_end;
 }
 
 private int b2int(byte[] b)
@@ -86,8 +90,8 @@ private void get_meta(InputStream in)
             break;
 
         case 'T':       // title
-            str = str.substring(0);
-            Log.d("T:" + str);
+            title = str.substring(0);
+            Log.d("T:" + title);
             break;
 
         default:        // unknown tag
@@ -130,10 +134,15 @@ public void run()
 
     act.runOnUiThread(new Runnable() {
         public void run() {
+            ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
             if (bitmap == null)
-                img_end.setImageResource(R.drawable.no);
+                iv.setImageResource(R.drawable.no);
             else
-                img_end.setImageBitmap(bitmap);
+                iv.setImageBitmap(bitmap);
+            if (title != null) {
+                TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
+                tv.setText(title);
+            }
             act.do_fade(img_start, img_end);
         }
     });

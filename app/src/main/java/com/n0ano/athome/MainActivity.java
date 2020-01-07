@@ -379,10 +379,33 @@ private void ss_xfade(final View start, final View end)
             });
 }
 
+private void ss_fadeup(final View start, final View end)
+{
+
+    end.setTranslationY(ss_height());
+    end.setVisibility(View.VISIBLE);
+    end.animate()
+       .translationYBy(-ss_height())
+       .setDuration(ss_duration)
+       .setListener(null);
+
+    start.animate()
+         .translationYBy(-ss_height())
+         .setDuration(ss_duration)
+         .setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    start.setTranslationY(0);
+                    start.setVisibility(View.GONE);
+                }
+            });
+}
+
 public void do_fade(View start, View end)
 {
 
     ss_xfade(start, end);
+    //ss_fadeup(start, end);
 }
 
 private int ss_width()
@@ -418,9 +441,13 @@ Log.d("saver: start");
     ss_state = Common.SAVER_SHOW;
     ss_counter = ss_delay;
     ss_views[0].setVisibility(View.GONE);
-    ss_views[0].setAlpha(0.0f);
+    ss_views[0].setAlpha(1.0f);
+    ss_views[0].setScaleX(1.0f);
+    ss_views[0].setScaleY(1.0f);
     ss_views[1].setVisibility(View.GONE);
-    ss_views[1].setAlpha(0.0f);
+    ss_views[1].setAlpha(1.0f);
+    ss_views[1].setScaleX(1.0f);
+    ss_views[1].setScaleY(1.0f);
     ss_viewid = 0;
     //
     //  ImageGet will call do_fade once the new image is loaded
