@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MotionEvent;
@@ -114,6 +115,7 @@ private int ss_offset = 0;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
 private SS_Faders ss_faders;
+private GestureDetectorCompat ss_gesture;
 
 public int ss_start = 0;        // seconds, 0 = none
 public int ss_delay = 0;        // seconds
@@ -169,6 +171,8 @@ protected void onCreate(Bundle state)
 
     ss_faders = new SS_Faders();
 
+    ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
+
     display(true);
 
     Log.d("MainActivity: onCreate");
@@ -181,10 +185,10 @@ public boolean dispatchTouchEvent(MotionEvent ev)
     if (ev.getY() < ss_offset)
         return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-        boolean eat = (ss_state == Common.SAVER_SHOWING);
-        screen_saver(Common.SAVER_RESET);
-        if (eat)
+        if (ss_state == Common.SAVER_SHOWING) {
+            screen_saver(Common.SAVER_RESET);
             return false;
+        }
     }
     return super.dispatchTouchEvent(ev);
 }
@@ -286,6 +290,14 @@ public boolean onOptionsItemSelected(MenuItem item)
     return super.onOptionsItemSelected(item);
 }
 
+@Override
+public boolean onTouchEvent(MotionEvent event)
+{
+
+    ss_gesture.onTouchEvent(event);
+    return super.onTouchEvent(event);
+}
+
 public void start_browser(String uri)
 {
 
@@ -372,7 +384,7 @@ private int ss_height()
     return v.getHeight();
 }
 
-private void saver_fade()
+public void saver_fade(int delta)
 {
 
     int old = ss_viewid;
@@ -382,7 +394,7 @@ private void saver_fade()
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, ss_server, ss_list, ss_user, ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
+    ImageGet ig = new ImageGet(this, ss_server, ss_list, delta, ss_user, ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
     ig.start();
 }
 
@@ -399,6 +411,7 @@ Log.d("saver: start");
     if (ss_state == Common.SAVER_COUNTING) {
         ss_state = Common.SAVER_SHOWING;
         ss_counter = ss_delay;
+        ss_fade = pref.get("ss_fade", 0);
         MenuItem icon = menu_bar.findItem(R.id.action_saver);
         icon.setIcon(R.drawable.play);
 
@@ -414,17 +427,19 @@ Log.d("saver: start");
         //
         //  ImageGet will call do_fade once the new image is loaded
         //
-        ImageGet ig = new ImageGet(this, ss_server, ss_list, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+        ImageGet ig = new ImageGet(this, ss_server, ss_list, 1, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
         ig.start();
     } else {
         MenuItem icon = menu_bar.findItem(R.id.action_saver);
         if (ss_state == Common.SAVER_FROZEN) {
             ss_state = Common.SAVER_SHOWING;
             ss_counter = ss_delay;
+            ss_fade = pref.get("ss_fade", 0);
             icon.setIcon(R.drawable.play);
-            saver_fade();
+            saver_fade(1);
         } else {
             ss_state = Common.SAVER_FROZEN;
+            ss_fade = 5;
             icon.setIcon(R.drawable.pause);
         }
     }
@@ -454,7 +469,7 @@ Log.d("saver paused");
                     public void run() {
                         ss_counter = ss_delay;
                         if (ss_state == Common.SAVER_SHOWING)
-                            saver_fade();
+                            saver_fade(1);
                         else
                             saver_start();
                     }

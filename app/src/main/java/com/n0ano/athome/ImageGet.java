@@ -26,6 +26,7 @@ private String user;
 private String pwd;
 
 private String list;
+private int delta;
 
 private View img_start;
 private View img_end;
@@ -35,12 +36,13 @@ private int max_h;
 
 private String title = null;
 
-public ImageGet(MainActivity act, String server, String list, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
+public ImageGet(MainActivity act, String server, String list, int delta, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
 {
 
     this.act = act;
     this.server = server;
     this.list = list;
+    this.delta = delta;
     this.user = user;
     this.pwd = pwd;
     this.max_w = max_w;
@@ -115,6 +117,7 @@ public void run()
                 "?get" +
                 "&host=" + Common.base(act.ss_host) +
                 "&list=" + list +
+                "&delta=" + delta +
                 "&w=" + max_w +
                 "&h=" + max_h;
         Log.d("get image from " + url);
