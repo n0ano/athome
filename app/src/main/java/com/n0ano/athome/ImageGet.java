@@ -142,10 +142,8 @@ public void run()
                 iv.setImageResource(R.drawable.no);
             else
                 iv.setImageBitmap(bitmap);
-            if (title != null) {
-                TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
-                tv.setText(title);
-            }
+            TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
+            tv.setText((title != null) ? title : "");
             act.do_fade(img_start, img_end);
         }
     });
