@@ -136,46 +136,11 @@ protected void onCreate(Bundle state)
 
     super.onCreate(state);
 
-    setContentView(R.layout.activity_main);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    try {
-        ContentResolver resolver = this.getApplicationContext().getContentResolver();
-        screen_bright = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS);
-
-        Field titleField = Toolbar.class.getDeclaredField("mTitleTextView");
-        titleField.setAccessible(true);
-        TextView barTitleView = (TextView) titleField.get(toolbar);
-        barTitleView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("title clicked");
-                display_toggle(null);
-            }
-        });
-    } catch (Exception e) {
-        Log.d("tool bar exception " + e);
-    }
-    ViewGroup.LayoutParams params = toolbar.getLayoutParams();
-    ss_offset = params.height;
-
-    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
         Log.cfg(debug, "", "");
 
-    popup = new Popup(this, pref);
-
-    ss_views[0] = (View) findViewById(R.id.saver_view1);
-    ss_views[1] = (View) findViewById(R.id.saver_view2);
-
-    ss_faders = new SS_Faders();
-
-    ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
-
-    display(true);
-
-    Log.d("MainActivity: onCreate");
+    start_home(state);
 }
 
 @Override
@@ -296,6 +261,48 @@ public boolean onTouchEvent(MotionEvent event)
 
     ss_gesture.onTouchEvent(event);
     return super.onTouchEvent(event);
+}
+
+private void start_home(Bundle state)
+{
+
+    setContentView(R.layout.activity_main);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    try {
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        screen_bright = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS);
+
+        Field titleField = Toolbar.class.getDeclaredField("mTitleTextView");
+        titleField.setAccessible(true);
+        TextView barTitleView = (TextView) titleField.get(toolbar);
+        barTitleView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("title clicked");
+                display_toggle(null);
+            }
+        });
+    } catch (Exception e) {
+        Log.d("tool bar exception " + e);
+    }
+    ViewGroup.LayoutParams params = toolbar.getLayoutParams();
+    ss_offset = params.height;
+
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+    popup = new Popup(this, pref);
+
+    ss_views[0] = (View) findViewById(R.id.saver_view1);
+    ss_views[1] = (View) findViewById(R.id.saver_view2);
+
+    ss_faders = new SS_Faders();
+
+    ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
+
+    display(true);
+
+    Log.d("MainActivity: onCreate");
 }
 
 public void start_browser(String uri)
