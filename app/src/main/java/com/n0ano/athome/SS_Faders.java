@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import java.util.Random;
 
@@ -83,8 +84,7 @@ private void xfade(final View start, final View end)
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    start.setAlpha(1.0f);
-                    start.setVisibility(View.GONE);
+                    fade_done(start, end);
                 }
             });
 }
@@ -105,8 +105,7 @@ private void fadeup(final View start, final View end, final int w, final int h)
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    start.setTranslationY(0);
-                    start.setVisibility(View.GONE);
+                    fade_done(start, end);
                 }
             });
 }
@@ -127,8 +126,7 @@ private void fadedown(final View start, final View end, final int w, final int h
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    start.setTranslationY(0);
-                    start.setVisibility(View.GONE);
+                    fade_done(start, end);
                 }
             });
 }
@@ -149,8 +147,7 @@ private void fadeleft(final View start, final View end, final int w, final int h
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    start.setTranslationX(0);
-                    start.setVisibility(View.GONE);
+                    fade_done(start, end);
                 }
             });
 }
@@ -171,8 +168,7 @@ private void faderight(final View start, final View end, final int w, final int 
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    start.setTranslationX(0);
-                    start.setVisibility(View.GONE);
+                    fade_done(start, end);
                 }
             });
 }
@@ -181,7 +177,19 @@ private void fadenone(final View start, final View end)
 {
 
     end.setVisibility(View.VISIBLE);
+    fade_done(start, end);
+}
+
+private void fade_done(View start, View end)
+{
+
     start.setVisibility(View.GONE);
+    start.setTranslationX(0);
+    start.setTranslationY(0);
+    start.setAlpha(1.0f);
+    TextView tv = (TextView)start.findViewById(R.id.title);
+    if (tv != null)
+        tv.setText("");
 }
 
 }
