@@ -135,6 +135,7 @@ protected void onCreate(Bundle state)
 {
 
     super.onCreate(state);
+    Log.d("MainActivity: onCreate");
 
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
@@ -301,8 +302,6 @@ private void start_home(Bundle state)
     ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
 
     display(true);
-
-    Log.d("MainActivity: onCreate");
 }
 
 public void start_browser(String uri)
@@ -369,6 +368,13 @@ public void display(final boolean onoff)
             }
         }
     });
+}
+
+public void screen_mgmt(View v)
+{
+
+    Intent intent = new Intent(this, ImageMgmt.class);
+    startActivity(intent);
 }
 
 public void do_fade(View start, View end)

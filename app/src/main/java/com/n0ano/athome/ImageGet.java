@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 public class ImageGet extends Thread
 {
 
-private final static String CGI_BIN = "/cgi-bin/explore.dd/get_frame";
 private MainActivity act;
 
 private String server;
@@ -113,7 +112,7 @@ public void run()
 
 	try {
         url = server +
-                CGI_BIN +
+                Common.CGI_BIN +
                 "?get" +
                 "&host=" + Common.base(act.ss_host) +
                 "&list=" + list +

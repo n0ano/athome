@@ -1,0 +1,173 @@
+#!//usr/bin/perl
+
+$tm="names&host=lenovo&list=pbw";
+$tf="get&host=lenovo&list=pbw&delta=1&w=600&h=888";
+$query = $ENV{"QUERY_STRING"};
+$type = "get";
+$maxw = 2048;
+$maxh = 2048;
+$host = "default";
+$list = "";
+$delta = 1;
+$nocache = 0;
+$fit = "fit";
+
+$DIR = "Books/Frame/";
+$FILES = ".files";
+
+@tokens = split(/&/, $query);
+foreach my $t (@tokens) {
+	($type = $t)			if $t =~ /^get/;
+	($type = $t)			if $t =~ /^names/;
+	($maxw = $t) =~ s/w=//		if $t =~ /^w=/;
+	($maxh = $t) =~ s/h=//		if $t =~ /^h=/;
+	($host = $t) =~ s/host=//	if $t =~ /^host=/;
+	($list = $t) =~ s/list=//	if $t =~ /^list=/;
+	($delta = $t) =~ s/delta=//	if $t =~ /^delta=/;
+	($index = $t) =~ s/index=//	if $t =~ /^index=/;
+	($nocache = 1) =~ s/nocache//	if $t =~ /^nocache/;
+}
+
+$host = "default"		if $host eq "";
+$host = $host . "-" . $list	if $list ne "";
+$FILES = $FILES . "-" . $list	if $list ne "";
+
+get_image($host, $delta)	if $type eq "get";
+get_names($DIR . $FILES)	if $type eq "names";
+
+sub out_line
+{
+	local ($t,$l) = @_;
+
+	$n = pack 'V',length($l) + 1;
+	print $n;
+	print $t.$l;
+}
+
+sub get_names
+{
+	local ($f) = @_;
+	local ($n);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+
+	open F, $f;
+	while (<F>) {
+		chop;
+		$n = $_;
+		&out_line("F", $n);
+	}
+	close F;
+	&out_line("E", "");
+}
+
+sub file_next
+{
+	local ($h,$d) = @_;
+	local ($f,$ff,$n,$first);
+
+	$ff = $DIR . ".hosts/" . $h;
+	open F, "$ff";
+	$num = <F>;
+	close F;
+
+	chop $num;
+	if ($num eq "") {
+		$num = 0;
+	} elsif ($type eq "meta") {
+		$num = $index;
+	} else {
+		$num = $num + $d;
+		$num = 9999	if $num < 0;
+	}
+
+	$n = -1;
+	open F, $DIR . $FILES;
+	while (<F>) {
+		$n = $n + 1;
+		chop;
+		$f = $_;
+		$first = $f	if $n == 0;
+		last		if $n >= $num;
+	}
+	if ($n != $num && $d >= 0) {
+		$num = 0;
+		$f = $first;
+	}
+
+	open F, ">$ff";
+	print F "$num\n";
+	close F;
+
+	return $f;
+}
+
+sub get_image
+{
+	local ($h,$d) = @_;
+	local ($n,$idx,$name,$F);
+
+	$name = &file_next($h, $d);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+	$idx = index($name, " ");
+	if ($idx >= 0) {
+		$title = substr($name, $idx + 1);
+		$name = substr($name, 0, $idx);
+	} else {
+		$title = "";
+	}
+	$n = $DIR . $name;
+
+	if ($fit eq "full") {
+		$cmd = "<$n";
+	} else {
+		if ($fit eq "screen") {
+			$suf = "\\>";
+		} elsif ($fit eq "stretch") {
+			$suf = "!";
+		} elsif ($fit = "fit") {
+			$suf = "";
+		}
+		$cmd = "convert \"$n\" -resize " . $maxw . "x" . $maxh . $suf . " -|";
+	}
+	binmode STDOUT;
+	&out_line("F", $name);
+	if ($title ne "") {
+		&out_line("T", $title);
+	}
+	&out_line("E", "");
+	if ($type eq "meta") {
+		close $F;
+		return;
+	}
+	$F = cache_file($name, $cmd, $maxw, $maxh);
+	print <$F>;
+	close $F;
+}
+
+sub cache_file
+{
+	local ($f,$c,$w,$h) = @_;
+	local ($I,$cdir);
+
+	$cdir = $DIR . "/.cache";
+	if (! -d $cdir || $nocache) {
+		open $I, $c;
+		binmode $I;
+		return $I;
+	}
+	$f =~ s/\//_/g;
+	$cname = $cdir . "/" . $f . ":" . $w . "x" . $h;
+	$c = $c . "cat >$cname";
+	system($c)		if ! -f $cname;
+	open $I, "<$cname";
+	binmode $I;
+	return $I;
+}
