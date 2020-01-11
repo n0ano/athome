@@ -176,15 +176,15 @@ public ArrayList<String> find_remote()
     HashMap<String, String> meta = new HashMap<String, String>();
     try {
         url = ss_server +
-                Common.CGI_BIN +
+                C.CGI_BIN +
                 "?names" +
-                "&host=" + Common.base(ss_host) +
+                "&host=" + C.base(ss_host) +
                 "&list=" + ss_list;
         Log.d("get names from " + url);
         Authenticator.setDefault(new CustomAuthenticator(ss_user, ss_pwd));
         in_rdr = new URL(url).openStream();
         for (;;) {
-            str = Common.meta_line(in_rdr);
+            str = C.meta_line(in_rdr);
             type = str.charAt(0);
             if (type == 'E')
                 return images;
@@ -242,7 +242,7 @@ private void setup()
 {
 
     ss_host = pref.get("ss_host", "");
-    ss_list = Common.suffix(ss_host);
+    ss_list = C.suffix(ss_host);
     ss_server = pref.get("ss_server", "");
     ss_user = pref.get("ss_user", "");
     ss_pwd = pref.get("ss_pwd", "");

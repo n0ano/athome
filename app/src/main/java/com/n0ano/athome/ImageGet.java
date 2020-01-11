@@ -112,9 +112,9 @@ public void run()
 
 	try {
         url = server +
-                Common.CGI_BIN +
+                C.CGI_BIN +
                 "?get" +
-                "&host=" + Common.base(act.ss_host) +
+                "&host=" + C.base(act.ss_host) +
                 "&list=" + list +
                 "&delta=" + delta +
                 "&w=" + max_w +

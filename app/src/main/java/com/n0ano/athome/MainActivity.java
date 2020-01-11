@@ -110,7 +110,7 @@ public Popup popup;
 private boolean screen = true;
 private int screen_bright = -1;
 private int ss_counter = 0;
-private int ss_state = Common.SAVER_BLOCKED;
+private int ss_state = C.SAVER_BLOCKED;
 private int ss_offset = 0;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
@@ -151,8 +151,8 @@ public boolean dispatchTouchEvent(MotionEvent ev)
     if (ev.getY() < ss_offset)
         return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-        if (ss_state == Common.SAVER_SHOWING) {
-            screen_saver(Common.SAVER_RESET);
+        if (ss_state == C.SAVER_SHOWING) {
+            screen_saver(C.SAVER_RESET);
             return false;
         }
     }
@@ -421,8 +421,8 @@ public void saver_start()
 {
 
 Log.d("saver: start");
-    if (ss_state == Common.SAVER_COUNTING) {
-        ss_state = Common.SAVER_SHOWING;
+    if (ss_state == C.SAVER_COUNTING) {
+        ss_state = C.SAVER_SHOWING;
         ss_counter = ss_delay;
         ss_fade = pref.get("ss_fade", 0);
         MenuItem icon = menu_bar.findItem(R.id.action_saver);
@@ -444,14 +444,14 @@ Log.d("saver: start");
         ig.start();
     } else {
         MenuItem icon = menu_bar.findItem(R.id.action_saver);
-        if (ss_state == Common.SAVER_FROZEN) {
-            ss_state = Common.SAVER_SHOWING;
+        if (ss_state == C.SAVER_FROZEN) {
+            ss_state = C.SAVER_SHOWING;
             ss_counter = ss_delay;
             ss_fade = pref.get("ss_fade", 0);
             icon.setIcon(R.drawable.play);
             saver_fade(1);
         } else {
-            ss_state = Common.SAVER_FROZEN;
+            ss_state = C.SAVER_FROZEN;
             ss_fade = 5;
             icon.setIcon(R.drawable.pause);
         }
@@ -461,27 +461,27 @@ Log.d("saver: start");
 public void screen_saver(int tick)
 {
 
-    if (ss_state == Common.SAVER_FROZEN)
+    if (ss_state == C.SAVER_FROZEN)
         return;
 
     switch (tick) {
 
-    case Common.SAVER_BLOCK:
+    case C.SAVER_BLOCK:
 Log.d("saver paused");
-        ss_state = Common.SAVER_BLOCKED;
+        ss_state = C.SAVER_BLOCKED;
         break;
 
-    case Common.SAVER_FREEZE:
-        ss_state = ((ss_state == Common.SAVER_FROZEN) ? Common.SAVER_SHOWING : Common.SAVER_FROZEN);
+    case C.SAVER_FREEZE:
+        ss_state = ((ss_state == C.SAVER_FROZEN) ? C.SAVER_SHOWING : C.SAVER_FROZEN);
         break;
 
-    case Common.SAVER_TICK:
-        if (ss_state != Common.SAVER_BLOCKED) {
+    case C.SAVER_TICK:
+        if (ss_state != C.SAVER_BLOCKED) {
             if (--ss_counter == 0) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         ss_counter = ss_delay;
-                        if (ss_state == Common.SAVER_SHOWING)
+                        if (ss_state == C.SAVER_SHOWING)
                             saver_fade(1);
                         else
                             saver_start();
@@ -491,15 +491,15 @@ Log.d("saver paused");
         }
         break;
 
-    case Common.SAVER_RESET:
+    case C.SAVER_RESET:
 Log.d("saver - reset to " + ss_start + " seconds, state - " + ss_state);
-        if (ss_state == Common.SAVER_SHOWING) {
+        if (ss_state == C.SAVER_SHOWING) {
             MenuItem icon = menu_bar.findItem(R.id.action_saver);
             icon.setIcon(R.drawable.monitor);
             display(screen);
         }
         ss_counter = ss_start;
-        ss_state = ((ss_start == 0) ? Common.SAVER_BLOCKED : Common.SAVER_COUNTING);
+        ss_state = ((ss_start == 0) ? C.SAVER_BLOCKED : C.SAVER_COUNTING);
         break;
 
     }
@@ -571,11 +571,11 @@ private void restore_state()
     ss_delay = pref.get("ss_delay", 0);
     ss_fade = pref.get("ss_fade", 0);
     ss_host = pref.get("ss_host", "");
-    ss_list = Common.suffix(ss_host);
+    ss_list = C.suffix(ss_host);
     ss_server = pref.get("ss_server", "");
     ss_user = pref.get("ss_user", "");
     ss_pwd = pref.get("ss_pwd", "");
-    screen_saver(Common.SAVER_RESET);
+    screen_saver(C.SAVER_RESET);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);
@@ -1094,7 +1094,7 @@ private void clock()
     else if (on_time >= 0 && time == on_time && !screen)
         display(true);
 
-    screen_saver(Common.SAVER_TICK);
+    screen_saver(C.SAVER_TICK);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv == null)

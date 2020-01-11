@@ -134,7 +134,7 @@ private Dialog start_dialog(int id)
 
     dialog.show();
 
-    act.screen_saver(Common.SAVER_BLOCK);
+    act.screen_saver(C.SAVER_BLOCK);
 
     return dialog;
 }
@@ -142,7 +142,7 @@ private Dialog start_dialog(int id)
 public void end_dialog(Dialog dialog)
 {
 
-    act.screen_saver(Common.SAVER_RESET);
+    act.screen_saver(C.SAVER_RESET);
     dialog.dismiss();
 }
 
@@ -519,13 +519,13 @@ private void outlets_dialog()
     });
 
     final TextView cols = (TextView) dialog.findViewById(R.id.outlets_cols);
-    cols.setText(Common.i2a(act.outlets_cols));
+    cols.setText(C.i2a(act.outlets_cols));
 
     final TextView min = (TextView) dialog.findViewById(R.id.outlets_batt_min);
-    min.setText(Common.i2a(act.outlets_batt_min));
+    min.setText(C.i2a(act.outlets_batt_min));
 
     final TextView max = (TextView) dialog.findViewById(R.id.outlets_batt_max);
-    max.setText(Common.i2a(act.outlets_batt_max));
+    max.setText(C.i2a(act.outlets_batt_max));
 
     Button bv_how = (Button) dialog.findViewById(R.id.outlets_x10);
     bv_how.setOnClickListener(new OnClickListener() {
@@ -553,11 +553,11 @@ private void outlets_dialog()
                 act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
             pref.put("outlets_battery", act.outlets_battery);
-            act.outlets_cols = Common.a2i(cols.getText().toString());
+            act.outlets_cols = C.a2i(cols.getText().toString());
             pref.put("outlets_cols", act.outlets_cols);
-            act.outlets_batt_min = Common.a2i(min.getText().toString());
+            act.outlets_batt_min = C.a2i(min.getText().toString());
             pref.put("outlets_batt_min", act.outlets_batt_min);
-            act.outlets_batt_max = Common.a2i(max.getText().toString());
+            act.outlets_batt_max = C.a2i(max.getText().toString());
             pref.put("outlets_batt_max", act.outlets_batt_max);
             end_dialog(dialog);
         }
@@ -622,10 +622,10 @@ private void screen_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_screen);
 
     final EditText ss_start = (EditText) dialog.findViewById(R.id.screen_start);
-    ss_start.setText(act.ss_start > 0 ? Common.i2a(act.ss_start) : "");
+    ss_start.setText(act.ss_start > 0 ? C.i2a(act.ss_start) : "");
 
     final EditText ss_delay = (EditText) dialog.findViewById(R.id.screen_delay);
-    ss_delay.setText(act.ss_start > 0 ? Common.i2a(act.ss_delay) : "");
+    ss_delay.setText(act.ss_start > 0 ? C.i2a(act.ss_delay) : "");
 
     final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, SS_Faders.types);
@@ -663,7 +663,7 @@ private void screen_dialog()
         public void onClick(View v) {
             act.ss_host = et_host.getText().toString();
             pref.put("ss_host", act.ss_host);
-            act.ss_list = Common.suffix(act.ss_host);
+            act.ss_list = C.suffix(act.ss_host);
             act.ss_server = et_server.getText().toString();
             pref.put("ss_server", act.ss_server);
             act.ss_user = et_user.getText().toString();
@@ -672,14 +672,14 @@ private void screen_dialog()
             pref.put("ss_pwd", act.ss_pwd);
 
             try {
-                act.ss_start = Common.a2i(ss_start.getText().toString());
+                act.ss_start = C.a2i(ss_start.getText().toString());
             } catch (Exception e) {
                 act.ss_start = 0;
             }
             pref.put("ss_start", act.ss_start);
             if (act.ss_start > 0) {
                 try {
-                    act.ss_delay = Common.a2i(ss_delay.getText().toString());
+                    act.ss_delay = C.a2i(ss_delay.getText().toString());
                 } catch (Exception e) {
                     act.ss_delay = SS_DELAY;
                 }
@@ -687,7 +687,7 @@ private void screen_dialog()
             }
             act.ss_fade = type_pos;
             pref.put("ss_fade", act.ss_fade);
-            act.screen_saver(Common.SAVER_RESET);
+            act.screen_saver(C.SAVER_RESET);
 
             end_dialog(dialog);
         }
@@ -703,7 +703,7 @@ private void developer_dialog()
     cb.setChecked(act.debug != 0);
 
     final TextView level = (TextView) dialog.findViewById(R.id.outlets_batt_level);
-    level.setText(Common.i2a(act.outlets_batt_level));
+    level.setText(C.i2a(act.outlets_batt_level));
 
     final TextView uri = (TextView) dialog.findViewById(R.id.log_uri);
     uri.setText(act.log_uri);
@@ -715,7 +715,7 @@ private void developer_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.outlets_batt_level = Common.a2i(level.getText().toString());
+            act.outlets_batt_level = C.a2i(level.getText().toString());
             pref.put("outlets_batt_level", act.outlets_batt_level);
 
             act.log_uri = uri.getText().toString();

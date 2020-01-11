@@ -7,7 +7,7 @@ import java.util.HashMap;
 //
 // Created by n0ano on 11/7/18.
 //
-public class Common {
+public class C {
 
 public final static String CGI_BIN = "/cgi-bin/explore.dd/get_frame";
 

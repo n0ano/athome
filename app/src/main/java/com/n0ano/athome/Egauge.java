@@ -56,7 +56,7 @@ private int get_value(String name, String resp)
         int end = resp.indexOf(".", start);
         if (end < 0)
             return w;
-        w = Common.a2i(resp.substring(start, end));
+        w = C.a2i(resp.substring(start, end));
     }
     return w;
 }
