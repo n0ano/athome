@@ -27,6 +27,8 @@ private String user;
 private String pwd;
 
 private String name;
+private String list;
+private String title;
 
 private View img_start;
 private View img_end;
@@ -34,12 +36,15 @@ private View img_end;
 private int max_w;
 private int max_h;
 
-public ImageGet(ScreenSaver act, String server, String name, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
+private HashMap<String, String> meta;
+
+public ImageGet(ScreenSaver act, String server, String list, String name, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
 {
 
     this.act = act;
     this.m_act = act.act;
     this.server = server;
+    this.list = list;
     this.name = name;
     this.user = user;
     this.pwd = pwd;
@@ -59,35 +64,64 @@ private int b2int(byte[] b)
     return i;
 }
 
-public void run()
+private InputStream open_http(String image)
 {
     String url;
 	InputStream in_rdr;
-    final Bitmap bitmap;
-    final HashMap<String, String> meta;
 
 	try {
         url = server +
                 C.CGI_BIN +
                 "?get" +
                 "&host=" + C.base(m_act.ss_host) +
-                "&name=" + name +
+                "&list=" + list +
+                "&name=" + image +
                 "&w=" + max_w +
                 "&h=" + max_h;
-        Log.d("get image from " + url);
+        Log.d("SS:get image from " + url);
         Authenticator.setDefault(new CustomAuthenticator(user, pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());
+	} catch (Exception e) {
+		Log.d("SS:get http image failed - " + e);
+		return null;
+	}
+    title = meta.get("T");
+    title = ((title != null) ? title : "");
+    return in_rdr;
+}
+
+private InputStream open_image(String image)
+{
+
+    if (image.startsWith("http://"))
+        return open_http(image.substring(7));
+//    else if (image.startsWith("file://"))
+//        return file open
+    return null;
+}
+
+public void run()
+{
+	InputStream in_rdr;
+    final Bitmap bitmap;
+    int gen = 0;
+
+	try {
+        in_rdr = open_image(name);
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
+        gen = Integer.parseInt(meta.get("E"), 10);
+        if (gen != act.ss_generation)
+            act.get_names(m_act.image_find, gen);
 	} catch (Exception e) {
-		Log.d("get image failed - " + e);
+		Log.d("SS:get image failed - " + e);
 		return;
 	}
     if (bitmap == null)
-        Log.d("image decode failed");
+        Log.d("SS:image decode failed");
     else
-        Log.d("image retrieved - " + bitmap.getWidth() + "x" + bitmap.getHeight());
+        Log.d("SS:image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
 
     m_act.runOnUiThread(new Runnable() {
         public void run() {
@@ -97,8 +131,7 @@ public void run()
             else
                 iv.setImageBitmap(bitmap);
             TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
-            String title = meta.get("T");
-            tv.setText((title != null) ? title : "");
+            tv.setText(title);
             act.do_fade(img_start, img_end);
         }
     });

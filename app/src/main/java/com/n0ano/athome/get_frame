@@ -1,10 +1,10 @@
 #!//usr/bin/perl
 
-$tm="names&host=lenovo&list=pbw";
-$tf="get&host=lenovo&list=pbw&name=.pbw/nassebrust.jpg&w=600&h=888";
+$tm="names&host=lenovo&list=";
+$tf="get&host=lenovo&name=Barb/IMG_8444.JPG&w=600&h=888";
 $query = $ENV{"QUERY_STRING"};
-$query = $tm;
 $type = "get";
+$hidden = "";
 $maxw = 2048;
 $maxh = 2048;
 $host = "default";
@@ -14,12 +14,13 @@ $NOCACHE = 0;
 $fit = "fit";
 
 $DIR = "Books/Frame/";
-$DIRS = ".files";
+$dirs = ".files";
 
 @tokens = split(/&/, $query);
 foreach my $t (@tokens) {
 	($type = $t)			if $t =~ /^get/;
 	($type = $t)			if $t =~ /^names/;
+	($hidden = $t)			if $t =~ /^all/;
 	($maxw = $t) =~ s/w=//		if $t =~ /^w=/;
 	($maxh = $t) =~ s/h=//		if $t =~ /^h=/;
 	($host = $t) =~ s/host=//	if $t =~ /^host=/;
@@ -30,7 +31,7 @@ foreach my $t (@tokens) {
 
 $host = "default"		if $host eq "";
 $host = $host . "-" . $list	if $list ne "";
-$dirs = $DIRS . "-" . $list	if $list ne "";
+$dirs = $dirs . "-" . $list	if $list ne "";
 
 get_image($host, $dirs, $name)	if $type eq "get";
 get_names($dirs)		if $type eq "names";
@@ -59,8 +60,8 @@ END
 	chop $gen;
 	while (<F>) {
 		chop;
-		$dir = $DIR . $_;
-		opendir($dh, $dir) || last;
+		$dir = $_;
+		opendir($dh, $DIR . $dir) || last;
 		while (readdir $dh) {
 			next		if $_ eq ".";
 			next		if $_ eq "..";
@@ -88,7 +89,7 @@ END
 	close F;
 
 	if ($fit eq "full") {
-		$cmd = "<$n";
+		$cmd = "<$DIR$n";
 	} else {
 		if ($fit eq "screen") {
 			$suf = "\\>";
@@ -97,7 +98,7 @@ END
 		} elsif ($fit = "fit") {
 			$suf = "";
 		}
-		$cmd = "convert \"$n\" -resize " . $maxw . "x" . $maxh . $suf . " -|";
+		$cmd = "convert \"$DIR$n\" -resize " . $maxw . "x" . $maxh . $suf . " -|";
 	}
 	$name = $n;
 	$name =~ s/\//_/g;

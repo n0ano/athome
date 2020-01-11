@@ -1,5 +1,6 @@
 package com.n0ano.athome;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -39,6 +40,9 @@ public String ss_server = "";
 public String ss_user = "";
 public String ss_pwd = "";
 
+private ImageFind image_find;
+private int ss_generation = -1;
+
 @Override
 protected void onCreate(Bundle state)
 {
@@ -54,7 +58,7 @@ protected void onCreate(Bundle state)
     tb.inflateMenu(R.menu.menu_screen);
     setTitle("Screen mgmt");
 
-    Log.d("ImageMgmt: onCreate");
+    Log.d("SS:ImageMgmt: onCreate");
 
 //    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 //        if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -65,8 +69,6 @@ protected void onCreate(Bundle state)
 //    }
 
     setup();
-
-    find_images();
     //show_idx = 0;
     //show_next();
 }
@@ -76,7 +78,7 @@ protected void onStart()
 {
 
     super.onStart();
-    Log.d("ImageMgmt: onStart");
+    Log.d("SS:ImageMgmt: onStart");
 }
 
 @Override
@@ -84,7 +86,7 @@ protected void onRestart()
 {
 
     super.onRestart();
-    Log.d("ImageMgmt: onRestart");
+    Log.d("SS:ImageMgmt: onRestart");
 }
 
 @Override
@@ -92,7 +94,7 @@ protected void onResume()
 {
 
     super.onResume();
-    Log.d("ImageMgmt: onResume");
+    Log.d("SS:ImageMgmt: onResume");
 }
 
 @Override
@@ -100,7 +102,7 @@ protected void onPause()
 {
 
     super.onPause();
-    Log.d("ImageMgmt: onPause");
+    Log.d("SS:ImageMgmt: onPause");
 }
 
 @Override
@@ -108,7 +110,7 @@ protected void onStop()
 {
 
     super.onStop();
-    Log.d("ImageMgmt: onStop");
+    Log.d("SS:ImageMgmt: onStop");
 }
 
 @Override
@@ -116,7 +118,7 @@ protected void onDestroy()
 {
 
     super.onDestroy();
-    Log.d("ImageMgmt: onDestroy");
+    Log.d("SS:ImageMgmt: onDestroy");
 }
 
 @Override
@@ -126,77 +128,22 @@ public boolean onCreateOptionsMenu(Menu menu)
     super.onCreateOptionsMenu(menu);
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_main, menu);
-Log.d("action bar created");
+Log.d("SS:action bar created");
     return true;
 }
 
-private void find_images()
+private void get_names(final ImageFind image_find, final int gen)
 {
 
-    new Thread(new Runnable() {
-        public void run() {
-            images = new ArrayList<String>();
-            find_local();
-            find_remote();
-            done();
-        }
-    }).start();
-}
-
-public ArrayList<String> find_local()
-{
-
-    Uri uri;
-    Cursor cursor;
-    int column_index_data, column_index_folder_name;
-    String path = null;
-    uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-    String[] projection = { MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
-
-    cursor = getContentResolver().query(uri, projection, null, null, null);
-
-    column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-    column_index_folder_name = cursor .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-    while (cursor.moveToNext()) {
-        path = cursor.getString(column_index_data);
-
-        images.add("file://" + path);
-    }
-    return images;
-}
-
-public ArrayList<String> find_remote()
-{
-    char type;
-    String str;
-    String url;
-	InputStream in_rdr = null;
-
-    HashMap<String, String> meta = new HashMap<String, String>();
-    try {
-        url = ss_server +
-                C.CGI_BIN +
-                "?names" +
-                "&host=" + C.base(ss_host) +
-                "&list=" + ss_list;
-        Log.d("get names from " + url);
-        Authenticator.setDefault(new CustomAuthenticator(ss_user, ss_pwd));
-        in_rdr = new URL(url).openStream();
-        for (;;) {
-            str = C.meta_line(in_rdr);
-            type = str.charAt(0);
-            if (type == 'E')
-                return images;
-            if (type == 'F')
-                images.add("http://" + str.substring(1));
-            else
-                Log.d("Unexpected meta data - " + str);
-        }
-    } catch (Exception e) {
-        Log.d("image get execption - " + e);
-    }
-    return images;
+    if (gen != ss_generation)
+        new Thread(new Runnable() {
+            public void run() {
+                images = image_find.find_local(new ArrayList<String>());
+                images = image_find.find_remote(true, images);
+                ss_generation = image_find.ss_generation;
+                done();
+            }
+        }).start();
 }
 
 private void show_next()
@@ -208,17 +155,17 @@ private void show_next()
     try {
         img_uri = images.get(show_idx++);
     } catch (Exception e) {
-Log.d("last image - " + show_idx);
+Log.d("SS:last image - " + show_idx);
         finish();
         return;
     }
-    Log.d("image uri - " + img_uri);
+    Log.d("SS:image uri - " + img_uri);
     try {
         in_rdr = new FileInputStream(new File(img_uri));
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
 	} catch (Exception e) {
-		Log.d("get image failed - " + e);
+		Log.d("SS:get image failed - " + e);
 		return;
 	}
     ImageView iv = (ImageView)findViewById(R.id.image);
@@ -231,10 +178,10 @@ Log.d("last image - " + show_idx);
 private void done()
 {
 
-    Log.d("Images:");
-    for (String path : images)
-        Log.d("image: " + path);
-
+    Log.d("SS:Images:");
+    for (String path : images) {
+        Log.d("SS:image: " + path);
+    }
     finish();
 }
 
@@ -246,6 +193,9 @@ private void setup()
     ss_server = pref.get("ss_server", "");
     ss_user = pref.get("ss_user", "");
     ss_pwd = pref.get("ss_pwd", "");
+
+    image_find = new ImageFind((Activity) this, ss_server, ss_host, ss_list, ss_user, ss_pwd);
+    get_names(image_find, 0);
 }
 
 public void cancel(View v)

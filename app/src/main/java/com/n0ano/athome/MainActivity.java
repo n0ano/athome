@@ -2,6 +2,7 @@ package com.n0ano.athome;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -42,6 +43,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
@@ -111,6 +113,7 @@ public boolean screen = true;
 private int screen_bright = -1;
 
 public ScreenSaver ss_saver;
+public ImageFind image_find;
 public int ss_offset = 0;
 public int ss_start = 0;        // seconds, 0 = none
 public int ss_delay = 0;        // seconds
@@ -122,6 +125,7 @@ public String ss_list = "";
 public String ss_server = "";
 public String ss_user = "";
 public String ss_pwd = "";
+public ArrayList<String> images;
 
 public int on_time = -1;        // (hour * 100) + minute, -1 = none
 public int off_time = -1;       // (hour * 100) + minute, -1 = none
@@ -181,6 +185,9 @@ protected void onResume()
 //test_parse();
 
     restore_state();
+    image_find = new ImageFind((Activity) this, ss_server, ss_host, ss_list, ss_user, ss_pwd);
+    if (ss_saver.ss_generation < 0)
+        ss_saver.get_names(image_find, 0);
     doit();
 }
 
@@ -437,7 +444,6 @@ private void restore_state()
     ss_server = pref.get("ss_server", "");
     ss_user = pref.get("ss_user", "");
     ss_pwd = pref.get("ss_pwd", "");
-    ss_saver.screen_saver(C.SAVER_RESET);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);

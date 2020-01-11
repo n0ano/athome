@@ -43,6 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 
@@ -52,10 +53,11 @@ public class ScreenSaver
 MainActivity act;
 
 ArrayList<String> images;
+private int ss_current;
 
-private int ss_generation = 0;
+public int ss_generation = -1;
 private int ss_counter = 0;
-private int ss_state = C.SAVER_BLOCKED;
+private int ss_state = C.SAVER_FROZEN;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
 private SS_Faders ss_faders;
@@ -69,7 +71,7 @@ public ScreenSaver(MainActivity act, View v1, View v2)
 
     images = new ArrayList<String>();
     ss_faders = new SS_Faders();
-Log.d("saver offset - " + act.ss_offset);
+    ss_state = C.SAVER_FROZEN;
 }
 
 public int state()
@@ -109,7 +111,14 @@ private int ss_height()
 private String ss_next(int delta)
 {
 
-    return ".pbw/nassebrust.jpg";
+    if (images.size() <= 0)
+        return "";
+    ss_current += delta;
+    if (ss_current >= images.size())
+        ss_current = 0;
+    else if (ss_current < 0)
+        ss_current = images.size() - 1;
+    return images.get(ss_current);
 }
 
 public void saver_fade(int delta)
@@ -122,7 +131,7 @@ public void saver_fade(int delta)
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, act.ss_server, ss_next(delta), act.ss_user, act.ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
+    ImageGet ig = new ImageGet(this, act.ss_server, act.ss_list, ss_next(delta), act.ss_user, act.ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
     ig.start();
 }
 
@@ -155,7 +164,7 @@ Log.d("saver: start");
         //
         //  ImageGet will call do_fade once the new image is loaded
         //
-        ImageGet ig = new ImageGet(this, act.ss_server, ss_next(1), act.ss_user, act.ss_pwd, ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+        ImageGet ig = new ImageGet(this, act.ss_server, act.ss_list, ss_next(1), act.ss_user, act.ss_pwd, ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
         ig.start();
     } else {
         MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
@@ -176,13 +185,13 @@ Log.d("saver: start");
 public void screen_saver(int tick)
 {
 
+//Log.d("SS: saver state - " + ss_state);
     if (ss_state == C.SAVER_FROZEN)
         return;
 
     switch (tick) {
 
     case C.SAVER_BLOCK:
-Log.d("saver paused");
         ss_state = C.SAVER_BLOCKED;
         break;
 
@@ -218,6 +227,25 @@ Log.d("saver - reset to " + act.ss_start + " seconds, state - " + ss_state);
         break;
 
     }
+}
+
+public void get_names(final ImageFind image_find, final int gen)
+{
+
+    if (gen != ss_generation)
+        new Thread(new Runnable() {
+            public void run() {
+                images = image_find.find_local(new ArrayList<String>());
+                images = image_find.find_remote(true, images);
+Log.d("SS:get_names - " + images.size() + ", gen - " + image_find.ss_generation);
+                ss_generation = image_find.ss_generation;
+                ss_current = images.size();
+                if (ss_current > 0) {
+                    ss_state = C.SAVER_BLOCKED;
+                    screen_saver(C.SAVER_RESET);
+                }
+            }
+        }).start();
 }
 
 }
