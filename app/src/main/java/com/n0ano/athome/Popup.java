@@ -79,7 +79,7 @@ public boolean menu_click(int item)
     switch (item) {
 
     case R.id.action_saver:
-        act.saver_click();
+        act.ss_saver.saver_click();
         return true;
 
     case R.id.action_display:
@@ -134,7 +134,7 @@ private Dialog start_dialog(int id)
 
     dialog.show();
 
-    act.screen_saver(C.SAVER_BLOCK);
+    act.ss_saver.screen_saver(C.SAVER_BLOCK);
 
     return dialog;
 }
@@ -142,7 +142,7 @@ private Dialog start_dialog(int id)
 public void end_dialog(Dialog dialog)
 {
 
-    act.screen_saver(C.SAVER_RESET);
+    act.ss_saver.screen_saver(C.SAVER_RESET);
     dialog.dismiss();
 }
 
@@ -687,7 +687,7 @@ private void screen_dialog()
             }
             act.ss_fade = type_pos;
             pref.put("ss_fade", act.ss_fade);
-            act.screen_saver(C.SAVER_RESET);
+            act.ss_saver.screen_saver(C.SAVER_RESET);
 
             end_dialog(dialog);
         }

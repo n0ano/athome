@@ -107,19 +107,15 @@ boolean running;
 public Parse parse = new Parse();
 public Popup popup;
 
-private boolean screen = true;
+public boolean screen = true;
 private int screen_bright = -1;
-private int ss_counter = 0;
-private int ss_state = C.SAVER_BLOCKED;
-private int ss_offset = 0;
-private int ss_viewid = 0;
-private View[] ss_views = new View[2];
-private SS_Faders ss_faders;
-private GestureDetectorCompat ss_gesture;
 
+public ScreenSaver ss_saver;
+public int ss_offset = 0;
 public int ss_start = 0;        // seconds, 0 = none
 public int ss_delay = 0;        // seconds
 public int ss_fade = 0;
+private GestureDetectorCompat ss_gesture;
 
 public String ss_host = "";
 public String ss_list = "";
@@ -151,8 +147,8 @@ public boolean dispatchTouchEvent(MotionEvent ev)
     if (ev.getY() < ss_offset)
         return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-        if (ss_state == C.SAVER_SHOWING) {
-            screen_saver(C.SAVER_RESET);
+        if (ss_saver.state() == C.SAVER_SHOWING) {
+            ss_saver.screen_saver(C.SAVER_RESET);
             return false;
         }
     }
@@ -294,10 +290,7 @@ private void start_home(Bundle state)
 
     popup = new Popup(this, pref);
 
-    ss_views[0] = (View) findViewById(R.id.saver_view1);
-    ss_views[1] = (View) findViewById(R.id.saver_view2);
-
-    ss_faders = new SS_Faders();
+    ss_saver = new ScreenSaver(this, (View) findViewById(R.id.saver_view1), (View) findViewById(R.id.saver_view2));
 
     ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
 
@@ -358,10 +351,7 @@ public void display(final boolean onoff)
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
             view = (View) findViewById(R.id.blank_view);
             view.setVisibility(onoff ? View.GONE : View.VISIBLE);
-            ss_views[0].setVisibility(View.GONE);
-            ss_views[0].setAlpha(0.0f);
-            ss_views[1].setVisibility(View.GONE);
-            ss_views[1].setAlpha(0.0f);
+            ss_saver.hide_views();
             if (menu_bar != null) {
                 MenuItem icon = menu_bar.findItem(R.id.action_display);
                 icon.setIcon(onoff ? R.drawable.light_on : R.drawable.light_off);
@@ -375,134 +365,6 @@ public void screen_mgmt(View v)
 
     Intent intent = new Intent(this, ImageMgmt.class);
     startActivity(intent);
-}
-
-public void do_fade(View start, View end)
-{
-
-    ss_faders.fade(ss_fade, start, end, ss_width(), ss_height());
-}
-
-private int ss_width()
-{
-
-    View v = (View)findViewById(R.id.scroll_view);
-    return v.getWidth();
-}
-
-private int ss_height()
-{
-
-    View v = (View)findViewById(R.id.scroll_view);
-    return v.getHeight();
-}
-
-public void saver_fade(int delta)
-{
-
-    int old = ss_viewid;
-    ss_viewid ^= 1;
-    ss_counter = ss_delay;
-
-    //
-    //  ImageGet will call do_fade once the new image is loaded
-    //
-    ImageGet ig = new ImageGet(this, ss_server, ss_list, delta, ss_user, ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
-    ig.start();
-}
-
-public void saver_click()
-{
-
-    saver_start();
-}
-
-public void saver_start()
-{
-
-Log.d("saver: start");
-    if (ss_state == C.SAVER_COUNTING) {
-        ss_state = C.SAVER_SHOWING;
-        ss_counter = ss_delay;
-        ss_fade = pref.get("ss_fade", 0);
-        MenuItem icon = menu_bar.findItem(R.id.action_saver);
-        icon.setIcon(R.drawable.play);
-
-        ss_views[0].setVisibility(View.GONE);
-        ss_views[0].setAlpha(1.0f);
-        ss_views[0].setScaleX(1.0f);
-        ss_views[0].setScaleY(1.0f);
-        ss_views[1].setVisibility(View.GONE);
-        ss_views[1].setAlpha(1.0f);
-        ss_views[1].setScaleX(1.0f);
-        ss_views[1].setScaleY(1.0f);
-        ss_viewid = 0;
-        //
-        //  ImageGet will call do_fade once the new image is loaded
-        //
-        ImageGet ig = new ImageGet(this, ss_server, ss_list, 1, ss_user, ss_pwd, ss_width(), ss_height(), (View)findViewById(R.id.scroll_view), ss_views[ss_viewid]);
-        ig.start();
-    } else {
-        MenuItem icon = menu_bar.findItem(R.id.action_saver);
-        if (ss_state == C.SAVER_FROZEN) {
-            ss_state = C.SAVER_SHOWING;
-            ss_counter = ss_delay;
-            ss_fade = pref.get("ss_fade", 0);
-            icon.setIcon(R.drawable.play);
-            saver_fade(1);
-        } else {
-            ss_state = C.SAVER_FROZEN;
-            ss_fade = 5;
-            icon.setIcon(R.drawable.pause);
-        }
-    }
-}
-
-public void screen_saver(int tick)
-{
-
-    if (ss_state == C.SAVER_FROZEN)
-        return;
-
-    switch (tick) {
-
-    case C.SAVER_BLOCK:
-Log.d("saver paused");
-        ss_state = C.SAVER_BLOCKED;
-        break;
-
-    case C.SAVER_FREEZE:
-        ss_state = ((ss_state == C.SAVER_FROZEN) ? C.SAVER_SHOWING : C.SAVER_FROZEN);
-        break;
-
-    case C.SAVER_TICK:
-        if (ss_state != C.SAVER_BLOCKED) {
-            if (--ss_counter == 0) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        ss_counter = ss_delay;
-                        if (ss_state == C.SAVER_SHOWING)
-                            saver_fade(1);
-                        else
-                            saver_start();
-                    }
-                });
-            }
-        }
-        break;
-
-    case C.SAVER_RESET:
-Log.d("saver - reset to " + ss_start + " seconds, state - " + ss_state);
-        if (ss_state == C.SAVER_SHOWING) {
-            MenuItem icon = menu_bar.findItem(R.id.action_saver);
-            icon.setIcon(R.drawable.monitor);
-            display(screen);
-        }
-        ss_counter = ss_start;
-        ss_state = ((ss_start == 0) ? C.SAVER_BLOCKED : C.SAVER_COUNTING);
-        break;
-
-    }
 }
 
 public void view_show(int view_id, int[] ids, int main)
@@ -575,7 +437,7 @@ private void restore_state()
     ss_server = pref.get("ss_server", "");
     ss_user = pref.get("ss_user", "");
     ss_pwd = pref.get("ss_pwd", "");
-    screen_saver(C.SAVER_RESET);
+    ss_saver.screen_saver(C.SAVER_RESET);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);
@@ -1094,7 +956,7 @@ private void clock()
     else if (on_time >= 0 && time == on_time && !screen)
         display(true);
 
-    screen_saver(C.SAVER_TICK);
+    ss_saver.screen_saver(C.SAVER_TICK);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv == null)
