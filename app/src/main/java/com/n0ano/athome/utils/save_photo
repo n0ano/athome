@@ -1,0 +1,67 @@
+#!/bin/bash
+
+DIR=/isis/homeb/books.d/Books/Frame
+
+unique() {
+
+	BASE=`expr "$1" : '\(.*\)\.[^.]*'`
+	SUF=`expr "$1" : '.*\.\([^.]*\)'`
+	n=1
+	while [ -f $2/$BASE-$n.$SUF ]
+	do
+		n=$(($n+1))
+	done
+	echo $BASE-$n.$SUF
+}
+
+FROM=`expr "$1" : 'From: \(.*\)'`
+NAME=`expr "$FROM" : '\(.*\) <.*>'`
+if [ "$NAME" = "" ]
+then
+	NAME=`expr "$FROM" : '.*<\(.*\)>'`
+fi
+if [ "$NAME" = "" ]
+then
+	NAME="$FROM"
+fi
+NAME=`echo "$NAME" | tr " " "_"`
+mkdir -p $DIR/$NAME
+
+SUBJ=`expr "$2" : 'Subject: \(.*\)'`
+LIST=`expr "$SUBJ" : '^\([^:]*\):'`
+if [ "$LIST" = "" ]
+then
+	LIST=".files"
+else
+	SUBJ=`expr "$SUBJ" : '^:[^:]*:\(.*\)'`
+	LIST=".files-$LIST"
+fi
+
+mkdir $$.dd
+cd $$.dd
+munpack >/dev/null 2>&1
+rm *.desc
+for i in *
+do
+	if [ -f $DIR/$NAME/$i ]
+	then
+		name=`unique $i $DIR/$NAME`
+	else
+		name=$i
+	fi
+	cp $i $DIR/$NAME/$name
+	chmod 0644 $DIR/$NAME/$name
+	if [ "$SUBJ" != "" ]
+	then
+		uname=`echo "$NAME/$name" | sed -e "s/\//_/g"`
+		echo "$SUBJ" >$DIR/.titles/$uname
+	fi
+done
+cd ..
+rm -rf $$.dd
+gen=`head -1 "$LIST"`
+gen=$(($gen + 1))
+echo $gen >$$.f
+(sed -n -e '2,$p' <"$LIST";echo "$NAME") | sort | uniq >>$$.f
+cp $$.f "$LIST"
+rm -f $$.f

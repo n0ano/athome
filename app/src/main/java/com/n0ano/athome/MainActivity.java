@@ -125,7 +125,6 @@ public String ss_list = "";
 public String ss_server = "";
 public String ss_user = "";
 public String ss_pwd = "";
-public ArrayList<String> images;
 
 public int on_time = -1;        // (hour * 100) + minute, -1 = none
 public int off_time = -1;       // (hour * 100) + minute, -1 = none

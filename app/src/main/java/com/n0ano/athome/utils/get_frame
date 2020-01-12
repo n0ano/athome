@@ -1,7 +1,7 @@
 #!//usr/bin/perl
 
-$tm="names&host=lenovo&list=";
-$tf="get&host=lenovo&name=Barb/IMG_8444.JPG&w=600&h=888";
+$tm="names&host=lenovo&list=pbw";
+$tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&w=600&h=888";
 $query = $ENV{"QUERY_STRING"};
 $type = "get";
 $hidden = "";
@@ -48,7 +48,7 @@ sub out_line
 sub get_names
 {
 	local ($f) = @_;
-	local ($n,$gen,$dh,$dir);
+	local ($n,$gen,$ts,$dh,$dir,$entry);
 
 	print <<END;
 Content-type: application/octet-stream
@@ -65,7 +65,9 @@ END
 		while (readdir $dh) {
 			next		if $_ eq ".";
 			next		if $_ eq "..";
-			&out_line("F", $dir . "/" . $_);
+			$entry = $dir . "/" . $_;
+			$ts = (stat($DIR . $entry))[9];
+			&out_line("T", $ts . ":" . $entry);
 		}
 		closedir $dh;
 	}
@@ -122,7 +124,7 @@ sub cache_file
 	local ($f,$c,$w,$h) = @_;
 	local ($I,$cdir);
 
-	$cdir = $DIR . "/.cache";
+	$cdir = $DIR . ".cache";
 	if (! -d $cdir || $NOCACHE) {
 		open $I, $c;
 		binmode $I;

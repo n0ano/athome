@@ -44,7 +44,7 @@ public ImageFind(Activity act, String ss_server, String ss_host, String ss_list,
     this.ss_pwd = ss_pwd;
 }
 
-public ArrayList<String> find_local(ArrayList<String> images)
+public ArrayList<ImageEntry> find_local(ArrayList<ImageEntry> images)
 {
 
 if (true) return images;
@@ -63,12 +63,12 @@ if (true) return images;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add("file://" + path);
+        images.add(new ImageEntry(path, C.IMAGE_LOCAL, 0));
     }
     return images;
 }
 
-public ArrayList<String> find_remote(boolean hidden, ArrayList<String> images)
+public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images)
 {
     char type;
     String str;
@@ -93,8 +93,8 @@ public ArrayList<String> find_remote(boolean hidden, ArrayList<String> images)
                 ss_generation = Integer.parseInt(str.substring(1), 10);
                 return images;
             }
-            if (type == 'F')
-                images.add("http://" + str.substring(1));
+            if (type == 'T')
+                images.add(new ImageEntry(str.substring(1), C.IMAGE_REMOTE));
             else
                 Log.d("SS:Unexpected meta data - " + str);
         }

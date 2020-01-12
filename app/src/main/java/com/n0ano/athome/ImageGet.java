@@ -26,7 +26,7 @@ private String server;
 private String user;
 private String pwd;
 
-private String name;
+private ImageEntry entry;
 private String list;
 private String title;
 
@@ -38,14 +38,14 @@ private int max_h;
 
 private HashMap<String, String> meta;
 
-public ImageGet(ScreenSaver act, String server, String list, String name, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
+public ImageGet(ScreenSaver act, String server, String list, ImageEntry entry, String user, String pwd, int max_w, int max_h, View img_start, View img_end)
 {
 
     this.act = act;
     this.m_act = act.act;
     this.server = server;
     this.list = list;
-    this.name = name;
+    this.entry = entry;
     this.user = user;
     this.pwd = pwd;
     this.max_w = max_w;
@@ -91,12 +91,14 @@ private InputStream open_http(String image)
     return in_rdr;
 }
 
-private InputStream open_image(String image)
+private InputStream open_image(ImageEntry entry)
 {
 
-    if (image.startsWith("http://"))
-        return open_http(image.substring(7));
-//    else if (image.startsWith("file://"))
+    if (entry == null)
+        return null;
+    if (entry.get_type() == C.IMAGE_REMOTE)
+        return open_http(entry.get_name());
+//    else if (entry.get_type() == C.IMAGE_LOCAL)
 //        return file open
     return null;
 }
@@ -108,7 +110,7 @@ public void run()
     int gen = 0;
 
 	try {
-        in_rdr = open_image(name);
+        in_rdr = open_image(entry);
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
         gen = Integer.parseInt(meta.get("E"), 10);

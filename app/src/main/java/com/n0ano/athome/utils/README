@@ -1,0 +1,24 @@
+Utility scripts for the server
+
+These scripts are needed to setup a Linux machine as in image server
+for the screen saver.  The basic operation is that the user emails a
+photo to `frame@server.com'.  The subject of the email is the title
+for the photo and the actual photo is attached to the email.  A missing
+subject just means there's no title for this photo.  The assumption is
+that the user wants to forward a copy of the message onto another email
+address (e.g. the Brookstone Photo Frame email address) and the user
+also wants to send the picture to the local image server.
+
+The user `frame@server.com' is the recipient of this message.  The
+`.procmailrc' file for `frame' will call the `~frame/bin/mailit'
+script to handle the email forwarding.
+
+The `mailit' script will forward the message onto the Brookstone Photo
+Frame email address (just comment out the `sendmail' line if you don't
+have a Brookstone Photo Frame).  The script will then use `ssh' to
+execute the command `~frame/bin/save_photo' on the actual image server.
+
+The `mailit' script will then extract the image files from the email
+message, store them in the right place on the image server, and then
+update the image servers meta-data to indicate that a new image file
+is available.

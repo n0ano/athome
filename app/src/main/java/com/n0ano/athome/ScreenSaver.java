@@ -45,6 +45,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class ScreenSaver
@@ -52,7 +53,7 @@ public class ScreenSaver
 
 MainActivity act;
 
-ArrayList<String> images;
+ArrayList<ImageEntry> images;
 private int ss_current;
 
 public int ss_generation = -1;
@@ -69,7 +70,7 @@ public ScreenSaver(MainActivity act, View v1, View v2)
     ss_views[0] = v1;
     ss_views[1] = v2;
 
-    images = new ArrayList<String>();
+    images = new ArrayList<ImageEntry>();
     ss_faders = new SS_Faders();
     ss_state = C.SAVER_FROZEN;
 }
@@ -108,11 +109,11 @@ private int ss_height()
     return v.getHeight();
 }
 
-private String ss_next(int delta)
+private ImageEntry ss_next(int delta)
 {
 
     if (images.size() <= 0)
-        return "";
+        return null;
     ss_current += delta;
     if (ss_current >= images.size())
         ss_current = 0;
@@ -235,8 +236,9 @@ public void get_names(final ImageFind image_find, final int gen)
     if (gen != ss_generation)
         new Thread(new Runnable() {
             public void run() {
-                images = image_find.find_local(new ArrayList<String>());
+                images = image_find.find_local(new ArrayList<ImageEntry>());
                 images = image_find.find_remote(true, images);
+                Collections.sort(images);
 Log.d("SS:get_names - " + images.size() + ", gen - " + image_find.ss_generation);
                 ss_generation = image_find.ss_generation;
                 ss_current = images.size();

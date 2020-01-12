@@ -1,0 +1,6 @@
+#
+#  Mail for the photo frame
+#
+
+:0:
+| /home/frame/bin/mailit

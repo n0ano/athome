@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class ImageMgmt extends AppCompatActivity
@@ -31,7 +32,7 @@ public static int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1001;
 
 Preferences pref;
 int debug = 0;
-ArrayList<String> images;
+ArrayList<ImageEntry> images;
 int show_idx;
 
 public String ss_host = "";
@@ -138,8 +139,9 @@ private void get_names(final ImageFind image_find, final int gen)
     if (gen != ss_generation)
         new Thread(new Runnable() {
             public void run() {
-                images = image_find.find_local(new ArrayList<String>());
+                images = image_find.find_local(new ArrayList<ImageEntry>());
                 images = image_find.find_remote(true, images);
+                Collections.sort(images);
                 ss_generation = image_find.ss_generation;
                 done();
             }
@@ -150,18 +152,18 @@ private void show_next()
 {
 	InputStream in_rdr;
     Bitmap bitmap;
-    String img_uri;
+    ImageEntry img;
 
     try {
-        img_uri = images.get(show_idx++);
+        img = images.get(show_idx++);
     } catch (Exception e) {
 Log.d("SS:last image - " + show_idx);
         finish();
         return;
     }
-    Log.d("SS:image uri - " + img_uri);
+    Log.d("SS:image uri - " + img.get_name());
     try {
-        in_rdr = new FileInputStream(new File(img_uri));
+        in_rdr = new FileInputStream(new File(img.get_name()));
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
 	} catch (Exception e) {
@@ -179,8 +181,8 @@ private void done()
 {
 
     Log.d("SS:Images:");
-    for (String path : images) {
-        Log.d("SS:image: " + path);
+    for (ImageEntry img : images) {
+        Log.d("SS:image: " + img.get_name());
     }
     finish();
 }
