@@ -8,59 +8,15 @@
     android:layout_height="match_parent"
     tools:context=".ImageMgmt">
 
-    <android.support.design.widget.AppBarLayout
+    <GridView
+        android:id="@+id/gridview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/toolBack"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:translationZ="1dp"
-        android:src="@drawable/no" />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:translationZ="2dp"
-        android:paddingRight="30dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp" >
-
-        <Button
-            android:id="@+id/cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:text="Reject"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-            android:onClick="cancel" />
-
-        <Button
-            android:id="@+id/ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Accept"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back"
-            android:onClick="ok" />
-
-        </LinearLayout>
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:columnWidth="150dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="24dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="spacingWidthUniform" />
 
 </RelativeLayout>

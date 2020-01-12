@@ -25,23 +25,15 @@ public class ImageFind
 {
 
 private Activity act;
-private String ss_server;
-private String ss_host;
-private String ss_list;
-private String ss_user;
-private String ss_pwd;
+private ScreenInfo info;
 
 public int ss_generation = -1;
 
-public ImageFind(Activity act, String ss_server, String ss_host, String ss_list, String ss_user, String ss_pwd)
+public ImageFind(Activity act, ScreenInfo info)
 {
 
     this.act = act;
-    this.ss_server = ss_server;
-    this.ss_host = ss_host;
-    this.ss_list = ss_list;
-    this.ss_user = ss_user;
-    this.ss_pwd = ss_pwd;
+    this.info = info;
 }
 
 public ArrayList<ImageEntry> find_local(ArrayList<ImageEntry> images)
@@ -63,12 +55,12 @@ if (true) return images;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry(path, C.IMAGE_LOCAL, 0));
+        images.add(new ImageEntry(path, C.IMAGE_LOCAL, 0, null));
     }
     return images;
 }
 
-public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images)
+public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, boolean thumb)
 {
     char type;
     String str;
@@ -77,14 +69,14 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
 
     HashMap<String, String> meta = new HashMap<String, String>();
     try {
-        url = ss_server +
+        url = info.ss_server +
                 C.CGI_BIN +
                 "?names" +
                 (hidden ? "&all" : "") +
-                "&host=" + C.base(ss_host) +
-                "&list=" + ss_list;
+                "&host=" + C.base(info.ss_host) +
+                "&list=" + info.ss_list;
         Log.d("SS:get names from " + url);
-        Authenticator.setDefault(new CustomAuthenticator(ss_user, ss_pwd));
+        Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
         in_rdr = new URL(url).openStream();
         for (;;) {
             str = C.meta_line(in_rdr);
@@ -94,7 +86,7 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 return images;
             }
             if (type == 'T')
-                images.add(new ImageEntry(str.substring(1), C.IMAGE_REMOTE));
+                images.add(new ImageEntry(str.substring(1), C.IMAGE_REMOTE, (thumb ? info : null)));
             else
                 Log.d("SS:Unexpected meta data - " + str);
         }

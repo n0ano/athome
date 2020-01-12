@@ -132,7 +132,7 @@ public void saver_fade(int delta)
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, act.ss_server, act.ss_list, ss_next(delta), act.ss_user, act.ss_pwd, ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
+    ImageGet ig = new ImageGet(this, act.ss_info, ss_next(delta), ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
     ig.start();
 }
 
@@ -165,7 +165,7 @@ Log.d("saver: start");
         //
         //  ImageGet will call do_fade once the new image is loaded
         //
-        ImageGet ig = new ImageGet(this, act.ss_server, act.ss_list, ss_next(1), act.ss_user, act.ss_pwd, ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+        ImageGet ig = new ImageGet(this, act.ss_info, ss_next(1), ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
         ig.start();
     } else {
         MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
@@ -237,7 +237,7 @@ public void get_names(final ImageFind image_find, final int gen)
         new Thread(new Runnable() {
             public void run() {
                 images = image_find.find_local(new ArrayList<ImageEntry>());
-                images = image_find.find_remote(true, images);
+                images = image_find.find_remote(true, images, false);
                 Collections.sort(images);
 Log.d("SS:get_names - " + images.size() + ", gen - " + image_find.ss_generation);
                 ss_generation = image_find.ss_generation;
