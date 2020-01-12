@@ -3,24 +3,31 @@ package com.n0ano.athome;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -33,6 +40,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
@@ -41,12 +49,15 @@ public class MainActivity extends AppCompatActivity
 
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;
+public final static int OUTLETS_COLS = 3;
 
 private final static String CONFIG_URI = "/cgi-bin/athome/config";
 private final static String CONFIG_LOAD =  "load";
 private final static String CONFIG_SAVE =  "save";
 
 Preferences pref;
+
+Menu menu_bar;
 
 public int general_layout;
 
@@ -80,6 +91,7 @@ String tplink_user;
 String tplink_pwd;
 
 String outlets_battery = "";
+int outlets_cols;
 int outlets_batt_min;
 int outlets_batt_max;
 int outlets_batt_level;
@@ -94,43 +106,54 @@ boolean running;
 public Parse parse = new Parse();
 public Popup popup;
 
-private boolean screen = true;
+public boolean screen = true;
 private int screen_bright = -1;
-public int on_time = -1;       // (hour * 100) + minute, -1 = none
-public int off_time = -1;      // (hour * 100) + minute, -1 = none
+
+public ScreenSaver ss_saver;
+public ImageFind image_find;
+public int ss_offset = 0;
+public int ss_start = 0;        // seconds, 0 = none
+public int ss_delay = 0;        // seconds
+public int ss_fade = 0;
+private GestureDetectorCompat ss_gesture;
+
+public String ss_host = "";
+public String ss_list = "";
+public String ss_server = "";
+public String ss_user = "";
+public String ss_pwd = "";
+public ArrayList<String> images;
+
+public int on_time = -1;        // (hour * 100) + minute, -1 = none
+public int off_time = -1;       // (hour * 100) + minute, -1 = none
 
 @Override
 protected void onCreate(Bundle state)
 {
 
     super.onCreate(state);
+    Log.d("MainActivity: onCreate");
 
-    setContentView(R.layout.activity_main);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    try {
-        ContentResolver resolver = this.getApplicationContext().getContentResolver();
-        screen_bright = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS);
-
-        Field titleField = Toolbar.class.getDeclaredField("mTitleTextView");
-        titleField.setAccessible(true);
-        TextView barTitleView = (TextView) titleField.get(toolbar);
-        barTitleView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("title clicked");
-                display_toggle(null);
-            }
-        });
-    } catch (Exception e) {
-        Log.d("tool bar exception " + e);
-    }
-    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
         Log.cfg(debug, "", "");
-    popup = new Popup(this, pref);
-    Log.d("MainActivity: onCreate");
+
+    start_home(state);
+}
+
+@Override
+public boolean dispatchTouchEvent(MotionEvent ev)
+{
+
+    if (ev.getY() < ss_offset)
+        return super.dispatchTouchEvent(ev);
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        if (ss_saver.state() == C.SAVER_SHOWING) {
+            ss_saver.screen_saver(C.SAVER_RESET);
+            return false;
+        }
+    }
+    return super.dispatchTouchEvent(ev);
 }
 
 @Override
@@ -159,6 +182,9 @@ protected void onResume()
 //test_parse();
 
     restore_state();
+    image_find = new ImageFind((Activity) this, ss_server, ss_host, ss_list, ss_user, ss_pwd);
+    if (ss_saver.ss_generation < 0)
+        ss_saver.get_names(image_find, 0);
     doit();
 }
 
@@ -213,6 +239,7 @@ public boolean onCreateOptionsMenu(Menu menu)
 
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_main, menu);
+    menu_bar = menu;
     return true;
 }
 
@@ -227,6 +254,51 @@ public boolean onOptionsItemSelected(MenuItem item)
     if (popup.menu_click(item.getItemId()))
         return true;
     return super.onOptionsItemSelected(item);
+}
+
+@Override
+public boolean onTouchEvent(MotionEvent event)
+{
+
+    ss_gesture.onTouchEvent(event);
+    return super.onTouchEvent(event);
+}
+
+private void start_home(Bundle state)
+{
+
+    setContentView(R.layout.activity_main);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    try {
+        ContentResolver resolver = this.getApplicationContext().getContentResolver();
+        screen_bright = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS);
+
+        Field titleField = Toolbar.class.getDeclaredField("mTitleTextView");
+        titleField.setAccessible(true);
+        TextView barTitleView = (TextView) titleField.get(toolbar);
+        barTitleView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("title clicked");
+                display_toggle(null);
+            }
+        });
+    } catch (Exception e) {
+        Log.d("tool bar exception " + e);
+    }
+    ViewGroup.LayoutParams params = toolbar.getLayoutParams();
+    ss_offset = params.height;
+
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+    popup = new Popup(this, pref);
+
+    ss_saver = new ScreenSaver(this, (View) findViewById(R.id.saver_view1), (View) findViewById(R.id.saver_view2));
+
+    ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
+
+    display(true);
 }
 
 public void start_browser(String uri)
@@ -270,13 +342,33 @@ public void display(final boolean onoff)
     runOnUiThread(new Runnable() {
         public void run() {
             screen = onoff;
-            Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, onoff ? screen_bright : 0);
-            View view = (View) findViewById(R.id.text_scroll);
+            try {
+                Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, onoff ? screen_bright : 0);
+            } catch (Exception e) {
+                Log.d("can't change brightness " + e);
+                Toast.makeText(getApplicationContext(), "Can't change brightness - permissions?", Toast.LENGTH_LONG).show();
+            }
+            View view = (View) findViewById(R.id.scroll_view);
+            view.setVisibility(onoff ? View.VISIBLE : View.GONE);
+            view.setAlpha(1.0f);
+            view = (View) findViewById(R.id.toolbar);
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
             view = (View) findViewById(R.id.blank_view);
             view.setVisibility(onoff ? View.GONE : View.VISIBLE);
+            ss_saver.hide_views();
+            if (menu_bar != null) {
+                MenuItem icon = menu_bar.findItem(R.id.action_display);
+                icon.setIcon(onoff ? R.drawable.light_on : R.drawable.light_off);
+            }
         }
     });
+}
+
+public void screen_mgmt(View v)
+{
+
+    Intent intent = new Intent(this, ImageMgmt.class);
+    startActivity(intent);
 }
 
 public void view_show(int view_id, int[] ids, int main)
@@ -341,6 +433,15 @@ private void restore_state()
     on_time = pref.get("general_on", -1);
     off_time = pref.get("general_off", -1);
 
+    ss_start = pref.get("ss_start", 0);
+    ss_delay = pref.get("ss_delay", 0);
+    ss_fade = pref.get("ss_fade", 0);
+    ss_host = pref.get("ss_host", "");
+    ss_list = C.suffix(ss_host);
+    ss_server = pref.get("ss_server", "");
+    ss_user = pref.get("ss_user", "");
+    ss_pwd = pref.get("ss_pwd", "");
+
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);
     egauge_url = pref.get("egauge_url", "");
@@ -357,6 +458,7 @@ private void restore_state()
     ecobee_refresh = pref.get("ecobee_refresh", "");
 
     outlets_battery = pref.get("outlets_battery", "");
+    outlets_cols = pref.get("outlets_cols", OUTLETS_COLS);
     outlets_batt_min = pref.get("outlets_batt_min", BATTERY_LOW);
     outlets_batt_max = pref.get("outlets_batt_max", BATTERY_HIGH);
     outlets_batt_level = pref.get("outlets_batt_level", 0);
@@ -727,6 +829,7 @@ public void show_cfg()
         cfg.put("egauge_layout", pref.get("egauge_layout", ""));
         cfg.put("egauge_progress", pref.get("egauge_progress", ""));
         cfg.put("general_layout", pref.get("general_layout", ""));
+        cfg.put("outlets_cols", pref.get("outlets_cols", ""));
         cfg.put("outlets_batt_level", pref.get("outlets_batt_level", ""));
         cfg.put("outlets_batt_max", pref.get("outlets_batt_max", ""));
         cfg.put("outlets_batt_min", pref.get("outlets_batt_min", ""));
@@ -855,6 +958,8 @@ private void clock()
         display(false);
     else if (on_time >= 0 && time == on_time && !screen)
         display(true);
+
+    ss_saver.screen_saver(C.SAVER_TICK);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv == null)

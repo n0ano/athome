@@ -83,11 +83,11 @@ public void init_view()
     TableRow tr = null;
     TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
     params.setMargins(0, 40, 0, 0); /* left, top, right, bottom */
-    int row = 3;
+    int row = act.outlets_cols;
     int max_devices = outlets_adapter.getCount();
     for (i = 0; i < max_devices; i++) {
         OutletsDevice dev = outlets_adapter.getItem(i);
-        if (++row > 3) {
+        if (++row > act.outlets_cols) {
             row = 1;
             if (tr != null)
                 tl.addView(tr, params);

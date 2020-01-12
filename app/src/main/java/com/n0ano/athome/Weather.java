@@ -67,14 +67,14 @@ public Weather(MainActivity act)
 {
 
 	this.act = act;
-    init_data();
+    init_data(true);
 }
 
 // Java doesn't have associative arrays but we can accomplish the
 //   same thing with a HashMap.  Unfortunately, we can't statically\
 //   initialize a HashMap so we have do that in a function;
 //
-private void init_data()
+private void init_data(boolean all)
 {
 
     /*
@@ -88,11 +88,13 @@ private void init_data()
     /*
      * Data we care about
      */
-    data.put("maxtemp", "");
-    data.put("maxtemp_time", "");
-    data.put("mintemp", "");
-    data.put("mintemp_time", "");
-    data.put("humidity", "");
+    if (all) {
+        data.put("maxtemp", "");
+        data.put("maxtemp_time", "");
+        data.put("mintemp", "");
+        data.put("mintemp_time", "");
+        data.put("humidity", "");
+    }
 }
 
 private void get_info_wunder(String resp)
@@ -185,6 +187,7 @@ public void update()
     //  Get the data
     //
     if (period++ >= PERIOD) {
+        init_data(false);
         get_wunder();
         period = 1;
     }

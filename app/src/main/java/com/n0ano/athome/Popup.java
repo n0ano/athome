@@ -49,6 +49,9 @@ public final static int layout_thermostat[] = {
 MainActivity act;
 
 private int batt_pos;
+private int type_pos;
+public final static int SS_START = 30;
+public final static int SS_DELAY = 30;
 
 Preferences pref;
 
@@ -74,6 +77,14 @@ public boolean menu_click(int item)
 {
 
     switch (item) {
+
+    case R.id.action_saver:
+        act.ss_saver.saver_click();
+        return true;
+
+    case R.id.action_display:
+        display_dialog();
+        return true;
 
     case R.id.action_general:
         general_dialog();
@@ -107,13 +118,14 @@ private Dialog start_dialog(int id)
 
     final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
     dialog.setContentView(id);
+    dialog.setCanceledOnTouchOutside(false);
 
     Button cancel = (Button) dialog.findViewById(R.id.cancel);
     if (cancel != null) {
         cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                end_dialog(dialog);
             }
         });
     }
@@ -122,7 +134,22 @@ private Dialog start_dialog(int id)
 
     dialog.show();
 
+    act.ss_saver.screen_saver(C.SAVER_BLOCK);
+
     return dialog;
+}
+
+public void end_dialog(Dialog dialog)
+{
+
+    act.ss_saver.screen_saver(C.SAVER_RESET);
+    dialog.dismiss();
+}
+
+public void display_dialog()
+{
+
+    act.display_toggle(null);
 }
 
 public void device_dialog(final OutletsDevice dev)
@@ -148,7 +175,7 @@ public void device_dialog(final OutletsDevice dev)
         public void onClick(View v) {
             dev.set_hold(cb.isChecked());
             dev.set_state(dev.get_state(), act);
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -193,6 +220,14 @@ private void general_dialog()
     final EditText et_off = (EditText) dialog.findViewById(R.id.general_off);
     et_off.setText(act.encode_time(act.off_time));
 
+    Button sb = (Button) dialog.findViewById(R.id.general_screen);
+    sb.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            screen_dialog();
+        }
+    });
+
     Button db = (Button) dialog.findViewById(R.id.general_developer);
     db.setOnClickListener(new OnClickListener() {
         @Override
@@ -206,7 +241,7 @@ private void general_dialog()
         @Override
         public void onClick(View v) {
             act.show_log();
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 
@@ -215,7 +250,7 @@ private void general_dialog()
         @Override
         public void onClick(View v) {
             act.show_cfg();
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 
@@ -245,7 +280,7 @@ private void general_dialog()
             act.show_views();
             if (act.thermostat_layout != LAYOUT_NONE)
                 act.thermostat.init_view();
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -279,7 +314,7 @@ private void egauge_dialog()
             pref.put("egauge_url", act.egauge_url);
 
             act.show_views();
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -297,7 +332,7 @@ private void ecobee_how()
         @Override
         public void onClick(View v) {
             act.start_browser(Ecobee.ECO_URL);
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -333,7 +368,7 @@ private void ecobee_doauth(final String api, final String pin)
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            dialog.dismiss();
+            end_dialog(dialog);
             act.ecobee_api = api;
             pref.put("ecobee_api", act.ecobee_api);
             new Thread(new Runnable() {
@@ -373,7 +408,7 @@ private void ecobee_dialog()
         @Override
         public void onClick(View v) {
             String api = api_tv.getText().toString();
-            dialog.dismiss();
+            end_dialog(dialog);
             ecobee_dopin(api);
         }
     });
@@ -388,7 +423,7 @@ private void ecobee_dialog()
             pref.put("ecobee_api", act.ecobee_api);
             pref.put("ecobee_access", act.ecobee_access);
             pref.put("ecobee_refresh", act.ecobee_refresh);
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -417,7 +452,7 @@ private void weather_dialog()
             pref.put("wunder_id", act.weather_id);
 
             act.show_views();
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -434,7 +469,7 @@ private void thermostat_dialog()
         @Override
         public void onClick(View v) {
             ecobee_dialog();
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 
@@ -442,7 +477,7 @@ private void thermostat_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -483,11 +518,14 @@ private void outlets_dialog()
 
     });
 
+    final TextView cols = (TextView) dialog.findViewById(R.id.outlets_cols);
+    cols.setText(C.i2a(act.outlets_cols));
+
     final TextView min = (TextView) dialog.findViewById(R.id.outlets_batt_min);
-    min.setText(Common.i2a(act.outlets_batt_min));
+    min.setText(C.i2a(act.outlets_batt_min));
 
     final TextView max = (TextView) dialog.findViewById(R.id.outlets_batt_max);
-    max.setText(Common.i2a(act.outlets_batt_max));
+    max.setText(C.i2a(act.outlets_batt_max));
 
     Button bv_how = (Button) dialog.findViewById(R.id.outlets_x10);
     bv_how.setOnClickListener(new OnClickListener() {
@@ -515,11 +553,13 @@ private void outlets_dialog()
                 act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
             pref.put("outlets_battery", act.outlets_battery);
-            act.outlets_batt_min = Common.a2i(min.getText().toString());
+            act.outlets_cols = C.a2i(cols.getText().toString());
+            pref.put("outlets_cols", act.outlets_cols);
+            act.outlets_batt_min = C.a2i(min.getText().toString());
             pref.put("outlets_batt_min", act.outlets_batt_min);
-            act.outlets_batt_max = Common.a2i(max.getText().toString());
+            act.outlets_batt_max = C.a2i(max.getText().toString());
             pref.put("outlets_batt_max", act.outlets_batt_max);
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -544,7 +584,7 @@ private void x10_dialog()
             pref.put("x10_url", act.x10_url);
             act.x10_jwt = jt.getText().toString();
             pref.put("x10_jwt", act.x10_jwt);
-            dialog.dismiss();
+            end_dialog(dialog);
             act.outlets.startup();
         }
     });
@@ -570,8 +610,86 @@ private void tplink_dialog()
             pref.put("tplink_user", act.tplink_user);
             act.tplink_pwd = pt.getText().toString();
             pref.put("tplink_pwd", act.tplink_pwd);
-            dialog.dismiss();
+            end_dialog(dialog);
             act.outlets.startup();
+        }
+    });
+}
+
+private void screen_dialog()
+{
+
+    final Dialog dialog = start_dialog(R.layout.bar_screen);
+
+    final EditText ss_start = (EditText) dialog.findViewById(R.id.screen_start);
+    ss_start.setText(act.ss_start > 0 ? C.i2a(act.ss_start) : "");
+
+    final EditText ss_delay = (EditText) dialog.findViewById(R.id.screen_delay);
+    ss_delay.setText(act.ss_start > 0 ? C.i2a(act.ss_delay) : "");
+
+    final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, SS_Faders.types);
+    adapter.setDropDownViewResource(R.layout.text_spinner);
+    ss_fade.setAdapter(adapter);
+    ss_fade.setSelection(type_pos = act.ss_fade);
+    ss_fade.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            type_pos = position;
+        }
+        
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // TODO Auto-generated method stub
+        }
+
+    });
+
+    final EditText et_host = (EditText) dialog.findViewById(R.id.screen_host);
+    et_host.setText(act.ss_host);
+
+    final EditText et_server = (EditText) dialog.findViewById(R.id.screen_server);
+    et_server.setText(act.ss_server);
+
+    final EditText et_user = (EditText) dialog.findViewById(R.id.screen_user);
+    et_user.setText(act.ss_user);
+
+    final EditText et_pwd = (EditText) dialog.findViewById(R.id.screen_pwd);
+    et_pwd.setText(act.ss_pwd);
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.ss_host = et_host.getText().toString();
+            pref.put("ss_host", act.ss_host);
+            act.ss_list = C.suffix(act.ss_host);
+            act.ss_server = et_server.getText().toString();
+            pref.put("ss_server", act.ss_server);
+            act.ss_user = et_user.getText().toString();
+            pref.put("ss_user", act.ss_user);
+            act.ss_pwd = et_pwd.getText().toString();
+            pref.put("ss_pwd", act.ss_pwd);
+
+            try {
+                act.ss_start = C.a2i(ss_start.getText().toString());
+            } catch (Exception e) {
+                act.ss_start = 0;
+            }
+            pref.put("ss_start", act.ss_start);
+            if (act.ss_start > 0) {
+                try {
+                    act.ss_delay = C.a2i(ss_delay.getText().toString());
+                } catch (Exception e) {
+                    act.ss_delay = SS_DELAY;
+                }
+                pref.put("ss_delay", act.ss_delay);
+            }
+            act.ss_fade = type_pos;
+            pref.put("ss_fade", act.ss_fade);
+            act.ss_saver.screen_saver(C.SAVER_RESET);
+
+            end_dialog(dialog);
         }
     });
 }
@@ -585,7 +703,7 @@ private void developer_dialog()
     cb.setChecked(act.debug != 0);
 
     final TextView level = (TextView) dialog.findViewById(R.id.outlets_batt_level);
-    level.setText(Common.i2a(act.outlets_batt_level));
+    level.setText(C.i2a(act.outlets_batt_level));
 
     final TextView uri = (TextView) dialog.findViewById(R.id.log_uri);
     uri.setText(act.log_uri);
@@ -597,7 +715,7 @@ private void developer_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.outlets_batt_level = Common.a2i(level.getText().toString());
+            act.outlets_batt_level = C.a2i(level.getText().toString());
             pref.put("outlets_batt_level", act.outlets_batt_level);
 
             act.log_uri = uri.getText().toString();
@@ -609,7 +727,7 @@ private void developer_dialog()
             pref.put("debug", act.debug);
             Log.cfg(act.debug, act.log_uri, act.log_params);
 
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }
@@ -629,7 +747,7 @@ public void remote_server(final String type, final String cfg)
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            dialog.dismiss();
+            end_dialog(dialog);
             new Thread(new Runnable() {
                 public void run() {
                     act.remote_doit(type, et.getText().toString(), cfg);
@@ -649,7 +767,7 @@ private void about_dialog()
         @Override
         public void onClick(View v) {
             act.start_browser(ATHOME_MANUAL);
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 
@@ -657,7 +775,7 @@ private void about_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            dialog.dismiss();
+            end_dialog(dialog);
         }
     });
 }

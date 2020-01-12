@@ -82,11 +82,11 @@ public void get_devices(ThermostatAdapter adapter)
         cmax = act.parse.json_get("coolRangeHigh", resp, i + 1);
         cdelta = act.parse.json_get("heatCoolMinDelta", resp, i + 1);
         adapter.getItem(i).set_range(mode,
-                                     Common.a2i(hmin),
-                                     Common.a2i(hmax),
-                                     Common.a2i(cmin),
-                                     Common.a2i(cmax),
-                                     Common.a2i(cdelta));
+                                     C.a2i(hmin),
+                                     C.a2i(hmax),
+                                     C.a2i(cmin),
+                                     C.a2i(cmax),
+                                     C.a2i(cdelta));
     }
 
     act.runOnUiThread(new Runnable() {

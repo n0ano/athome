@@ -1,0 +1,137 @@
+#!//usr/bin/perl
+
+$tm="names&host=lenovo&list=";
+$tf="get&host=lenovo&name=Barb/IMG_8444.JPG&w=600&h=888";
+$query = $ENV{"QUERY_STRING"};
+$type = "get";
+$hidden = "";
+$maxw = 2048;
+$maxh = 2048;
+$host = "default";
+$list = "";
+$delta = 1;
+$NOCACHE = 0;
+$fit = "fit";
+
+$DIR = "Books/Frame/";
+$dirs = ".files";
+
+@tokens = split(/&/, $query);
+foreach my $t (@tokens) {
+	($type = $t)			if $t =~ /^get/;
+	($type = $t)			if $t =~ /^names/;
+	($hidden = $t)			if $t =~ /^all/;
+	($maxw = $t) =~ s/w=//		if $t =~ /^w=/;
+	($maxh = $t) =~ s/h=//		if $t =~ /^h=/;
+	($host = $t) =~ s/host=//	if $t =~ /^host=/;
+	($list = $t) =~ s/list=//	if $t =~ /^list=/;
+	($name = $t) =~ s/name=//	if $t =~ /^name=/;
+	($NOCACHE = 1) =~ s/nocache//	if $t =~ /^nocache/;
+}
+
+$host = "default"		if $host eq "";
+$host = $host . "-" . $list	if $list ne "";
+$dirs = $dirs . "-" . $list	if $list ne "";
+
+get_image($host, $dirs, $name)	if $type eq "get";
+get_names($dirs)		if $type eq "names";
+
+sub out_line
+{
+	local ($t,$l) = @_;
+
+	$n = pack 'V',length($l) + 1;
+	print $n;
+	print $t.$l;
+}
+
+sub get_names
+{
+	local ($f) = @_;
+	local ($n,$gen,$dh,$dir);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+
+	open F, $DIR . $f;
+	$gen = <F>;
+	chop $gen;
+	while (<F>) {
+		chop;
+		$dir = $_;
+		opendir($dh, $DIR . $dir) || last;
+		while (readdir $dh) {
+			next		if $_ eq ".";
+			next		if $_ eq "..";
+			&out_line("F", $dir . "/" . $_);
+		}
+		closedir $dh;
+	}
+	close F;
+	&out_line("E", $gen);
+}
+
+sub get_image
+{
+	local ($h,$d,$n) = @_;
+	local ($t,$gen,$name,$F);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+
+	open F, "$DIR" . $d;
+	$gen = <F>;
+	chop $gen;
+	close F;
+
+	if ($fit eq "full") {
+		$cmd = "<$DIR$n";
+	} else {
+		if ($fit eq "screen") {
+			$suf = "\\>";
+		} elsif ($fit eq "stretch") {
+			$suf = "!";
+		} elsif ($fit = "fit") {
+			$suf = "";
+		}
+		$cmd = "convert \"$DIR$n\" -resize " . $maxw . "x" . $maxh . $suf . " -|";
+	}
+	$name = $n;
+	$name =~ s/\//_/g;
+	binmode STDOUT;
+	&out_line("F", $n);
+	$t = $DIR . ".titles/" . $name;
+	if (-f $t) {
+		open F, $t;
+		$title = <F>;
+		close F;
+		&out_line("T", $title);
+	}
+	&out_line("E", $gen);
+	$F = cache_file($name, $cmd, $maxw, $maxh);
+	print <$F>;
+	close $F;
+}
+
+sub cache_file
+{
+	local ($f,$c,$w,$h) = @_;
+	local ($I,$cdir);
+
+	$cdir = $DIR . "/.cache";
+	if (! -d $cdir || $NOCACHE) {
+		open $I, $c;
+		binmode $I;
+		return $I;
+	}
+	$cname = $cdir . "/" . $f . ":" . $w . "x" . $h;
+	$c = $c . "cat >$cname";
+	system($c)		if ! -f $cname;
+	open $I, "<$cname";
+	binmode $I;
+	return $I;
+}

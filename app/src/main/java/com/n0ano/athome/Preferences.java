@@ -55,6 +55,7 @@ private void cfg_v0_v2()
 	put("egauge_progress", pref.getInt("egauge_progress", 1));
 	put("general_layout", pref.getInt("general_layout", Popup.LAYOUT_TABLET));
 	put("outlets_batt_level", pref.getInt("outlets_batt_level", 0));
+	put("outlets_cols", pref.getInt("outlets_cols", MainActivity.OUTLETS_COLS));
 	put("outlets_batt_max", pref.getInt("outlets_batt_max", MainActivity.BATTERY_HIGH));
 	put("outlets_batt_min", pref.getInt("outlets_batt_min", MainActivity.BATTERY_LOW));
 	put("thermostat_layout", pref.getInt("thermostat_layout", Popup.LAYOUT_TABLET));

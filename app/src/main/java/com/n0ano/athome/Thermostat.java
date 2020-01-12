@@ -120,7 +120,7 @@ private void hold_dialog(final ThermostatDevice dev)
     np.setMinValue(dev.get_h_min()/10);
     np.setMaxValue(dev.get_h_max()/10);
     String t = dev.get_temp();
-    int temp = Common.a2i(t.substring(0, t.length() - 2));
+    int temp = C.a2i(t.substring(0, t.length() - 2));
     np.setValue(temp);
     np.setWrapSelectorWheel(false);
 
@@ -155,7 +155,7 @@ private void hold_dialog(final ThermostatDevice dev)
             new Thread(new Runnable() {
                 public void run() {
                     dev.set_hold(hold_type(rg.getCheckedRadioButtonId()));
-                    ecobee.ecobee_hold(Common.a2i(t), dev);
+                    ecobee.ecobee_hold(C.a2i(t), dev);
                 }
             }).start();
         }

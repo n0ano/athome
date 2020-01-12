@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Screen Saver"
+        android:textSize="20dp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:textColor="@color/dialog_fore" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Start"
+            android:textColor="@color/dialog_fore" />
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/screen_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text=""
+            android:hint="        "
+            android:inputType="time"
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+            android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dp"
+            android:textSize="14sp"
+            android:text="delay"
+            android:textColor="@color/dialog_fore" />
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/screen_delay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text=""
+            android:hint="        "
+            android:inputType="time"
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+            android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor" />
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Transition type"
+            android:textColor="@color/dialog_fore" />
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/screen_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Name: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/screen_host"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Server: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/screen_server"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="User: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/screen_user"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Password: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/screen_pwd"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:inputType="textPassword"
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+    <Button
+        android:id="@+id/screen_mgmt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Image mgmt"
+        android:onClick="screen_mgmt"
+        android:textColor="@color/dialog_fore"
+        android:background="@color/buttonBack" />
+
+	<LinearLayout
+		android:gravity="right"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingRight="30dp"
+		android:paddingTop="20dp"
+		android:paddingBottom="20dp" >
+
+		<Button
+			android:id="@+id/cancel"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingRight="30dp"
+			android:text="Cancel"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+		<Button
+			android:id="@+id/ok"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Ok"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+
+    </LinearLayout>
+
+</LinearLayout>
