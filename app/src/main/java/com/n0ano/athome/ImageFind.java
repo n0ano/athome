@@ -85,9 +85,16 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 ss_generation = Integer.parseInt(str.substring(1), 10);
                 return images;
             }
-            if (type == 'T')
-                images.add(new ImageEntry(str.substring(1), C.IMAGE_REMOTE, (thumb ? info : null)));
-            else
+            if (type == 'T') {
+                final String name = str.substring(1);
+                if (C.loading_name != null)
+                    act.runOnUiThread(new Runnable() {
+                        public void run() {
+                            C.loading_name.setText(name.substring(name.indexOf(":")));
+                        }
+                    });
+                images.add(new ImageEntry(name, C.IMAGE_REMOTE, (thumb ? info : null)));
+            } else
                 Log.d("SS:Unexpected meta data - " + str);
         }
     } catch (Exception e) {

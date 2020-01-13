@@ -105,6 +105,7 @@ private void done()
     act.runOnUiThread(new Runnable() {
         public void run() {
             me.notifyDataSetChanged();
+            act.set_view(R.id.mgmt_gridview, R.id.mgmt_loading);
         }
     });
 }

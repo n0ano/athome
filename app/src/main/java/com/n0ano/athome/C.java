@@ -1,5 +1,7 @@
 package com.n0ano.athome;
 
+import android.widget.TextView;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ public final static int SAVER_COUNTING =    0;  // counting down to start
 public final static int SAVER_SHOWING =     1;  // saver actively running
 public final static int SAVER_BLOCKED =     2;  // block for popups
 public final static int SAVER_FROZEN =      3;  // freeze saver with picture displayed
+
+public static TextView loading_name = null;
 
 public static int a2i(String num)
 {

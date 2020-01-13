@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,6 +48,9 @@ protected void onCreate(Bundle state)
 
     super.onCreate(state);
     setContentView(R.layout.activity_image_mgmt);
+    View v = (View) findViewById(R.id.mgmt_loading);
+    v.setVisibility(View.VISIBLE);
+    C.loading_name = (TextView) findViewById(R.id.mgmt_name);
 
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
@@ -125,7 +129,7 @@ private void setup()
     screen_info = new ScreenInfo(pref);
 }
 
-private void set_view(int visible, int invisible)
+public void set_view(int visible, int invisible)
 {
     View v;
 
