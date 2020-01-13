@@ -219,7 +219,6 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:text="Image mgmt"
-        android:onClick="screen_mgmt"
         android:textColor="@color/dialog_fore"
         android:background="@color/buttonBack" />
 

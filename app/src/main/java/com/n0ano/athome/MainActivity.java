@@ -1,5 +1,6 @@
 package com.n0ano.athome;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;

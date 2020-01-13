@@ -657,6 +657,15 @@ private void screen_dialog()
     final EditText et_pwd = (EditText) dialog.findViewById(R.id.screen_pwd);
     et_pwd.setText(act.ss_info.ss_pwd);
 
+    Button mgmt = (Button) dialog.findViewById(R.id.screen_mgmt);
+    mgmt.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            end_dialog(dialog);
+            act.screen_mgmt(v);
+        }
+    });
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
