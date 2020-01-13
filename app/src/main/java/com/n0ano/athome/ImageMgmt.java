@@ -125,11 +125,45 @@ private void setup()
     screen_info = new ScreenInfo(pref);
 }
 
-public void image_click(View v)
+private void set_view(int visible, int invisible)
+{
+    View v;
+
+    v = (View)findViewById(visible);
+    v.setVisibility(View.VISIBLE);
+    v = (View)findViewById(invisible);
+    v.setVisibility(View.GONE);
+}
+
+public void go_image(View v)
 {
 
-    ImageEntry entry = (ImageEntry)v.getTag();
+    View vv = (View)findViewById(R.id.gridview);
+    final int w = vv.getWidth();
+    final int h = vv.getHeight();
+
+    final ImageEntry entry = (ImageEntry)v.getTag();
 Log.d("SS: image clicked - " + entry.get_name());
+    set_view(R.id.imageview, R.id.gridview);
+    final ImageView iv = (ImageView)findViewById(R.id.imageview);
+    iv.setImageResource(R.drawable.no);
+    new Thread(new Runnable() {
+        public void run() {
+            final Bitmap bitmap = new ImageThumb(screen_info, entry, w, h).get_bitmap();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (bitmap != null)
+                        iv.setImageBitmap(bitmap);
+                }
+            });
+        }
+    }).start();
+}
+
+public void go_grid(View v)
+{
+
+    set_view(R.id.gridview, R.id.imageview);
 }
 
 public void ok(View v)
