@@ -1,5 +1,7 @@
 #!//usr/bin/perl
 
+use URI::Escape qw( uri_unescape );
+
 $tm="names&host=lenovo&list=pbw";
 $tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&w=600&h=888";
 $query = $ENV{"QUERY_STRING"};
@@ -25,7 +27,7 @@ foreach my $t (@tokens) {
 	($maxh = $t) =~ s/h=//		if $t =~ /^h=/;
 	($host = $t) =~ s/host=//	if $t =~ /^host=/;
 	($list = $t) =~ s/list=//	if $t =~ /^list=/;
-	($name = $t) =~ s/name=//	if $t =~ /^name=/;
+	($name = uri_unescape($t)) =~ s/name=//	if $t =~ /^name=/;
 	($NOCACHE = 1) =~ s/nocache//	if $t =~ /^nocache/;
 }
 

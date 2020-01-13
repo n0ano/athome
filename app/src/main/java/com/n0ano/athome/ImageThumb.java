@@ -48,7 +48,7 @@ private InputStream open_http(String image)
                 "?get" +
                 "&host=" + C.base(info.ss_host) +
                 "&list=" + info.ss_list +
-                "&name=" + image +
+                "&name=" + URLEncoder.encode(image) +
                 "&w=" + max_w +
                 "&h=" + max_h;
         Log.d("SS:get image from " + url);
