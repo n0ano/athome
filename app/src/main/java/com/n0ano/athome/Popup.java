@@ -224,6 +224,7 @@ private void general_dialog()
     sb.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            end_dialog(dialog);
             screen_dialog();
         }
     });

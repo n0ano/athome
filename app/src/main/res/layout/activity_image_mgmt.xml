@@ -8,22 +8,38 @@
     android:layout_height="match_parent"
     tools:context=".ImageMgmt">
 
-    <GridView
-        android:id="@+id/gridview"
+    <RelativeLayout
+        android:id="@+id/mgmt_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <GridView
+            android:id="@+id/mgmt_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:columnWidth="150dp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="24dp"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="spacingWidthUniform" />
+
+        </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mgmt_imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:columnWidth="150dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="24dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="spacingWidthUniform" />
+        android:visibility="gone" >
 
-    <ImageView
-        android:id="@+id/imageview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:onClick="go_grid"
-        android:visibility="gone" />
+        <ImageView
+            android:id="@+id/mgmt_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:onClick="go_grid" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

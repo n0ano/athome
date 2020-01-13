@@ -66,7 +66,7 @@ protected void onCreate(Bundle state)
 
     setup();
 
-    GridView gv = (GridView) findViewById(R.id.gridview);
+    GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, screen_info);
     gv.setAdapter(image_adapt);
 }
@@ -138,14 +138,14 @@ private void set_view(int visible, int invisible)
 public void go_image(View v)
 {
 
-    View vv = (View)findViewById(R.id.gridview);
+    View vv = (View)findViewById(R.id.mgmt_gridview);
     final int w = vv.getWidth();
     final int h = vv.getHeight();
 
     final ImageEntry entry = (ImageEntry)v.getTag();
 Log.d("SS: image clicked - " + entry.get_name());
-    set_view(R.id.imageview, R.id.gridview);
-    final ImageView iv = (ImageView)findViewById(R.id.imageview);
+    set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
+    final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.no);
     new Thread(new Runnable() {
         public void run() {
@@ -163,7 +163,7 @@ Log.d("SS: image clicked - " + entry.get_name());
 public void go_grid(View v)
 {
 
-    set_view(R.id.gridview, R.id.imageview);
+    set_view(R.id.mgmt_gridview, R.id.mgmt_imageview);
 }
 
 public void ok(View v)
