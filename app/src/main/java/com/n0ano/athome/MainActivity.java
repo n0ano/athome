@@ -117,12 +117,7 @@ public int ss_delay = 0;        // seconds
 public int ss_fade = 0;
 private GestureDetectorCompat ss_gesture;
 
-public String ss_host = "";
-public String ss_list = "";
-public String ss_server = "";
-public String ss_user = "";
-public String ss_pwd = "";
-public ArrayList<String> images;
+public ScreenInfo ss_info;
 
 public int on_time = -1;        // (hour * 100) + minute, -1 = none
 public int off_time = -1;       // (hour * 100) + minute, -1 = none
@@ -182,7 +177,7 @@ protected void onResume()
 //test_parse();
 
     restore_state();
-    image_find = new ImageFind((Activity) this, ss_server, ss_host, ss_list, ss_user, ss_pwd);
+    image_find = new ImageFind((Activity) this, ss_info);
     if (ss_saver.ss_generation < 0)
         ss_saver.get_names(image_find, 0);
     doit();
@@ -436,11 +431,7 @@ private void restore_state()
     ss_start = pref.get("ss_start", 0);
     ss_delay = pref.get("ss_delay", 0);
     ss_fade = pref.get("ss_fade", 0);
-    ss_host = pref.get("ss_host", "");
-    ss_list = C.suffix(ss_host);
-    ss_server = pref.get("ss_server", "");
-    ss_user = pref.get("ss_user", "");
-    ss_pwd = pref.get("ss_pwd", "");
+    ss_info = new ScreenInfo(pref);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);

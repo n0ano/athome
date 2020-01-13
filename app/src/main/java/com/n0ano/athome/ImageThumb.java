@@ -16,35 +16,25 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-public class ImageGet extends Thread
+public class ImageThumb
 {
-
-private ScreenSaver act;
-private MainActivity m_act;
 
 private ScreenInfo info;
 private ImageEntry entry;
 private String title;
-
-private View img_start;
-private View img_end;
 
 private int max_w;
 private int max_h;
 
 private HashMap<String, String> meta;
 
-public ImageGet(ScreenSaver act, ScreenInfo info, ImageEntry entry, int max_w, int max_h, View img_start, View img_end)
+public ImageThumb(ScreenInfo info, ImageEntry entry, int max_w, int max_h)
 {
 
-    this.act = act;
-    this.m_act = act.act;
     this.info = info;
     this.entry = entry;
     this.max_w = max_w;
     this.max_h = max_h;
-    this.img_start = img_start;
-    this.img_end = img_end;
 }
 
 private InputStream open_http(String image)
@@ -86,7 +76,7 @@ private InputStream open_image(ImageEntry entry)
     return null;
 }
 
-public void run()
+public Bitmap get_bitmap()
 {
 	InputStream in_rdr;
     final Bitmap bitmap;
@@ -96,31 +86,16 @@ public void run()
         in_rdr = open_image(entry);
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
-        gen = Integer.parseInt(meta.get("E"), 10);
-        if (gen != act.ss_generation)
-            act.get_names(m_act.image_find, gen);
 	} catch (Exception e) {
 		Log.d("SS:get image failed - " + e);
-		return;
+		return null;
 	}
     if (bitmap == null)
         Log.d("SS:image decode failed");
     else
         Log.d("SS:image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
 
-    m_act.runOnUiThread(new Runnable() {
-        public void run() {
-            ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
-            if (bitmap == null)
-                iv.setImageResource(R.drawable.no);
-            else
-                iv.setImageBitmap(bitmap);
-            TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
-            tv.setText(title);
-            if (img_start != null)
-                act.do_fade(img_start, img_end);
-        }
-    });
+    return bitmap;
 }
 
 }

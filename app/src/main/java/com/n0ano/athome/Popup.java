@@ -646,30 +646,30 @@ private void screen_dialog()
     });
 
     final EditText et_host = (EditText) dialog.findViewById(R.id.screen_host);
-    et_host.setText(act.ss_host);
+    et_host.setText(act.ss_info.ss_host);
 
     final EditText et_server = (EditText) dialog.findViewById(R.id.screen_server);
-    et_server.setText(act.ss_server);
+    et_server.setText(act.ss_info.ss_server);
 
     final EditText et_user = (EditText) dialog.findViewById(R.id.screen_user);
-    et_user.setText(act.ss_user);
+    et_user.setText(act.ss_info.ss_user);
 
     final EditText et_pwd = (EditText) dialog.findViewById(R.id.screen_pwd);
-    et_pwd.setText(act.ss_pwd);
+    et_pwd.setText(act.ss_info.ss_pwd);
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.ss_host = et_host.getText().toString();
-            pref.put("ss_host", act.ss_host);
-            act.ss_list = C.suffix(act.ss_host);
-            act.ss_server = et_server.getText().toString();
-            pref.put("ss_server", act.ss_server);
-            act.ss_user = et_user.getText().toString();
-            pref.put("ss_user", act.ss_user);
-            act.ss_pwd = et_pwd.getText().toString();
-            pref.put("ss_pwd", act.ss_pwd);
+            act.ss_info.ss_host = et_host.getText().toString();
+            pref.put("ss_host", act.ss_info.ss_host);
+            act.ss_info.ss_list = C.suffix(act.ss_info.ss_host);
+            act.ss_info.ss_server = et_server.getText().toString();
+            pref.put("ss_server", act.ss_info.ss_server);
+            act.ss_info.ss_user = et_user.getText().toString();
+            pref.put("ss_user", act.ss_info.ss_user);
+            act.ss_info.ss_pwd = et_pwd.getText().toString();
+            pref.put("ss_pwd", act.ss_info.ss_pwd);
 
             try {
                 act.ss_start = C.a2i(ss_start.getText().toString());

@@ -11,6 +11,9 @@ public class C {
 
 public final static String CGI_BIN = "/cgi-bin/explore.dd/get_frame";
 
+public final static int IMAGE_LOCAL =   0;
+public final static int IMAGE_REMOTE =  1;
+
 //
 //  Commands to the scren saver controller
 //
