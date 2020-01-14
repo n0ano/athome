@@ -90,6 +90,10 @@ public boolean menu_click(int item)
         general_dialog();
         return true;
 
+    case R.id.action_screen:
+        screen_dialog();
+        return true;
+
     case R.id.action_egauge:
         egauge_dialog();
         return true;
@@ -219,15 +223,6 @@ private void general_dialog()
 
     final EditText et_off = (EditText) dialog.findViewById(R.id.general_off);
     et_off.setText(act.encode_time(act.off_time));
-
-    Button sb = (Button) dialog.findViewById(R.id.general_screen);
-    sb.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            end_dialog(dialog);
-            screen_dialog();
-        }
-    });
 
     Button db = (Button) dialog.findViewById(R.id.general_developer);
     db.setOnClickListener(new OnClickListener() {

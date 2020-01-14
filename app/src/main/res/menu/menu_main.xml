@@ -24,6 +24,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_screen"
+        android:orderInCategory="100"
+        android:title="Screen Saver"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_egauge"
         android:orderInCategory="100"
         android:title="eGauge"
