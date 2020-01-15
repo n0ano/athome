@@ -753,12 +753,16 @@ public void remote_doit(String type, String url, String cfg)
         call_api("POST", url + CONFIG_URI, type, "", cfg);
     } else {
         String resp = call_api("GET", url + CONFIG_URI, type, "", null);
-        set_cfg(resp.substring(1));
+        final boolean ok = (resp.length() > 1);
+        if (ok)
+            set_cfg(resp.substring(1));
         runOnUiThread(new Runnable() {
             public void run() {
                 setContentView(R.layout.activity_main);
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
+                if (!ok)
+                    Toast.makeText(getApplicationContext(), "No config - bad host name?", Toast.LENGTH_LONG).show();
                 doit();
             }
         });
@@ -821,6 +825,14 @@ public void show_cfg()
         cfg.put("egauge_layout", pref.get("egauge_layout", ""));
         cfg.put("egauge_progress", pref.get("egauge_progress", ""));
         cfg.put("general_layout", pref.get("general_layout", ""));
+        cfg.put("ss_start", pref.get("ss_start", ""));
+        cfg.put("ss_delay", pref.get("ss_delay", ""));
+        cfg.put("ss_fade", pref.get("ss_fade", ""));
+        cfg.put("ss_host", pref.get("ss_host", ""));
+        cfg.put("ss_list", pref.get("ss_list", ""));
+        cfg.put("ss_server", pref.get("ss_server", ""));
+        cfg.put("ss_user", pref.get("ss_user", ""));
+        cfg.put("ss_pwd", pref.get("ss_pwd", ""));
         cfg.put("outlets_cols", pref.get("outlets_cols", ""));
         cfg.put("outlets_batt_level", pref.get("outlets_batt_level", ""));
         cfg.put("outlets_batt_max", pref.get("outlets_batt_max", ""));
