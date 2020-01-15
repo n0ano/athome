@@ -136,7 +136,8 @@ public void onBackPressed()
     String list = "" + image_adapt.get_generation();
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
-        list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R") + entry.get_name();
+        if (entry.get_check())
+            list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R") + entry.get_name();
     }
     pref.put("images", list);
     super.onBackPressed();
@@ -152,14 +153,13 @@ public void set_view(int visible, int invisible)
     v.setVisibility(View.GONE);
 }
 
-public void go_image(View v)
+public void go_image(View v, final ImageEntry entry)
 {
 
     View vv = (View)findViewById(R.id.mgmt_gridview);
     final int w = vv.getWidth();
     final int h = vv.getHeight();
 
-    final ImageEntry entry = (ImageEntry)v.getTag();
 Log.d("SS: image clicked - " + entry.get_name());
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);

@@ -63,21 +63,41 @@ public Object getItem(int position)
 }
 
 @Override
-public View getView(int position, View convertView, ViewGroup parent)
+public View getView(int position, View view, ViewGroup parent)
 {
 
     final ImageEntry image = images.get(position);
-    if (convertView == null) {
+    if (view == null) {
         final LayoutInflater layoutInflater = LayoutInflater.from(act);
-        convertView = layoutInflater.inflate(R.layout.grid_image, null);
+        view = layoutInflater.inflate(R.layout.grid_image, null);
     }
-    ImageView iv = (ImageView)convertView.findViewById(R.id.image);
+
+    final ImageView iv = (ImageView)view.findViewById(R.id.image);
+    final ImageView ic = (ImageView)view.findViewById(R.id.mgmt_check);
+
     iv.setTag(image);
     if (image.bitmap == null)
         iv.setImageResource(R.drawable.no);
     else
         iv.setImageBitmap(image.bitmap);
-    return convertView;
+
+    view.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+Log.d(image.get_name() + ":touched");
+            image.set_check(!image.get_check());
+            ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
+        }
+    });
+    view.setOnLongClickListener(new View.OnLongClickListener() {
+        public boolean onLongClick(View v) {
+            act.go_image(v, image);
+            return true;
+        }
+    });
+
+    ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
+
+    return view;
 }
 
 private void get_names(final ImageFind image_find)
@@ -96,9 +116,13 @@ private void get_names(final ImageFind image_find)
 private void done()
 {
 
+    String str = act.pref.get("images", "");
+    String[] imgs = str.split(";");
+
     Log.d("SS:Images:");
     for (ImageEntry img : images) {
         Log.d("SS:image: " + img.get_name());
+        img.set_check(imgs);
     }
 
     final ImageAdapter me = this;
