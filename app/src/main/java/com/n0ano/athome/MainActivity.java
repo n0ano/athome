@@ -128,11 +128,12 @@ protected void onCreate(Bundle state)
 {
 
     super.onCreate(state);
-    Log.d("MainActivity: onCreate");
 
     pref = new Preferences(this);
     debug = pref.get("debug", 0);
         Log.cfg(debug, "", "");
+Log.cfg(1, "", "");
+    Log.d("MainActivity: onCreate");
 
     start_home(state);
 }
@@ -144,10 +145,8 @@ public boolean dispatchTouchEvent(MotionEvent ev)
     if (ev.getY() < ss_offset)
         return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-        if (ss_saver.state() == C.SAVER_SHOWING) {
-            ss_saver.screen_saver(C.SAVER_RESET);
+        if (!ss_saver.touch())
             return false;
-        }
     }
     return super.dispatchTouchEvent(ev);
 }
@@ -178,9 +177,8 @@ protected void onResume()
 //test_parse();
 
     restore_state();
+    ss_saver = new ScreenSaver(this, (View) findViewById(R.id.saver_view1), (View) findViewById(R.id.saver_view2));
     image_find = new ImageFind((Activity) this, ss_info);
-    if (ss_saver.ss_generation < 0)
-        ss_saver.get_names(image_find, 0);
     doit();
 }
 
@@ -290,8 +288,6 @@ private void start_home(Bundle state)
 
     popup = new Popup(this, pref);
 
-    ss_saver = new ScreenSaver(this, (View) findViewById(R.id.saver_view1), (View) findViewById(R.id.saver_view2));
-
     ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
 
     display(true);
@@ -351,7 +347,6 @@ public void display(final boolean onoff)
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
             view = (View) findViewById(R.id.blank_view);
             view.setVisibility(onoff ? View.GONE : View.VISIBLE);
-            ss_saver.hide_views();
             if (menu_bar != null) {
                 MenuItem icon = menu_bar.findItem(R.id.action_display);
                 icon.setIcon(onoff ? R.drawable.light_on : R.drawable.light_off);

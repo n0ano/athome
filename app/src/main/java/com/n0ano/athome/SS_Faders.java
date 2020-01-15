@@ -10,6 +10,10 @@ import java.util.Random;
 
 public class SS_Faders
 {
+
+private final static int FADE_START =   0;
+private final static int FADE_END =     1;
+
 public final static String[] types = {
     "fade",             // 0
     "slide_up",         // 1
@@ -20,13 +24,18 @@ public final static String[] types = {
     "random"            // 6
 };
 
+private ScreenSaver ctx;
+
 private Random rand;
 
 private int duration = 2000;
 
-public SS_Faders()
+private int active;
+
+public SS_Faders(ScreenSaver ctx)
 {
 
+    this.ctx = ctx;
     rand = new Random();
 }
 
@@ -35,6 +44,8 @@ public void fade(int type, View start, View end, int w, int h)
 
     if (type == 6)
         type = rand.nextInt(5);
+
+    active = 2;
 
     switch (type) {
 
@@ -65,6 +76,12 @@ public void fade(int type, View start, View end, int w, int h)
     }
 }
 
+public boolean fading()
+{
+
+    return active > 0;
+}
+
 //
 // Cross fade from start to end
 //
@@ -76,7 +93,12 @@ private void xfade(final View start, final View end)
     end.animate()
        .alpha(1.0f)
        .setDuration(duration)
-       .setListener(null);
+       .setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                fade_done(end, FADE_END);
+            }
+       });
 
     start.animate()
          .alpha(0.0f)
@@ -84,7 +106,7 @@ private void xfade(final View start, final View end)
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    fade_done(start, end);
+                    fade_done(start, FADE_START);
                 }
             });
 }
@@ -97,7 +119,12 @@ private void fadeup(final View start, final View end, final int w, final int h)
     end.animate()
        .translationYBy(-h)
        .setDuration(duration)
-       .setListener(null);
+       .setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                fade_done(end, FADE_END);
+            }
+       });
 
     start.animate()
          .translationYBy(-h)
@@ -105,7 +132,7 @@ private void fadeup(final View start, final View end, final int w, final int h)
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    fade_done(start, end);
+                    fade_done(start, FADE_START);
                 }
             });
 }
@@ -118,7 +145,12 @@ private void fadedown(final View start, final View end, final int w, final int h
     end.animate()
        .translationYBy(h)
        .setDuration(duration)
-       .setListener(null);
+       .setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                fade_done(end, FADE_END);
+            }
+       });
 
     start.animate()
          .translationYBy(h)
@@ -126,7 +158,7 @@ private void fadedown(final View start, final View end, final int w, final int h
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    fade_done(start, end);
+                    fade_done(start, FADE_START);
                 }
             });
 }
@@ -139,7 +171,12 @@ private void fadeleft(final View start, final View end, final int w, final int h
     end.animate()
        .translationXBy(-w)
        .setDuration(duration)
-       .setListener(null);
+       .setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                fade_done(end, FADE_END);
+            }
+       });
 
     start.animate()
          .translationXBy(-w)
@@ -147,7 +184,7 @@ private void fadeleft(final View start, final View end, final int w, final int h
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    fade_done(start, end);
+                    fade_done(start, FADE_START);
                 }
             });
 }
@@ -160,7 +197,12 @@ private void faderight(final View start, final View end, final int w, final int 
     end.animate()
        .translationXBy(w)
        .setDuration(duration)
-       .setListener(null);
+       .setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                fade_done(end, FADE_END);
+            }
+       });
 
     start.animate()
          .translationXBy(w)
@@ -168,7 +210,7 @@ private void faderight(final View start, final View end, final int w, final int 
          .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    fade_done(start, end);
+                    fade_done(start, FADE_START);
                 }
             });
 }
@@ -176,20 +218,32 @@ private void faderight(final View start, final View end, final int w, final int 
 private void fadenone(final View start, final View end)
 {
 
-    end.setVisibility(View.VISIBLE);
-    fade_done(start, end);
+    fade_done(end, FADE_END);
+    fade_done(start, FADE_START);
 }
 
-private void fade_done(View start, View end)
+private void fade_done(View view, int which)
 {
 
-    start.setVisibility(View.GONE);
-    start.setTranslationX(0);
-    start.setTranslationY(0);
-    start.setAlpha(1.0f);
-    TextView tv = (TextView)start.findViewById(R.id.title);
-    if (tv != null)
-        tv.setText("");
+    switch (which) {
+
+    case FADE_START:
+        view.setVisibility(View.GONE);
+        view.setTranslationX(0);
+        view.setTranslationY(0);
+        view.setAlpha(1.0f);
+        TextView tv = (TextView)view.findViewById(R.id.title);
+        if (tv != null)
+            tv.setText("");
+        --active;
+        break;
+
+    case FADE_END:
+        view.setVisibility(View.VISIBLE);
+        --active;
+        break;
+
+    }
 }
 
 }

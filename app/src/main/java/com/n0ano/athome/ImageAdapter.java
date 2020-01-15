@@ -59,7 +59,7 @@ public long getItemId(int position)
 public Object getItem(int position)
 {
 
-    return null;
+    return images.get(position);
 }
 
 @Override
@@ -108,6 +108,12 @@ private void done()
             act.set_view(R.id.mgmt_gridview, R.id.mgmt_loading);
         }
     });
+}
+
+public int get_generation()
+{
+
+    return image_find.ss_generation;
 }
 
 }

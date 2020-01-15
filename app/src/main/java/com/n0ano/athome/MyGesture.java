@@ -33,7 +33,7 @@ public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, 
 
     //  velocityX > 0 => swipe right
     //            < 0 => swipe left
-    act.ss_saver.saver_fade(velocityX < 0 ? 1 : -1);
+    act.ss_saver.saver_fling(velocityX < 0 ? 1 : -1);
     return true;
 }
 

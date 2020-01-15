@@ -58,7 +58,7 @@ private int ss_current;
 
 public int ss_generation = -1;
 private int ss_counter = 0;
-private int ss_state = C.SAVER_FROZEN;
+public int ss_state = C.SAVER_BLOCKED;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
 private SS_Faders ss_faders;
@@ -66,19 +66,17 @@ private SS_Faders ss_faders;
 public ScreenSaver(MainActivity act, View v1, View v2)
 {
 
+    Log.d("SS:screen saver started");
     this.act = act;
     ss_views[0] = v1;
     ss_views[1] = v2;
+    hide_views();
 
     images = new ArrayList<ImageEntry>();
-    ss_faders = new SS_Faders();
-    ss_state = C.SAVER_FROZEN;
-}
+    ss_faders = new SS_Faders(this);
+    ss_state = C.SAVER_BLOCKED;
 
-public int state()
-{
-
-    return ss_state;
+    set_images();
 }
 
 public void hide_views()
@@ -93,6 +91,14 @@ public void do_fade(View start, View end)
 {
 
     ss_faders.fade(act.ss_fade, start, end, ss_width(), ss_height());
+}
+
+public void cancel_fade()
+{
+
+    View v = (View)act.findViewById(R.id.scroll_view);
+    v.setAlpha(1.0f);
+    act.display(act.screen);
 }
 
 private int ss_width()
@@ -136,38 +142,20 @@ public void saver_fade(int delta)
     ig.start();
 }
 
+public void saver_fling(int dir)
+{
+
+//Log.d("SS:state - " + ss_state + ", " + dir);
+    if (ss_state == C.SAVER_FROZEN)
+        saver_fade(dir);
+}
+
 public void saver_click()
 {
 
-    saver_start();
-}
-
-public void saver_start()
-{
-
-Log.d("saver: start");
-    if (ss_state == C.SAVER_COUNTING) {
-        ss_state = C.SAVER_SHOWING;
-        ss_counter = act.ss_delay;
-        act.ss_fade = act.pref.get("ss_fade", 0);
-        MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
-        icon.setIcon(R.drawable.play);
-
-        ss_views[0].setVisibility(View.GONE);
-        ss_views[0].setAlpha(1.0f);
-        ss_views[0].setScaleX(1.0f);
-        ss_views[0].setScaleY(1.0f);
-        ss_views[1].setVisibility(View.GONE);
-        ss_views[1].setAlpha(1.0f);
-        ss_views[1].setScaleX(1.0f);
-        ss_views[1].setScaleY(1.0f);
-        ss_viewid = 0;
-        //
-        //  ImageGet will call do_fade once the new image is loaded
-        //
-        ImageGet ig = new ImageGet(this, act.ss_info, ss_next(1), ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
-        ig.start();
-    } else {
+    if (ss_state == C.SAVER_COUNTING)
+        saver_start();
+    else {
         MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
         if (ss_state == C.SAVER_FROZEN) {
             ss_state = C.SAVER_SHOWING;
@@ -183,10 +171,35 @@ Log.d("saver: start");
     }
 }
 
+public void saver_start()
+{
+
+Log.d("SS:saver: start");
+    ss_state = C.SAVER_SHOWING;
+    ss_counter = act.ss_delay;
+    act.ss_fade = act.pref.get("ss_fade", 0);
+    MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
+    icon.setIcon(R.drawable.play);
+
+    ss_views[0].setVisibility(View.GONE);
+    ss_views[0].setAlpha(1.0f);
+    ss_views[0].setScaleX(1.0f);
+    ss_views[0].setScaleY(1.0f);
+    ss_views[1].setVisibility(View.GONE);
+    ss_views[1].setAlpha(1.0f);
+    ss_views[1].setScaleX(1.0f);
+    ss_views[1].setScaleY(1.0f);
+    ss_viewid = 0;
+    //
+    //  ImageGet will call do_fade once the new image is loaded
+    //
+    ImageGet ig = new ImageGet(this, act.ss_info, ss_next(1), ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
+    ig.start();
+}
+
 public void screen_saver(int tick)
 {
 
-//Log.d("SS: saver state - " + ss_state);
     if (ss_state == C.SAVER_FROZEN)
         return;
 
@@ -217,17 +230,27 @@ public void screen_saver(int tick)
         break;
 
     case C.SAVER_RESET:
-Log.d("saver - reset to " + act.ss_start + " seconds, state - " + ss_state);
         if (ss_state == C.SAVER_SHOWING) {
             MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
             icon.setIcon(R.drawable.monitor);
-            act.display(act.screen);
+            cancel_fade();
+            hide_views();
         }
         ss_counter = act.ss_start;
         ss_state = ((act.ss_start == 0) ? C.SAVER_BLOCKED : C.SAVER_COUNTING);
         break;
 
     }
+}
+
+public boolean touch()
+{
+
+    if ((ss_state == C.SAVER_SHOWING) && !ss_faders.fading()) {
+        screen_saver(C.SAVER_RESET);
+        return false;
+    }
+    return true;
 }
 
 public void get_names(final ImageFind image_find, final int gen)
@@ -248,6 +271,29 @@ Log.d("SS:get_names - " + images.size() + ", gen - " + image_find.ss_generation)
                 }
             }
         }).start();
+}
+
+private void set_images()
+{
+
+    String str = act.pref.get("images", "");
+    String[] imgs = str.split(";");
+    if (imgs.length > 1) {
+        ss_generation = Integer.parseInt(imgs[0], 10);
+        for (int i = 1; i < imgs.length; i++) {
+            String name = imgs[i];
+            if (!name.isEmpty()) {
+                int t = ((name.charAt(0) == 'L') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
+                images.add(new ImageEntry(name.substring(1), t, i, null));
+            }
+        }
+    }
+    ss_current = images.size();
+Log.d("SS:set_images - " + images.size());
+    if (images.size() > 0) {
+        ss_state = C.SAVER_BLOCKED;
+        screen_saver(C.SAVER_RESET);
+    }
 }
 
 }

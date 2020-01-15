@@ -68,7 +68,11 @@ protected void onCreate(Bundle state)
 //        return;
 //    }
 
-    setup();
+    screen_info = new ScreenInfo(pref);
+    if (screen_info.ss_host.isEmpty()) {
+        finish();
+        return;
+    }
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, screen_info);
@@ -123,10 +127,19 @@ protected void onDestroy()
     Log.d("SS:ImageMgmt: onDestroy");
 }
 
-private void setup()
+@Override
+public void onBackPressed()
 {
+    ImageEntry entry;
 
-    screen_info = new ScreenInfo(pref);
+    Log.d("SS:ImageMgmt: onBackPressed");
+    String list = "" + image_adapt.get_generation();
+    for (int i = 0; i < image_adapt.getCount(); i++) {
+        entry = (ImageEntry)image_adapt.getItem(i);
+        list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R") + entry.get_name();
+    }
+    pref.put("images", list);
+    super.onBackPressed();
 }
 
 public void set_view(int visible, int invisible)
