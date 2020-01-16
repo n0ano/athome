@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ImageAdapter extends BaseAdapter
 {
@@ -115,18 +116,26 @@ private void get_names(final ImageFind image_find)
 
 private void done()
 {
+    int off;
 
     String str = act.pref.get("images", "");
-    String[] imgs = str.split(";");
-    image_find.ss_generation = Integer.parseInt(imgs[0]);
-    imgs[0] = null;
+    String[] strs = str.split(";");
+    image_find.ss_generation = Integer.parseInt(strs[0]);
+
+    Map<String, String> imgs = new HashMap<String, String>();
+
+    for (int i = 1; i < strs.length; i++) {
+        str = strs[i];
+        off = 1;
+        if (str.charAt(1) == 'R')
+            off += 4;
+        imgs.put(str.substring(off), str.substring(0, off));
+    }
 
     Log.d("SS:Images:");
     for (ImageEntry img : images) {
-        if (img != null) {
-            Log.d("SS:image: " + img.get_name());
-            img.enable(imgs);
-        }
+        Log.d("SS:image: " + img.get_name() + " - " + imgs.get(img.get_name()));
+        img.enable(imgs.get(img.get_name()));
     }
 
     final ImageAdapter me = this;

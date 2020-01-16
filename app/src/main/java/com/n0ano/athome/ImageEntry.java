@@ -51,32 +51,14 @@ public void set_rotate(int r) { rotate = r; }
 public boolean get_check() { return checked; }
 public void set_check(boolean ck) { checked = ck; }
 
-public void ddd_enable(String[] names)
+public void enable(String info)
 {
-
-    checked = true;
-    for (String str : names) {
-        Log.d("SS: enable - " + str);
-        return;
-    }
-}
-public void enable(String[] names)
-{
-    String image;
 
     checked = false;
-    for (String str : names) {
-        if (str == null)
-            continue;
-        image = str.substring(1);
-        if (image.charAt(0) == 'R') {
-            rotate = Integer.parseInt(image.substring(1,4));
-            image = image.substring(4);
-        }
-        if (name.equals(image)) {
-            checked = true;
-            return;
-        }
+    if (info != null) {
+        if ((info.length() > 1) && (info.charAt(1) == 'R'))
+            rotate = Integer.parseInt(info.substring(1,4));
+        checked = true;
     }
 }
 
