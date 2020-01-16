@@ -49,6 +49,10 @@ public boolean menu_click(int item)
         right_action();
         return true;
 
+    case R.id.action_save:
+        save_action();
+        return true;
+
     case R.id.action_info:
         info_action();
         return true;
@@ -58,10 +62,16 @@ public boolean menu_click(int item)
     return false;
 }
 
+private void save_action()
+{
+
+    act.save(null);
+}
+
 private void undo_action()
 {
 
-    act.go_grid(null);
+    act.go_back(null);
 }
 
 public void left_action()

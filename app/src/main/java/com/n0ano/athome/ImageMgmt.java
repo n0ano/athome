@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +40,7 @@ int show_idx;
 
 public PopupImage popup;
 Menu menu_bar;
+int mgmt_view;
 
 public ScreenInfo screen_info;
 
@@ -165,22 +167,6 @@ public boolean onOptionsItemSelected(MenuItem item)
 @Override
 public void onBackPressed()
 {
-    ImageEntry entry;
-    int r;
-
-    Log.d("SS:ImageMgmt: onBackPressed");
-    String list = "" + image_adapt.get_generation();
-    for (int i = 0; i < image_adapt.getCount(); i++) {
-        entry = (ImageEntry)image_adapt.getItem(i);
-        if (entry.get_check()) {
-            list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R");
-            r = entry.get_rotate();
-            if (r != 0)
-                list = list + "R" + String.format("%03d", r);
-            list = list + entry.get_name();
-        }
-    }
-    pref.put("images", list);
     super.onBackPressed();
 }
 
@@ -192,14 +178,14 @@ public void set_view(int visible, int invisible)
     v.setVisibility(View.VISIBLE);
     v = (View)findViewById(invisible);
     v.setVisibility(View.GONE);
+
+    mgmt_view = visible;
 }
 
 private void set_menu(boolean visible)
 {
     MenuItem item;
 
-    item = menu_bar.findItem(R.id.action_undo);
-    item.setVisible(visible);
     item = menu_bar.findItem(R.id.action_left);
     item.setVisible(visible);
     item = menu_bar.findItem(R.id.action_right);
@@ -218,7 +204,6 @@ public void go_image(View v, final ImageEntry entry)
     final int h = vv.getHeight();
 
     cur_image = entry;
-Log.d("SS: image clicked - " + entry.get_name());
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.no);
@@ -242,11 +227,51 @@ public void go_grid(View v)
     set_view(R.id.mgmt_gridview, R.id.mgmt_imageview);
 }
 
-public void image_save(View v)
+public void go_back(View v)
 {
 
-Log.d(cur_image.get_name() + ": save the new image");
-    go_grid(null);
+    if (mgmt_view == R.id.mgmt_imageview)
+        go_grid(null);
+    else
+        finish();
+}
+
+
+public void save(View v)
+{
+
+Log.d(cur_image.get_name() + ":save");
+    if (mgmt_view == R.id.mgmt_imageview)
+        save_image();
+    else
+        save_list();
+}
+
+private void save_image()
+{
+
+    Toast.makeText(getApplicationContext(), "image changes saved", Toast.LENGTH_LONG).show();
+}
+
+private void save_list()
+{
+
+    ImageEntry entry;
+    int r;
+
+    Log.d("SS:ImageMgmt: save image list");
+    String list = "" + image_adapt.get_generation();
+    for (int i = 0; i < image_adapt.getCount(); i++) {
+        entry = (ImageEntry)image_adapt.getItem(i);
+        if (entry.get_check()) {
+            list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R");
+            r = entry.get_rotate();
+            if (r != 0)
+                list = list + "R" + String.format("%03d", r);
+            list = list + entry.get_name();
+        }
+    }
+    pref.put("images", list);
 }
 
 public void ok(View v)

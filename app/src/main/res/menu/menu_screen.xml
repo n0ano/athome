@@ -4,13 +4,6 @@
     tools:context="com.n0ano.athome.MainActivity">
 
     <item
-        android:id="@+id/action_undo"
-        android:icon="@drawable/undo"
-        android:orderInCategory="100"
-        android:title="Edits"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_left"
         android:icon="@drawable/rotate_l"
         android:orderInCategory="100"
@@ -29,6 +22,20 @@
         android:icon="@drawable/info"
         android:orderInCategory="100"
         android:title="Information"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/save"
+        android:orderInCategory="100"
+        android:title="Save"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/undo"
+        android:orderInCategory="100"
+        android:title="Edits"
         app:showAsAction="always" />
 
 </menu>
