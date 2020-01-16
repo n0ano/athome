@@ -113,6 +113,7 @@ public boolean menu_click(int item)
     case R.id.action_about:
         about_dialog();
         return true;
+
     }
     return false;
 }

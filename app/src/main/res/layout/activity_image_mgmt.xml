@@ -8,12 +8,26 @@
     android:layout_height="match_parent"
     tools:context=".ImageMgmt">
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/toolBack"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
     <LinearLayout
         android:id="@+id/mgmt_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/appbar"
         android:layout_centerHorizontal="true" >
 
         <TextView
@@ -35,7 +49,7 @@
         android:id="@+id/mgmt_gridview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/appbar"
         android:layout_alignParentLeft="true"
         android:visibility="gone" >
 
@@ -56,7 +70,7 @@
         android:id="@+id/mgmt_imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/appbar"
         android:layout_alignParentLeft="true"
         android:visibility="gone" >
 
@@ -66,7 +80,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:onClick="go_grid" />
+            android:onClick="image_save" />
 
     </RelativeLayout>
 

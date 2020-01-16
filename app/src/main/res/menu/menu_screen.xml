@@ -3,4 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.n0ano.athome.MainActivity">
 
+    <item
+        android:id="@+id/action_left"
+        android:icon="@drawable/rotate_l"
+        android:orderInCategory="100"
+        android:title="Rotate left"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_right"
+        android:icon="@drawable/rotate_r"
+        android:orderInCategory="100"
+        android:title="Rotate right"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/undo"
+        android:orderInCategory="100"
+        android:title="Edits"
+        app:showAsAction="always" />
+
 </menu>

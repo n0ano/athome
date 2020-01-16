@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -36,11 +37,15 @@ Preferences pref;
 int debug = 0;
 int show_idx;
 
+public PopupImage popup;
+Menu menu_bar;
+
 public ScreenInfo screen_info;
 
 private ImageFind image_find;
 
 ImageAdapter image_adapt;
+ImageEntry cur_image;
 
 @Override
 protected void onCreate(Bundle state)
@@ -48,6 +53,10 @@ protected void onCreate(Bundle state)
 
     super.onCreate(state);
     setContentView(R.layout.activity_image_mgmt);
+
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
     View v = (View) findViewById(R.id.mgmt_loading);
     v.setVisibility(View.VISIBLE);
     C.loading_name = (TextView) findViewById(R.id.mgmt_name);
@@ -56,7 +65,9 @@ protected void onCreate(Bundle state)
     debug = pref.get("debug", 0);
         Log.cfg(debug, "", "");
 
-    setTitle("Screen mgmt");
+    popup = new PopupImage(this, pref);
+
+    setTitle("Image mgmt");
 
     Log.d("SS:ImageMgmt: onCreate");
 
@@ -128,6 +139,30 @@ protected void onDestroy()
 }
 
 @Override
+public boolean onCreateOptionsMenu(Menu menu)
+{
+
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.menu_screen, menu);
+    menu_bar = menu;
+    set_menu(false);
+    return true;
+}
+
+@Override
+public boolean onOptionsItemSelected(MenuItem item)
+{
+
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+
+    if (popup.menu_click(item.getItemId()))
+        return true;
+    return super.onOptionsItemSelected(item);
+}
+
+@Override
 public void onBackPressed()
 {
     ImageEntry entry;
@@ -153,13 +188,28 @@ public void set_view(int visible, int invisible)
     v.setVisibility(View.GONE);
 }
 
+private void set_menu(boolean visible)
+{
+    MenuItem item;
+
+    item = menu_bar.findItem(R.id.action_left);
+    item.setVisible(visible);
+    item = menu_bar.findItem(R.id.action_right);
+    item.setVisible(visible);
+    item = menu_bar.findItem(R.id.action_undo);
+    item.setVisible(visible);
+}
+
 public void go_image(View v, final ImageEntry entry)
 {
+
+    set_menu(true);
 
     View vv = (View)findViewById(R.id.mgmt_gridview);
     final int w = vv.getWidth();
     final int h = vv.getHeight();
 
+    cur_image = entry;
 Log.d("SS: image clicked - " + entry.get_name());
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
@@ -180,7 +230,15 @@ Log.d("SS: image clicked - " + entry.get_name());
 public void go_grid(View v)
 {
 
+    set_menu(false);
     set_view(R.id.mgmt_gridview, R.id.mgmt_imageview);
+}
+
+public void image_save(View v)
+{
+
+Log.d(cur_image.get_name() + ": save the new image");
+    go_grid(null);
 }
 
 public void ok(View v)
