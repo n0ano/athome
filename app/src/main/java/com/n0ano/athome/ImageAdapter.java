@@ -118,11 +118,15 @@ private void done()
 
     String str = act.pref.get("images", "");
     String[] imgs = str.split(";");
+    image_find.ss_generation = Integer.parseInt(imgs[0]);
+    imgs[0] = null;
 
     Log.d("SS:Images:");
     for (ImageEntry img : images) {
-        Log.d("SS:image: " + img.get_name());
-        img.set_check(imgs);
+        if (img != null) {
+            Log.d("SS:image: " + img.get_name());
+            img.enable(imgs);
+        }
     }
 
     final ImageAdapter me = this;

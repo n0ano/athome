@@ -55,7 +55,7 @@ if (true) return images;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry(path, C.IMAGE_LOCAL, 0, null));
+        images.add(new ImageEntry(path, C.IMAGE_LOCAL, 0, 0, null));
     }
     return images;
 }

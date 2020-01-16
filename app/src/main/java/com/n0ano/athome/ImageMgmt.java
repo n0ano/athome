@@ -166,13 +166,19 @@ public boolean onOptionsItemSelected(MenuItem item)
 public void onBackPressed()
 {
     ImageEntry entry;
+    int r;
 
     Log.d("SS:ImageMgmt: onBackPressed");
     String list = "" + image_adapt.get_generation();
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
-        if (entry.get_check())
-            list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R") + entry.get_name();
+        if (entry.get_check()) {
+            list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R");
+            r = entry.get_rotate();
+            if (r != 0)
+                list = list + "R" + String.format("%03d", r);
+            list = list + entry.get_name();
+        }
     }
     pref.put("images", list);
     super.onBackPressed();
@@ -192,11 +198,13 @@ private void set_menu(boolean visible)
 {
     MenuItem item;
 
+    item = menu_bar.findItem(R.id.action_undo);
+    item.setVisible(visible);
     item = menu_bar.findItem(R.id.action_left);
     item.setVisible(visible);
     item = menu_bar.findItem(R.id.action_right);
     item.setVisible(visible);
-    item = menu_bar.findItem(R.id.action_undo);
+    item = menu_bar.findItem(R.id.action_info);
     item.setVisible(visible);
 }
 

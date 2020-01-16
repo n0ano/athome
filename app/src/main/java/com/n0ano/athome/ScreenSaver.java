@@ -275,6 +275,7 @@ Log.d("SS:get_names - " + images.size() + ", gen - " + image_find.ss_generation)
 
 private void set_images()
 {
+    int t, r;
 
     String str = act.pref.get("images", "");
     String[] imgs = str.split(";");
@@ -283,8 +284,11 @@ private void set_images()
         for (int i = 1; i < imgs.length; i++) {
             String name = imgs[i];
             if (!name.isEmpty()) {
-                int t = ((name.charAt(0) == 'L') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
-                images.add(new ImageEntry(name.substring(1), t, i, null));
+                t = ((name.charAt(0) == 'L') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
+                r = 0;
+                if (name.charAt(1) == 'R')
+                    r = Integer.parseInt(name.substring(2, 5), 10);
+                images.add(new ImageEntry(name.substring(1), t, i, r, null));
             }
         }
     }

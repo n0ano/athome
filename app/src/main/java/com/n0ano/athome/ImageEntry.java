@@ -9,14 +9,16 @@ String name;
 int type;
 int ts;
 boolean checked;
+int rotate;
 Bitmap bitmap;
 
-public ImageEntry(String name, int type, int ts, ScreenInfo info)
+public ImageEntry(String name, int type, int ts, int rotate, ScreenInfo info)
 {
 
     this.name = name;
     this.type = type;
     this.ts = ts;
+    this.rotate = rotate;
     this.bitmap = null;
     this.checked = true;
     if (info != null)
@@ -30,6 +32,7 @@ public ImageEntry(String name, int type, ScreenInfo info)
     this.name = name.substring(idx + 1);
     this.type = type;
     this.ts = Integer.parseInt(name.substring(0, idx), 10);
+    this.rotate = 0;
     this.bitmap = null;
     this.checked = true;
     if (info != null)
@@ -42,17 +45,39 @@ public int get_type() { return type; }
 
 public int get_ts() { return ts; }
 
+public int get_rotate() { return rotate; }
+public void set_rotate(int r) { rotate = r; }
+
 public boolean get_check() { return checked; }
 public void set_check(boolean ck) { checked = ck; }
-public void set_check(String[] names)
+
+public void ddd_enable(String[] names)
 {
 
+    checked = true;
+    for (String str : names) {
+        Log.d("SS: enable - " + str);
+        return;
+    }
+}
+public void enable(String[] names)
+{
+    String image;
+
     checked = false;
-    for (String str : names)
-        if (name.equals(str.substring(1))) {
+    for (String str : names) {
+        if (str == null)
+            continue;
+        image = str.substring(1);
+        if (image.charAt(0) == 'R') {
+            rotate = Integer.parseInt(image.substring(1,4));
+            image = image.substring(4);
+        }
+        if (name.equals(image)) {
             checked = true;
             return;
         }
+    }
 }
 
 private void get_thumb(ScreenInfo info)

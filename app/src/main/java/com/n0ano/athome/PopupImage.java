@@ -37,6 +37,10 @@ public boolean menu_click(int item)
 
     switch (item) {
 
+    case R.id.action_undo:
+        undo_action();
+        return true;
+
     case R.id.action_left:
         left_action();
         return true;
@@ -45,13 +49,19 @@ public boolean menu_click(int item)
         right_action();
         return true;
 
-    case R.id.action_undo:
-        undo_action();
+    case R.id.action_info:
+        info_action();
         return true;
 
     }
 
     return false;
+}
+
+private void undo_action()
+{
+
+    act.go_grid(null);
 }
 
 public void left_action()
@@ -66,10 +76,10 @@ public void right_action()
 Log.d(act.cur_image.get_name() + "rotate image right");
 }
 
-private void undo_action()
+public void info_action()
 {
 
-    act.go_grid(null);
+Log.d(act.cur_image.get_name() + "image info");
 }
 
 }
