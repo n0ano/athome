@@ -109,6 +109,15 @@ Log.d(image.get_name() + ":touched");
     return view;
 }
 
+public void select(boolean check)
+{
+
+    for (ImageEntry img : images) {
+        img.set_check(check);
+    }
+    notifyDataSetChanged();
+}
+
 private void get_names(final ImageFind image_find)
 {
 

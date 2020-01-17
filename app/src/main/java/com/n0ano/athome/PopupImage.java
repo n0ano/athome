@@ -38,19 +38,27 @@ public boolean menu_click(int item)
     switch (item) {
 
     case R.id.action_undo:
-        undo_action();
+        act.go_back();
         return true;
 
     case R.id.action_left:
-        left_action();
+        act.rotate(-90);
         return true;
 
     case R.id.action_right:
-        right_action();
+        act.rotate(90);
+        return true;
+
+    case R.id.action_all:
+        act.select(true);
+        return true;
+
+    case R.id.action_none:
+        act.select(false);
         return true;
 
     case R.id.action_save:
-        save_action();
+        act.save();
         return true;
 
     case R.id.action_info:
@@ -60,30 +68,6 @@ public boolean menu_click(int item)
     }
 
     return false;
-}
-
-private void save_action()
-{
-
-    act.save(null);
-}
-
-private void undo_action()
-{
-
-    act.go_back(null);
-}
-
-public void left_action()
-{
-
-    act.rotate(-90);
-}
-
-public void right_action()
-{
-
-    act.rotate(90);
 }
 
 public void info_action()

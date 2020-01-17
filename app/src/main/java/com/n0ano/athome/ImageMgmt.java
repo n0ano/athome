@@ -153,7 +153,7 @@ public boolean onCreateOptionsMenu(Menu menu)
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_screen, menu);
     menu_bar = menu;
-    set_menu(false);
+    set_menu(R.id.mgmt_gridview);
     return true;
 }
 
@@ -188,22 +188,45 @@ public void set_view(int visible, int invisible)
     mgmt_view = visible;
 }
 
-private void set_menu(boolean visible)
+private void set_menu(int id)
 {
     MenuItem item;
 
-    item = menu_bar.findItem(R.id.action_left);
-    item.setVisible(visible);
-    item = menu_bar.findItem(R.id.action_right);
-    item.setVisible(visible);
-    item = menu_bar.findItem(R.id.action_info);
-    item.setVisible(visible);
+    switch (id) {
+
+    case R.id.mgmt_gridview:
+        item = menu_bar.findItem(R.id.action_left);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_right);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_info);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_all);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_none);
+        item.setVisible(true);
+        break;
+
+    case R.id.mgmt_imageview:
+        item = menu_bar.findItem(R.id.action_left);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_right);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_info);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_all);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_none);
+        item.setVisible(false);
+        break;
+
+    }
 }
 
 public void go_image(View v, final ImageEntry entry)
 {
 
-    set_menu(true);
+    set_menu(R.id.mgmt_imageview);
 
     View vv = (View)findViewById(R.id.mgmt_gridview);
     final int w = vv.getWidth();
@@ -226,18 +249,18 @@ public void go_image(View v, final ImageEntry entry)
     }).start();
 }
 
-public void go_grid(View v)
+public void go_grid()
 {
 
-    set_menu(false);
+    set_menu(R.id.mgmt_gridview);
     set_view(R.id.mgmt_gridview, R.id.mgmt_imageview);
 }
 
-public void go_back(View v)
+public void go_back()
 {
 
     if (mgmt_view == R.id.mgmt_imageview)
-        go_grid(null);
+        go_grid();
     else
         finish();
 }
@@ -255,13 +278,19 @@ Log.d(cur_image.get_name() + ": angle - " + r);
     go_image(null, cur_image);
 }
 
-public void save(View v)
+public void save()
 {
 
     if (mgmt_view == R.id.mgmt_imageview)
         save_image();
     else
         save_list();
+}
+
+public void select(boolean all)
+{
+
+    image_adapt.select(all);
 }
 
 private void save_image()
@@ -290,7 +319,7 @@ private void save_list()
     }
     image_adapt.notifyDataSetChanged();
     pref.put("images", list);
-    go_back(null);
+    go_back();
 }
 
 public void get_saved()
