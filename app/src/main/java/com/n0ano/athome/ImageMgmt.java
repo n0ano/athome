@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ImageMgmt extends AppCompatActivity
 {
@@ -43,11 +44,14 @@ Menu menu_bar;
 int mgmt_view;
 
 public ScreenInfo screen_info;
+public int ss_generation = 0;
 
 private ImageFind image_find;
 
 ImageAdapter image_adapt;
 ImageEntry cur_image;
+
+public Map<String, String> saved_images;
 
 @Override
 protected void onCreate(Bundle state)
@@ -86,6 +90,8 @@ protected void onCreate(Bundle state)
         finish();
         return;
     }
+
+    get_saved();
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, screen_info);
@@ -236,11 +242,22 @@ public void go_back(View v)
         finish();
 }
 
+public void rotate(int deg)
+{
+
+    int r = cur_image.get_rotate() + deg;
+    while (r < 0)
+        r += 360;
+    while (r >= 360)
+        r -= 360;
+Log.d(cur_image.get_name() + ": angle - " + r);
+    cur_image.set_rotate(r);
+    go_image(null, cur_image);
+}
 
 public void save(View v)
 {
 
-Log.d(cur_image.get_name() + ":save");
     if (mgmt_view == R.id.mgmt_imageview)
         save_image();
     else
@@ -250,7 +267,7 @@ Log.d(cur_image.get_name() + ":save");
 private void save_image()
 {
 
-    Toast.makeText(getApplicationContext(), "image changes saved", Toast.LENGTH_LONG).show();
+    save_list();
 }
 
 private void save_list()
@@ -260,7 +277,7 @@ private void save_list()
     int r;
 
     Log.d("SS:ImageMgmt: save image list");
-    String list = "" + image_adapt.get_generation();
+    String list = "" + ss_generation;
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
         if (entry.get_check()) {
@@ -271,7 +288,28 @@ private void save_list()
             list = list + entry.get_name();
         }
     }
+    image_adapt.notifyDataSetChanged();
     pref.put("images", list);
+    go_back(null);
+}
+
+public void get_saved()
+{
+    int off;
+
+    String str = pref.get("images", "");
+    String[] strs = str.split(";");
+    ss_generation = Integer.parseInt(strs[0]);
+
+    saved_images = new HashMap<String, String>();
+
+    for (int i = 1; i < strs.length; i++) {
+        str = strs[i];
+        off = 1;
+        if (str.charAt(1) == 'R')
+            off += 4;
+        saved_images.put(str.substring(off), str.substring(0, off));
+    }
 }
 
 public void ok(View v)

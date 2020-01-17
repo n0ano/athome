@@ -9,6 +9,7 @@ $type = "get";
 $hidden = "";
 $maxw = 2048;
 $maxh = 2048;
+$rotate = 0;
 $host = "default";
 $list = "";
 $delta = 1;
@@ -20,15 +21,16 @@ $dirs = ".files";
 
 @tokens = split(/&/, $query);
 foreach my $t (@tokens) {
-	($type = $t)			if $t =~ /^get/;
-	($type = $t)			if $t =~ /^names/;
-	($hidden = $t)			if $t =~ /^all/;
-	($maxw = $t) =~ s/w=//		if $t =~ /^w=/;
-	($maxh = $t) =~ s/h=//		if $t =~ /^h=/;
-	($host = $t) =~ s/host=//	if $t =~ /^host=/;
-	($list = $t) =~ s/list=//	if $t =~ /^list=/;
+	($type = $t)				if $t =~ /^get/;
+	($type = $t)				if $t =~ /^names/;
+	($hidden = $t)				if $t =~ /^all/;
+	($maxw = $t) =~ s/w=//			if $t =~ /^w=/;
+	($maxh = $t) =~ s/h=//			if $t =~ /^h=/;
+	($rotate = $t) =~ s/r=//		if $t =~ /^r=/;
+	($host = $t) =~ s/host=//		if $t =~ /^host=/;
+	($list = $t) =~ s/list=//		if $t =~ /^list=/;
 	($name = uri_unescape($t)) =~ s/name=//	if $t =~ /^name=/;
-	($NOCACHE = 1) =~ s/nocache//	if $t =~ /^nocache/;
+	($NOCACHE = 1) =~ s/nocache//		if $t =~ /^nocache/;
 }
 
 $host = "default"		if $host eq "";
@@ -80,7 +82,7 @@ END
 sub get_image
 {
 	local ($h,$d,$n) = @_;
-	local ($t,$gen,$name,$F);
+	local ($r,$t,$gen,$name,$F);
 
 	print <<END;
 Content-type: application/octet-stream
@@ -102,7 +104,9 @@ END
 		} elsif ($fit = "fit") {
 			$suf = "";
 		}
-		$cmd = "convert \"$DIR$n\" -resize " . $maxw . "x" . $maxh . $suf . " -|";
+		$r = "";
+		$r = "-rotate $rotate"		if $rotate;
+		$cmd = "convert \"$DIR$n\" $r -resize " . $maxw . "x" . $maxh . $suf . " -|";
 	}
 	$name = $n;
 	$name =~ s/\//_/g;
@@ -132,7 +136,7 @@ sub cache_file
 		binmode $I;
 		return $I;
 	}
-	$cname = $cdir . "/" . $f . ":" . $w . "x" . $h;
+	$cname = $cdir . "/" . $f . ":" . $w . "x" . $h . ":" . $rotate;
 	$c = $c . "cat >$cname";
 	system($c)		if ! -f $cname;
 	open $I, "<$cname";

@@ -57,7 +57,7 @@ public void enable(String info)
     checked = false;
     if (info != null) {
         if ((info.length() > 1) && (info.charAt(1) == 'R'))
-            rotate = Integer.parseInt(info.substring(1,4));
+            rotate = Integer.parseInt(info.substring(2,5));
         checked = true;
     }
 }

@@ -77,13 +77,13 @@ private void undo_action()
 public void left_action()
 {
 
-Log.d(act.cur_image.get_name() + "rotate image left");
+    act.rotate(-90);
 }
 
 public void right_action()
 {
 
-Log.d(act.cur_image.get_name() + "rotate image right");
+    act.rotate(90);
 }
 
 public void info_action()

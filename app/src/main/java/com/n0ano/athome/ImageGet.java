@@ -60,7 +60,8 @@ private InputStream open_http(String image)
                 "&list=" + info.ss_list +
                 "&name=" + URLEncoder.encode(image) +
                 "&w=" + max_w +
-                "&h=" + max_h;
+                "&h=" + max_h +
+                "&r=" + entry.get_rotate();
         Log.d("SS:get image from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
 		in_rdr = new URL(url).openStream();

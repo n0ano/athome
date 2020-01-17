@@ -3,6 +3,7 @@ package com.n0ano.athome;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,8 +80,15 @@ public View getView(int position, View view, ViewGroup parent)
     iv.setTag(image);
     if (image.bitmap == null)
         iv.setImageResource(R.drawable.no);
-    else
-        iv.setImageBitmap(image.bitmap);
+    else {
+        if (image.get_rotate() == 0)
+            iv.setImageBitmap(image.bitmap);
+        else {
+            Matrix matrix  = new Matrix();
+            matrix.postRotate((float)image.get_rotate());
+            iv.setImageBitmap(Bitmap.createBitmap(image.bitmap, 0, 0, image.bitmap.getWidth(), image.bitmap.getHeight(), matrix, true));
+        }
+    }
 
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
@@ -116,26 +124,10 @@ private void get_names(final ImageFind image_find)
 
 private void done()
 {
-    int off;
 
-    String str = act.pref.get("images", "");
-    String[] strs = str.split(";");
-    image_find.ss_generation = Integer.parseInt(strs[0]);
-
-    Map<String, String> imgs = new HashMap<String, String>();
-
-    for (int i = 1; i < strs.length; i++) {
-        str = strs[i];
-        off = 1;
-        if (str.charAt(1) == 'R')
-            off += 4;
-        imgs.put(str.substring(off), str.substring(0, off));
-    }
-
-    Log.d("SS:Images:");
     for (ImageEntry img : images) {
-        Log.d("SS:image: " + img.get_name() + " - " + imgs.get(img.get_name()));
-        img.enable(imgs.get(img.get_name()));
+        //Log.d("SS:image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
+        img.enable(act.saved_images.get(img.get_name()));
     }
 
     final ImageAdapter me = this;
@@ -145,12 +137,6 @@ private void done()
             act.set_view(R.id.mgmt_gridview, R.id.mgmt_loading);
         }
     });
-}
-
-public int get_generation()
-{
-
-    return image_find.ss_generation;
 }
 
 }
