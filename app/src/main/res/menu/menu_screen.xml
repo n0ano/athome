@@ -8,14 +8,14 @@
         android:icon="@drawable/rotate_l"
         android:orderInCategory="100"
         android:title="Rotate left"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_right"
         android:icon="@drawable/rotate_r"
         android:orderInCategory="100"
         android:title="Rotate right"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_info"
