@@ -38,7 +38,7 @@ public boolean menu_click(int item)
     switch (item) {
 
     case R.id.action_undo:
-        act.go_back();
+        act.go_back(null);
         return true;
 
     case R.id.action_left:
@@ -73,7 +73,37 @@ public boolean menu_click(int item)
 public void info_action()
 {
 
-Log.d(act.cur_image.get_name() + "image info");
+    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.bar_info);
+    dialog.setCanceledOnTouchOutside(false);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.info_name);
+    tv.setText(act.cur_image.get_name());
+
+    CheckBox cb = (CheckBox) dialog.findViewById(R.id.info_selected);
+    cb.setChecked(act.cur_image.get_check());
+
+    tv = (TextView) dialog.findViewById(R.id.info_type);
+    tv.setText((act.cur_image.get_type() == C.IMAGE_LOCAL) ? "local" : "remote");
+
+    tv = (TextView) dialog.findViewById(R.id.info_rotate);
+    tv.setText(String.valueOf(act.cur_image.get_rotate()));
+
+    tv = (TextView) dialog.findViewById(R.id.info_width);
+    tv.setText(String.valueOf(act.cur_image.get_width()));
+
+    tv = (TextView) dialog.findViewById(R.id.info_height);
+    tv.setText(String.valueOf(act.cur_image.get_height()));
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    dialog.show();
 }
 
 }

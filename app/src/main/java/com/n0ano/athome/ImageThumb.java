@@ -49,6 +49,7 @@ private InputStream open_http(String image)
                 "&host=" + C.base(info.ss_host) +
                 "&list=" + info.ss_list +
                 "&name=" + URLEncoder.encode(image) +
+                "&xy" +
                 "&w=" + max_w +
                 "&h=" + max_h +
                 "&r=" + entry.get_rotate();
@@ -62,7 +63,18 @@ private InputStream open_http(String image)
 	}
     title = meta.get("T");
     title = ((title != null) ? title : "");
+    dimen(meta.get("D"));
     return in_rdr;
+}
+
+private void dimen(String dims)
+{
+
+    int off = dims.indexOf("x");
+    if (off < 0)
+        return;
+    entry.set_width(Integer.parseInt(dims.substring(0, off)));
+    entry.set_height(Integer.parseInt(dims.substring(off + 1)));
 }
 
 private InputStream open_image(ImageEntry entry)

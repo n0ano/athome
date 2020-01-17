@@ -6,6 +6,8 @@ public class ImageEntry implements Comparable<ImageEntry>
 {
 
 String name;
+int width;
+int height;
 int type;
 int ts;
 boolean checked;
@@ -19,6 +21,8 @@ public ImageEntry(String name, int type, int ts, int rotate, ScreenInfo info)
     this.type = type;
     this.ts = ts;
     this.rotate = rotate;
+    this.width = 0;
+    this.height = 0;
     this.bitmap = null;
     this.checked = true;
     if (info != null)
@@ -33,6 +37,8 @@ public ImageEntry(String name, int type, ScreenInfo info)
     this.type = type;
     this.ts = Integer.parseInt(name.substring(0, idx), 10);
     this.rotate = 0;
+    this.width = 0;
+    this.height = 0;
     this.bitmap = null;
     this.checked = true;
     if (info != null)
@@ -44,6 +50,12 @@ public String get_name() { return name; }
 public int get_type() { return type; }
 
 public int get_ts() { return ts; }
+
+public int get_width() { return width; }
+public void set_width(int w) { width = w; }
+
+public int get_height() { return height; }
+public void set_height(int h) { height = h; }
 
 public int get_rotate() { return rotate; }
 public void set_rotate(int r) { rotate = r; }

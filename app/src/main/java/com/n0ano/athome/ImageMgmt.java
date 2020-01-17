@@ -256,7 +256,7 @@ public void go_grid()
     set_view(R.id.mgmt_gridview, R.id.mgmt_imageview);
 }
 
-public void go_back()
+public void go_back(View v)
 {
 
     if (mgmt_view == R.id.mgmt_imageview)
@@ -319,7 +319,7 @@ private void save_list()
     }
     image_adapt.notifyDataSetChanged();
     pref.put("images", list);
-    go_back();
+    go_back(null);
 }
 
 public void get_saved()
