@@ -45,14 +45,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
-import com.n0ano.athome.SS.ImageFind;
 import com.n0ano.athome.SS.ImageMgmt;
 import com.n0ano.athome.SS.ScreenInfo;
 import com.n0ano.athome.SS.ScreenSaver;
 import com.n0ano.athome.SS.MyGesture;
 import com.n0ano.athome.SS.SS_Callbacks;
 
-public class MainActivity extends AppCompatActivity implements SS_Callbacks
+public class MainActivity extends AppCompatActivity
 {
 
 public final static int BATTERY_LOW  = 20;
@@ -118,14 +117,10 @@ public boolean screen = true;
 private int screen_bright = -1;
 
 public ScreenSaver ss_saver;
-public ImageFind image_find;
-public int ss_offset = 0;
-public int ss_start = 0;        // seconds, 0 = none
-public int ss_delay = 0;        // seconds
-public int ss_fade = 0;
 private GestureDetectorCompat ss_gesture;
 
 public ScreenInfo ss_info;
+private int ss_offset = 0;
 
 public int on_time = -1;        // (hour * 100) + minute, -1 = none
 public int off_time = -1;       // (hour * 100) + minute, -1 = none
@@ -184,8 +179,56 @@ protected void onResume()
 //test_parse();
 
     restore_state();
-    ss_saver = new ScreenSaver(this, (View) findViewById(R.id.saver_view1), (View) findViewById(R.id.saver_view2));
-    image_find = new ImageFind((Activity) this, ss_info);
+    ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
+        @Override
+        public ScreenInfo ss_start()
+        {
+            Log.d("DDD-SS", "screen saver start");
+            View v = (View)findViewById(R.id.scroll_view);
+            ss_info.width =  v.getWidth();
+            v = (View)findViewById(R.id.scroll_view);
+            ss_info.height =  v.getHeight();
+
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                    icon.setIcon(R.drawable.play);
+                    View v = (View)findViewById(R.id.scroll_view);
+                    v.setAlpha(1.0f);
+                }
+            });
+
+            return ss_info;
+        }
+
+        @Override
+        public void ss_stop()
+        {
+            Log.d("DDD-SS", "screen saver stop");
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                    icon.setIcon(R.drawable.monitor);
+                    display(screen);
+                }
+            });
+        }
+
+        @Override
+        public void ss_icon(final int icon_id)
+        {
+            Log.d("DDD-SS", "screen icon - " + icon_id);
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                    icon.setIcon(icon_id);
+                }
+            });
+        }
+    });
+
+    ss_gesture = new GestureDetectorCompat(this, new MyGesture(ss_saver));
+
     doit();
 }
 
@@ -265,20 +308,6 @@ public boolean onTouchEvent(MotionEvent event)
     return super.onTouchEvent(event);
 }
 
-@Override
-public void ss_start()
-{
-
-Log.d("DDD-SS", "screen savere start");
-}
-
-@Override
-public void ss_stop()
-{
-
-Log.d("DDD-SS", "screen savere stop");
-}
-
 private void start_home(Bundle state)
 {
 
@@ -308,8 +337,6 @@ private void start_home(Bundle state)
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     popup = new Popup(this, pref);
-
-    ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
 
     display(true);
 }
@@ -445,9 +472,6 @@ private void restore_state()
     on_time = pref.get("general_on", -1);
     off_time = pref.get("general_off", -1);
 
-    ss_start = pref.get("ss_start", 0);
-    ss_delay = pref.get("ss_delay", 0);
-    ss_fade = pref.get("ss_fade", 0);
     ss_info = new ScreenInfo(pref);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
@@ -978,8 +1002,6 @@ private void clock()
         display(false);
     else if (on_time >= 0 && time == on_time && !screen)
         display(true);
-
-    ss_saver.screen_saver(C.SAVER_TICK);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv == null)

@@ -21,11 +21,10 @@ import com.n0ano.athome.R;
 import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
 
-public class ImageGet extends Thread
+public class ImageGet
 {
 
 private ScreenSaver act;
-private MainActivity m_act;
 
 private ScreenInfo info;
 private ImageEntry entry;
@@ -34,22 +33,35 @@ private String title;
 private View img_start;
 private View img_end;
 
-private int max_w;
-private int max_h;
-
 private HashMap<String, String> meta;
 
-public ImageGet(ScreenSaver act, ScreenInfo info, ImageEntry entry, int max_w, int max_h, View img_start, View img_end)
+public ImageGet(ScreenSaver act, ScreenInfo info, ImageEntry entry, View img_start, View img_end)
 {
+	InputStream in_rdr;
+    final Bitmap bitmap;
+    int gen = 0;
 
     this.act = act;
-    this.m_act = act.act;
     this.info = info;
     this.entry = entry;
-    this.max_w = max_w;
-    this.max_h = max_h;
     this.img_start = img_start;
     this.img_end = img_end;
+
+	try {
+        in_rdr = open_image(entry);
+        bitmap = BitmapFactory.decodeStream(in_rdr);
+        in_rdr.close();
+        gen = Integer.parseInt(meta.get("E"), 10);
+	} catch (Exception e) {
+		Log.d("DDD-SS", "get image failed - " + e);
+		return;
+	}
+    if (bitmap == null)
+        Log.d("DDD-SS", "image decode failed");
+    else
+        Log.d("DDD-SS", "image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
+
+    act.show_image(bitmap, title, img_start, img_end, gen);
 }
 
 private InputStream open_http(String image)
@@ -58,17 +70,17 @@ private InputStream open_http(String image)
 	InputStream in_rdr;
 
 	try {
-        url = info.ss_server +
+        url = info.server +
                 C.CGI_BIN +
                 "?get" +
-                "&host=" + C.base(info.ss_host) +
-                "&list=" + info.ss_list +
+                "&host=" + C.base(info.host) +
+                "&list=" + info.list +
                 "&name=" + URLEncoder.encode(image) +
-                "&w=" + max_w +
-                "&h=" + max_h +
+                "&w=" + info.width +
+                "&h=" + info.height +
                 "&r=" + entry.get_rotate();
         Log.d("DDD-SS", "get image from " + url);
-        Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
+        Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());
 	} catch (Exception e) {
@@ -90,43 +102,6 @@ private InputStream open_image(ImageEntry entry)
 //    else if (entry.get_type() == C.IMAGE_LOCAL)
 //        return file open
     return null;
-}
-
-public void run()
-{
-	InputStream in_rdr;
-    final Bitmap bitmap;
-    int gen = 0;
-
-	try {
-        in_rdr = open_image(entry);
-        bitmap = BitmapFactory.decodeStream(in_rdr);
-        in_rdr.close();
-        gen = Integer.parseInt(meta.get("E"), 10);
-        if (gen != act.ss_generation)
-            act.get_names(m_act.image_find, gen);
-	} catch (Exception e) {
-		Log.d("DDD-SS", "get image failed - " + e);
-		return;
-	}
-    if (bitmap == null)
-        Log.d("DDD-SS", "image decode failed");
-    else
-        Log.d("DDD-SS", "image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
-
-    m_act.runOnUiThread(new Runnable() {
-        public void run() {
-            ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
-            if (bitmap == null)
-                iv.setImageResource(R.drawable.no);
-            else
-                iv.setImageBitmap(bitmap);
-            TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
-            tv.setText(title);
-            if (img_start != null)
-                act.do_fade(img_start, img_end);
-        }
-    });
 }
 
 }

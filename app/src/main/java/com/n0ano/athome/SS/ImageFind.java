@@ -72,14 +72,14 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
 
     HashMap<String, String> meta = new HashMap<String, String>();
     try {
-        url = info.ss_server +
+        url = info.server +
                 C.CGI_BIN +
                 "?names" +
                 (hidden ? "&all" : "") +
-                "&host=" + C.base(info.ss_host) +
-                "&list=" + info.ss_list;
+                "&host=" + C.base(info.host) +
+                "&list=" + info.list;
         Log.d("DDD-SS", "get names from " + url);
-        Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
+        Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
         in_rdr = new URL(url).openStream();
         for (;;) {
             str = C.meta_line(in_rdr);

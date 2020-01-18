@@ -3,6 +3,7 @@ package com.n0ano.athome.SS;
 public interface SS_Callbacks
 {
 
-    void ss_start();
+    ScreenInfo ss_start();
     void ss_stop();
+    void ss_icon(int icon_id);
 }

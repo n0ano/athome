@@ -16,22 +16,6 @@ public final static String CGI_BIN = "/cgi-bin/explore.dd/get_frame";
 public final static int IMAGE_LOCAL =   0;
 public final static int IMAGE_REMOTE =  1;
 
-//
-//  Commands to the scren saver controller
-//
-public final static int SAVER_RESET =   0;  // reset the counter
-public final static int SAVER_TICK =    1;  // timer tic occurred
-public final static int SAVER_BLOCK =   2;  // block saver while popups displayed
-public final static int SAVER_FREEZE =  3;  // toggle frozen state
-
-//
-//  Screen saver states
-//
-public final static int SAVER_COUNTING =    0;  // counting down to start
-public final static int SAVER_SHOWING =     1;  // saver actively running
-public final static int SAVER_BLOCKED =     2;  // block for popups
-public final static int SAVER_FROZEN =      3;  // freeze saver with picture displayed
-
 public static TextView loading_name = null;
 
 public static int a2i(String num)

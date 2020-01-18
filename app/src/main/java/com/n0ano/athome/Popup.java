@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.n0ano.athome.Log;
 import com.n0ano.athome.SS.Faders;
+import com.n0ano.athome.SS.ScreenSaver;
 
 public class Popup extends MainActivity
 {
@@ -140,7 +141,7 @@ private Dialog start_dialog(int id)
 
     dialog.show();
 
-    act.ss_saver.screen_saver(C.SAVER_BLOCK);
+    act.ss_saver.screen_saver(ScreenSaver.SAVER_BLOCK);
 
     return dialog;
 }
@@ -148,7 +149,7 @@ private Dialog start_dialog(int id)
 public void end_dialog(Dialog dialog)
 {
 
-    act.ss_saver.screen_saver(C.SAVER_RESET);
+    act.ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
     dialog.dismiss();
 }
 
@@ -620,16 +621,16 @@ private void screen_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_screen);
 
     final EditText ss_start = (EditText) dialog.findViewById(R.id.screen_start);
-    ss_start.setText(act.ss_start > 0 ? C.i2a(act.ss_start) : "");
+    ss_start.setText(act.ss_info.start > 0 ? C.i2a(act.ss_info.start) : "");
 
     final EditText ss_delay = (EditText) dialog.findViewById(R.id.screen_delay);
-    ss_delay.setText(act.ss_start > 0 ? C.i2a(act.ss_delay) : "");
+    ss_delay.setText(act.ss_info.start > 0 ? C.i2a(act.ss_info.delay) : "");
 
     final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, Faders.types);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     ss_fade.setAdapter(adapter);
-    ss_fade.setSelection(type_pos = act.ss_fade);
+    ss_fade.setSelection(type_pos = act.ss_info.fade);
     ss_fade.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -644,16 +645,16 @@ private void screen_dialog()
     });
 
     final EditText et_host = (EditText) dialog.findViewById(R.id.screen_host);
-    et_host.setText(act.ss_info.ss_host);
+    et_host.setText(act.ss_info.host);
 
     final EditText et_server = (EditText) dialog.findViewById(R.id.screen_server);
-    et_server.setText(act.ss_info.ss_server);
+    et_server.setText(act.ss_info.server);
 
     final EditText et_user = (EditText) dialog.findViewById(R.id.screen_user);
-    et_user.setText(act.ss_info.ss_user);
+    et_user.setText(act.ss_info.user);
 
     final EditText et_pwd = (EditText) dialog.findViewById(R.id.screen_pwd);
-    et_pwd.setText(act.ss_info.ss_pwd);
+    et_pwd.setText(act.ss_info.pwd);
 
     Button mgmt = (Button) dialog.findViewById(R.id.screen_mgmt);
     mgmt.setOnClickListener(new OnClickListener() {
@@ -668,33 +669,32 @@ private void screen_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.ss_info.ss_host = et_host.getText().toString();
-            pref.put("ss_host", act.ss_info.ss_host);
-            act.ss_info.ss_list = C.suffix(act.ss_info.ss_host);
-            act.ss_info.ss_server = et_server.getText().toString();
-            pref.put("ss_server", act.ss_info.ss_server);
-            act.ss_info.ss_user = et_user.getText().toString();
-            pref.put("ss_user", act.ss_info.ss_user);
-            act.ss_info.ss_pwd = et_pwd.getText().toString();
-            pref.put("ss_pwd", act.ss_info.ss_pwd);
+            act.ss_info.host = et_host.getText().toString();
+            pref.put("ss_host", act.ss_info.host);
+            act.ss_info.list = C.suffix(act.ss_info.host);
+            act.ss_info.server = et_server.getText().toString();
+            pref.put("ss_server", act.ss_info.server);
+            act.ss_info.user = et_user.getText().toString();
+            pref.put("ss_user", act.ss_info.user);
+            act.ss_info.pwd = et_pwd.getText().toString();
+            pref.put("ss_pwd", act.ss_info.pwd);
 
             try {
-                act.ss_start = C.a2i(ss_start.getText().toString());
+                act.ss_info.start = C.a2i(ss_start.getText().toString());
             } catch (Exception e) {
-                act.ss_start = 0;
+                act.ss_info.start = 0;
             }
-            pref.put("ss_start", act.ss_start);
-            if (act.ss_start > 0) {
+            pref.put("ss_start", act.ss_info.start);
+            if (act.ss_info.start > 0) {
                 try {
-                    act.ss_delay = C.a2i(ss_delay.getText().toString());
+                    act.ss_info.delay = C.a2i(ss_delay.getText().toString());
                 } catch (Exception e) {
-                    act.ss_delay = SS_DELAY;
+                    act.ss_info.delay = SS_DELAY;
                 }
-                pref.put("ss_delay", act.ss_delay);
+                pref.put("ss_delay", act.ss_info.delay);
             }
-            act.ss_fade = type_pos;
-            pref.put("ss_fade", act.ss_fade);
-            act.ss_saver.screen_saver(C.SAVER_RESET);
+            act.ss_info.fade = type_pos;
+            pref.put("ss_fade", act.ss_info.fade);
 
             end_dialog(dialog);
         }

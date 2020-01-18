@@ -91,7 +91,7 @@ protected void onCreate(Bundle state)
 //    }
 
     screen_info = new ScreenInfo(pref);
-    if (screen_info.ss_host.isEmpty()) {
+    if (screen_info.host.isEmpty()) {
         finish();
         return;
     }

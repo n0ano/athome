@@ -2,10 +2,12 @@ package com.n0ano.athome.SS;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,38 +55,83 @@ import com.n0ano.athome.SS.Faders;
 
 import com.n0ano.athome.R;
 import com.n0ano.athome.MainActivity;
+import com.n0ano.athome.Preferences;
 import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
 
 public class ScreenSaver
 {
 
-MainActivity act;
+//
+//  Commands to the scren saver controller
+//
+public final static int SAVER_RESET =   0;  // reset the counter
+public final static int SAVER_TICK =    1;  // timer tic occurred
+public final static int SAVER_BLOCK =   2;  // block saver while popups displayed
+public final static int SAVER_FREEZE =  3;  // toggle frozen state
+
+//
+//  Screen saver states
+//
+public final static int SAVER_COUNTING =    0;  // counting down to start
+public final static int SAVER_SHOWING =     1;  // saver actively running
+public final static int SAVER_BLOCKED =     2;  // block for popups
+public final static int SAVER_FROZEN =      3;  // freeze saver with picture displayed
+
+Activity act;
+SS_Callbacks callbacks;
+Preferences pref;
+Thread main_thread;
 
 ArrayList<ImageEntry> images;
 private int ss_current;
 
-public int ss_generation = -1;
+private ScreenInfo ss_info;
+private ImageFind image_find;
+
 private int ss_counter = 0;
-public int ss_state = C.SAVER_BLOCKED;
-private int ss_viewid = 0;
+public int state = SAVER_BLOCKED;
+
+private View first;
 private View[] ss_views = new View[2];
+private int ss_viewid = 0;
 private Faders faders;
 
-public ScreenSaver(MainActivity act, View v1, View v2)
+boolean click = false;
+boolean flick = false;
+int flick_dir;
+
+public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks callbacks)
 {
 
     Log.d("DDD-SS", "screen saver started");
     this.act = act;
+    this.callbacks = callbacks;
+
+    pref = new Preferences(act);
+
+    ss_info = new ScreenInfo(pref);
+
+    image_find = new ImageFind(act, ss_info);
+
+    this.first = first;
     ss_views[0] = v1;
     ss_views[1] = v2;
     hide_views();
 
     images = new ArrayList<ImageEntry>();
     faders = new Faders(this);
-    ss_state = C.SAVER_BLOCKED;
+    state = SAVER_BLOCKED;
 
-    set_images();
+    //
+    //  Start the main loop in its own thread
+    //
+    main_thread = new Thread(new Runnable() {
+        public void run() {
+            main_loop();
+        }
+    });
+    main_thread.start();
 }
 
 public void hide_views()
@@ -97,29 +145,7 @@ public void hide_views()
 public void do_fade(View start, View end)
 {
 
-    faders.fade(act.ss_fade, start, end, ss_width(), ss_height());
-}
-
-public void cancel_fade()
-{
-
-    View v = (View)act.findViewById(R.id.scroll_view);
-    v.setAlpha(1.0f);
-    act.display(act.screen);
-}
-
-private int ss_width()
-{
-
-    View v = (View)act.findViewById(R.id.scroll_view);
-    return v.getWidth();
-}
-
-private int ss_height()
-{
-
-    View v = (View)act.findViewById(R.id.scroll_view);
-    return v.getHeight();
+    faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height);
 }
 
 private ImageEntry ss_next(int delta)
@@ -135,45 +161,82 @@ private ImageEntry ss_next(int delta)
     return images.get(ss_current);
 }
 
+public void show_image(final Bitmap bitmap, final String title, final View img_start, final View img_end, int gen)
+{
+
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
+            if (bitmap == null)
+                iv.setImageResource(R.drawable.no);
+            else
+                iv.setImageBitmap(bitmap);
+            TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
+            tv.setText(title);
+            if (img_start != null)
+                do_fade(img_start, img_end);
+        }
+    });
+    get_names(gen);
+}
+
 public void saver_fade(int delta)
 {
 
     int old = ss_viewid;
     ss_viewid ^= 1;
-    ss_counter = act.ss_delay;
+    ss_counter = ss_info.delay;
 
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, act.ss_info, ss_next(delta), ss_width(), ss_height(), ss_views[old], ss_views[ss_viewid]);
-    ig.start();
+    ImageGet ig = new ImageGet(this, ss_info, ss_next(delta), ss_views[old], ss_views[ss_viewid]);
 }
 
 public void saver_fling(int dir)
 {
 
-//Log.d("DDD-SS", "state - " + ss_state + ", " + dir);
-    if (ss_state == C.SAVER_FROZEN)
-        saver_fade(dir);
+Log.d("DDD-SS", "fling state - " + state + ", " + dir);
+    flick = true;
+    flick_dir = dir;
+    main_thread.interrupt();
+}
+
+public void flicked()
+{
+
+    if (flick) {
+        if (state == SAVER_FROZEN)
+            saver_fade(flick_dir);
+    }
+    flick = false;
 }
 
 public void saver_click()
 {
 
-    if (ss_state == C.SAVER_COUNTING)
+    click = true;
+    main_thread.interrupt();
+}
+
+public void clicked()
+{
+
+    if (!click)
+        return;
+    click = false;
+
+    if (state == SAVER_COUNTING)
         saver_start();
     else {
-        MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
-        if (ss_state == C.SAVER_FROZEN) {
-            ss_state = C.SAVER_SHOWING;
-            ss_counter = act.ss_delay;
-            act.ss_fade = act.pref.get("ss_fade", 0);
-            icon.setIcon(R.drawable.play);
+        if (state == ScreenSaver.SAVER_FROZEN) {
+            state = ScreenSaver.SAVER_SHOWING;
+            callbacks.ss_icon(R.drawable.play);
+            ss_counter = ss_info.delay;
             saver_fade(1);
         } else {
-            ss_state = C.SAVER_FROZEN;
-            act.ss_fade = 5;
-            icon.setIcon(R.drawable.pause);
+            state = SAVER_FROZEN;
+            callbacks.ss_icon(R.drawable.pause);
         }
     }
 }
@@ -182,12 +245,9 @@ public void saver_start()
 {
 
 Log.d("DDD-SS", "saver: start");
-    act.ss_start();
-    ss_state = C.SAVER_SHOWING;
-    ss_counter = act.ss_delay;
-    act.ss_fade = act.pref.get("ss_fade", 0);
-    MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
-    icon.setIcon(R.drawable.play);
+    ss_info = callbacks.ss_start();
+    state = SAVER_SHOWING;
+    ss_counter = ss_info.delay;
 
     ss_views[0].setVisibility(View.GONE);
     ss_views[0].setAlpha(1.0f);
@@ -201,52 +261,44 @@ Log.d("DDD-SS", "saver: start");
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, act.ss_info, ss_next(1), ss_width(), ss_height(), (View)act.findViewById(R.id.scroll_view), ss_views[ss_viewid]);
-    ig.start();
+    ImageGet ig = new ImageGet(this, ss_info, ss_next(1), first, ss_views[ss_viewid]);
 }
 
 public void screen_saver(int tick)
 {
 
-    if (ss_state == C.SAVER_FROZEN)
+    if (state == SAVER_FROZEN)
         return;
 
     switch (tick) {
 
-    case C.SAVER_BLOCK:
-        ss_state = C.SAVER_BLOCKED;
+    case SAVER_BLOCK:
+        state = SAVER_BLOCKED;
         break;
 
-    case C.SAVER_FREEZE:
-        ss_state = ((ss_state == C.SAVER_FROZEN) ? C.SAVER_SHOWING : C.SAVER_FROZEN);
+    case SAVER_FREEZE:
+        state = ((state == SAVER_FROZEN) ? SAVER_SHOWING : SAVER_FROZEN);
         break;
 
-    case C.SAVER_TICK:
-        if (ss_state != C.SAVER_BLOCKED) {
+    case SAVER_TICK:
+        if (state != SAVER_BLOCKED) {
             if (--ss_counter == 0) {
-                act.runOnUiThread(new Runnable() {
-                    public void run() {
-                        ss_counter = act.ss_delay;
-                        if (ss_state == C.SAVER_SHOWING)
-                            saver_fade(1);
-                        else
-                            saver_start();
-                    }
-                });
+                ss_counter = ss_info.delay;
+                if (state == SAVER_SHOWING)
+                    saver_fade(1);
+                else
+                    saver_start();
             }
         }
         break;
 
-    case C.SAVER_RESET:
-        if (ss_state == C.SAVER_SHOWING) {
-            act.ss_stop();
-            MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
-            icon.setIcon(R.drawable.monitor);
-            cancel_fade();
+    case SAVER_RESET:
+        if (state == SAVER_SHOWING) {
+            callbacks.ss_stop();
             hide_views();
         }
-        ss_counter = act.ss_start;
-        ss_state = ((act.ss_start == 0) ? C.SAVER_BLOCKED : C.SAVER_COUNTING);
+        ss_counter = ss_info.start;
+        state = ((ss_info.start == 0) ? SAVER_BLOCKED : SAVER_COUNTING);
         break;
 
     }
@@ -255,41 +307,33 @@ public void screen_saver(int tick)
 public boolean touch()
 {
 
-    if ((ss_state == C.SAVER_SHOWING) && !faders.fading()) {
-        screen_saver(C.SAVER_RESET);
+    if ((state == SAVER_SHOWING) && !faders.fading()) {
+        screen_saver(SAVER_RESET);
         return false;
     }
     return true;
 }
 
-public void get_names(final ImageFind image_find, final int gen)
+public void get_names(int gen)
 {
 
-    if (gen != ss_generation)
-        new Thread(new Runnable() {
-            public void run() {
-                images = image_find.find_local(new ArrayList<ImageEntry>());
-                images = image_find.find_remote(true, images, false);
-                Collections.sort(images);
+    if (gen != ss_info.generation) {
+        images = image_find.find_local(new ArrayList<ImageEntry>());
+        images = image_find.find_remote(true, images, false);
+        Collections.sort(images);
 Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_generation);
-                ss_generation = image_find.ss_generation;
-                ss_current = images.size();
-                if (ss_current > 0) {
-                    ss_state = C.SAVER_BLOCKED;
-                    screen_saver(C.SAVER_RESET);
-                }
-            }
-        }).start();
+        ss_info.generation = image_find.ss_generation;
+    }
 }
 
 private void set_images()
 {
     int t, r, off;
 
-    String str = act.pref.get("images", "");
+    String str = pref.get("images", "");
     String[] imgs = str.split(";");
     if (imgs.length > 1) {
-        ss_generation = Integer.parseInt(imgs[0], 10);
+        ss_info.generation = Integer.parseInt(imgs[0], 10);
         for (int i = 1; i < imgs.length; i++) {
             String name = imgs[i];
             if (!name.isEmpty()) {
@@ -307,8 +351,28 @@ private void set_images()
     ss_current = images.size();
 Log.d("DDD-SS", "set_images - " + images.size());
     if (images.size() > 0) {
-        ss_state = C.SAVER_BLOCKED;
-        screen_saver(C.SAVER_RESET);
+        state = SAVER_BLOCKED;
+        screen_saver(SAVER_RESET);
+    }
+}
+
+//
+//  Main loop runs in its own thread
+//
+private void main_loop()
+{
+
+    set_images();
+
+    for (;;) {
+        try {
+            Thread.sleep(1000);
+            screen_saver(SAVER_TICK);
+        } catch (Exception e) {
+            Log.d("DDD-SS", "main loop interrupted");
+            clicked();
+            flicked();
+        }
     }
 }
 

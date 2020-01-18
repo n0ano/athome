@@ -46,18 +46,18 @@ private InputStream open_http(String image)
 	InputStream in_rdr;
 
 	try {
-        url = info.ss_server +
+        url = info.server +
                 C.CGI_BIN +
                 "?get" +
-                "&host=" + C.base(info.ss_host) +
-                "&list=" + info.ss_list +
+                "&host=" + C.base(info.host) +
+                "&list=" + info.list +
                 "&name=" + URLEncoder.encode(image) +
                 "&xy" +
                 "&w=" + max_w +
                 "&h=" + max_h +
                 "&r=" + entry.get_rotate();
         Log.d("DDD-SS", "get image from " + url);
-        Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
+        Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());
 	} catch (Exception e) {

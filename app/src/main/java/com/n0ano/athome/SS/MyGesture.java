@@ -9,14 +9,12 @@ import android.view.View.OnClickListener;
 
 import java.util.Random;
 
-import com.n0ano.athome.MainActivity;
-
 public class MyGesture extends GestureDetector.SimpleOnGestureListener
 {
 
-MainActivity act;
+ScreenSaver act;
 
-public MyGesture(MainActivity act)
+public MyGesture(ScreenSaver act)
 {
 
     this.act = act;
@@ -35,7 +33,7 @@ public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, 
 
     //  velocityX > 0 => swipe right
     //            < 0 => swipe left
-    act.ss_saver.saver_fling(velocityX < 0 ? 1 : -1);
+    act.saver_fling(velocityX < 0 ? 1 : -1);
     return true;
 }
 
