@@ -182,6 +182,7 @@ public void saver_start()
 {
 
 Log.d("DDD-SS", "saver: start");
+    act.ss_start();
     ss_state = C.SAVER_SHOWING;
     ss_counter = act.ss_delay;
     act.ss_fade = act.pref.get("ss_fade", 0);
@@ -238,6 +239,7 @@ public void screen_saver(int tick)
 
     case C.SAVER_RESET:
         if (ss_state == C.SAVER_SHOWING) {
+            act.ss_stop();
             MenuItem icon = act.menu_bar.findItem(R.id.action_saver);
             icon.setIcon(R.drawable.monitor);
             cancel_fade();

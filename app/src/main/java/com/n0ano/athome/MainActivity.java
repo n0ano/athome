@@ -50,8 +50,9 @@ import com.n0ano.athome.SS.ImageMgmt;
 import com.n0ano.athome.SS.ScreenInfo;
 import com.n0ano.athome.SS.ScreenSaver;
 import com.n0ano.athome.SS.MyGesture;
+import com.n0ano.athome.SS.SS_Callbacks;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements SS_Callbacks
 {
 
 public final static int BATTERY_LOW  = 20;
@@ -262,6 +263,20 @@ public boolean onTouchEvent(MotionEvent event)
 
     ss_gesture.onTouchEvent(event);
     return super.onTouchEvent(event);
+}
+
+@Override
+public void ss_start()
+{
+
+Log.d("DDD-SS", "screen savere start");
+}
+
+@Override
+public void ss_stop()
+{
+
+Log.d("DDD-SS", "screen savere stop");
 }
 
 private void start_home(Bundle state)
