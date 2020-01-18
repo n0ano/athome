@@ -1,17 +1,10 @@
 package com.n0ano.athome;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.n0ano.athome.Log;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 // Created by n0ano on 10/10/16.
 //

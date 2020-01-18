@@ -1,8 +1,6 @@
 package com.n0ano.athome;
 
 import android.app.Dialog;
-import android.content.Intent;
-import android.net.Uri;
 import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,7 +15,6 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.n0ano.athome.Log;
 import com.n0ano.athome.SS.Faders;
 import com.n0ano.athome.SS.ScreenSaver;
 

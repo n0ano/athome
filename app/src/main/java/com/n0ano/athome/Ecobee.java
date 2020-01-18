@@ -1,28 +1,9 @@
 package com.n0ano.athome;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.NumberPicker;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 
-import com.n0ano.athome.Log;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 // Created by n0ano on 10/10/16.
 //

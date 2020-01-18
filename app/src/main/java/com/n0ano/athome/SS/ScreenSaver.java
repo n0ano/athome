@@ -1,60 +1,16 @@
 package com.n0ano.athome.SS;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.BatteryManager;
-import android.os.Bundle;
-import android.os.SystemClock;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Iterator;
-
-import com.n0ano.athome.SS.Faders;
 
 import com.n0ano.athome.R;
-import com.n0ano.athome.MainActivity;
 import com.n0ano.athome.Preferences;
 import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
@@ -78,6 +34,13 @@ public final static int SAVER_SHOWING =     1;  // saver actively running
 public final static int SAVER_BLOCKED =     2;  // block for popups
 public final static int SAVER_FROZEN =      3;  // freeze saver with picture displayed
 
+//
+//  Main loop interruption types
+//
+public final static int INTR_NONE =      0;
+public final static int INTR_START =     1;  // start the saver
+public final static int INTR_NEXT =      2;  // next image
+
 Activity act;
 SS_Callbacks callbacks;
 Preferences pref;
@@ -97,9 +60,9 @@ private View[] ss_views = new View[2];
 private int ss_viewid = 0;
 private Faders faders;
 
-boolean click = false;
-boolean flick = false;
+int intr_type = INTR_NONE;
 int flick_dir;
+int fade_type;
 
 public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks callbacks)
 {
@@ -193,51 +156,52 @@ public void saver_fade(int delta)
     ImageGet ig = new ImageGet(this, ss_info, ss_next(delta), ss_views[old], ss_views[ss_viewid]);
 }
 
-public void saver_fling(int dir)
-{
-
-Log.d("DDD-SS", "fling state - " + state + ", " + dir);
-    flick = true;
-    flick_dir = dir;
-    main_thread.interrupt();
-}
-
-public void flicked()
-{
-
-    if (flick) {
-        if (state == SAVER_FROZEN)
-            saver_fade(flick_dir);
-    }
-    flick = false;
-}
-
 public void saver_click()
 {
 
-    click = true;
+    intr_type = INTR_START;
     main_thread.interrupt();
 }
 
-public void clicked()
+public void saver_fling(int dir)
 {
 
-    if (!click)
-        return;
-    click = false;
+    flick_dir = dir;
 
-    if (state == SAVER_COUNTING)
-        saver_start();
-    else {
-        if (state == ScreenSaver.SAVER_FROZEN) {
-            state = ScreenSaver.SAVER_SHOWING;
-            callbacks.ss_icon(R.drawable.play);
-            ss_counter = ss_info.delay;
-            saver_fade(1);
-        } else {
-            state = SAVER_FROZEN;
-            callbacks.ss_icon(R.drawable.pause);
+    intr_type = INTR_NEXT;
+    main_thread.interrupt();
+}
+
+public void intr(int type)
+{
+
+    intr_type = INTR_NONE;
+    switch (type) {
+
+    case INTR_START:
+        if (state == SAVER_COUNTING)
+            saver_start();
+        else {
+            if (state == ScreenSaver.SAVER_FROZEN) {
+                callbacks.ss_icon(R.drawable.play);
+                state = ScreenSaver.SAVER_SHOWING;
+                ss_counter = ss_info.delay;
+                ss_info.fade = fade_type;
+                saver_fade(1);
+            } else {
+                callbacks.ss_icon(R.drawable.pause);
+                state = SAVER_FROZEN;
+                fade_type = ss_info.fade;
+                ss_info.fade = 5;
+            }
         }
+        break;
+
+    case INTR_NEXT:
+        if (state == SAVER_FROZEN)
+            saver_fade(flick_dir);
+        break;
+
     }
 }
 
@@ -370,8 +334,7 @@ private void main_loop()
             screen_saver(SAVER_TICK);
         } catch (Exception e) {
             Log.d("DDD-SS", "main loop interrupted");
-            clicked();
-            flicked();
+            intr(intr_type);
         }
     }
 }

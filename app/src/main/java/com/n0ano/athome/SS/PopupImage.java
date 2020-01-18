@@ -1,23 +1,12 @@
 package com.n0ano.athome.SS;
 
 import android.app.Dialog;
-import android.content.Intent;
-import android.net.Uri;
-import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.n0ano.athome.Log;
 import com.n0ano.athome.Preferences;
 import com.n0ano.athome.R;
 import com.n0ano.athome.C;

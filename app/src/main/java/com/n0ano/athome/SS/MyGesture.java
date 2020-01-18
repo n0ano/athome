@@ -1,13 +1,7 @@
 package com.n0ano.athome.SS;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
-
-import java.util.Random;
 
 public class MyGesture extends GestureDetector.SimpleOnGestureListener
 {

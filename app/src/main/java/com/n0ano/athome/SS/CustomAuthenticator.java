@@ -1,7 +1,5 @@
 package com.n0ano.athome.SS;
 
-import com.n0ano.athome.Log;
-
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 

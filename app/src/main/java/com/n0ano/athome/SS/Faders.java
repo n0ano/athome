@@ -3,7 +3,6 @@ package com.n0ano.athome.SS;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import java.util.Random;
