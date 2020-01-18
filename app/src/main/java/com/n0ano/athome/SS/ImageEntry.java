@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.graphics.Bitmap;
 

@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.n0ano.athome.R;
+import com.n0ano.athome.Log;
 
 public class ImageAdapter extends BaseAdapter
 {

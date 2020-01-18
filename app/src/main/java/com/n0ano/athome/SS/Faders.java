@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -8,7 +8,9 @@ import android.widget.TextView;
 
 import java.util.Random;
 
-public class SS_Faders
+import com.n0ano.athome.R;
+
+public class Faders
 {
 
 private final static int FADE_START =   0;
@@ -32,7 +34,7 @@ private int duration = 2000;
 
 private int active;
 
-public SS_Faders(ScreenSaver ctx)
+public Faders(ScreenSaver ctx)
 {
 
     this.ctx = ctx;

@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +15,11 @@ import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+
+import com.n0ano.athome.MainActivity;
+import com.n0ano.athome.R;
+import com.n0ano.athome.C;
+import com.n0ano.athome.Log;
 
 public class ImageGet extends Thread
 {

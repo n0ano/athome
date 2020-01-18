@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import java.util.Random;
+
+import com.n0ano.athome.MainActivity;
 
 public class MyGesture extends GestureDetector.SimpleOnGestureListener
 {

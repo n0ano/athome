@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -48,6 +48,13 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 
+import com.n0ano.athome.SS.Faders;
+
+import com.n0ano.athome.R;
+import com.n0ano.athome.MainActivity;
+import com.n0ano.athome.C;
+import com.n0ano.athome.Log;
+
 public class ScreenSaver
 {
 
@@ -61,7 +68,7 @@ private int ss_counter = 0;
 public int ss_state = C.SAVER_BLOCKED;
 private int ss_viewid = 0;
 private View[] ss_views = new View[2];
-private SS_Faders ss_faders;
+private Faders faders;
 
 public ScreenSaver(MainActivity act, View v1, View v2)
 {
@@ -73,7 +80,7 @@ public ScreenSaver(MainActivity act, View v1, View v2)
     hide_views();
 
     images = new ArrayList<ImageEntry>();
-    ss_faders = new SS_Faders(this);
+    faders = new Faders(this);
     ss_state = C.SAVER_BLOCKED;
 
     set_images();
@@ -90,7 +97,7 @@ public void hide_views()
 public void do_fade(View start, View end)
 {
 
-    ss_faders.fade(act.ss_fade, start, end, ss_width(), ss_height());
+    faders.fade(act.ss_fade, start, end, ss_width(), ss_height());
 }
 
 public void cancel_fade()
@@ -246,7 +253,7 @@ public void screen_saver(int tick)
 public boolean touch()
 {
 
-    if ((ss_state == C.SAVER_SHOWING) && !ss_faders.fading()) {
+    if ((ss_state == C.SAVER_SHOWING) && !faders.fading()) {
         screen_saver(C.SAVER_RESET);
         return false;
     }

@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -20,6 +20,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.n0ano.athome.C;
+import com.n0ano.athome.Log;
 
 public class ImageFind
 {

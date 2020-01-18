@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
+import com.n0ano.athome.SS.Faders;
 
 public class Popup extends MainActivity
 {
@@ -625,7 +626,7 @@ private void screen_dialog()
     ss_delay.setText(act.ss_start > 0 ? C.i2a(act.ss_delay) : "");
 
     final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, SS_Faders.types);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, Faders.types);
     adapter.setDropDownViewResource(R.layout.text_spinner);
     ss_fade.setAdapter(adapter);
     ss_fade.setSelection(type_pos = act.ss_fade);

@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.n0ano.athome.R;
+import com.n0ano.athome.C;
+import com.n0ano.athome.Log;
+import com.n0ano.athome.Preferences;
 
 public class ImageMgmt extends AppCompatActivity
 {

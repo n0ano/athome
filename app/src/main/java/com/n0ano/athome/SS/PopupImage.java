@@ -1,4 +1,4 @@
-package com.n0ano.athome;
+package com.n0ano.athome.SS;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -18,6 +18,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.n0ano.athome.Log;
+import com.n0ano.athome.Preferences;
+import com.n0ano.athome.R;
+import com.n0ano.athome.C;
 
 public class PopupImage extends ImageMgmt
 {

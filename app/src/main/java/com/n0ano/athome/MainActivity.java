@@ -45,6 +45,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 
+import com.n0ano.athome.SS.ImageFind;
+import com.n0ano.athome.SS.ImageMgmt;
+import com.n0ano.athome.SS.ScreenInfo;
+import com.n0ano.athome.SS.ScreenSaver;
+import com.n0ano.athome.SS.MyGesture;
+
 public class MainActivity extends AppCompatActivity
 {
 
@@ -56,9 +62,9 @@ private final static String CONFIG_URI = "/cgi-bin/athome/config";
 private final static String CONFIG_LOAD =  "load";
 private final static String CONFIG_SAVE =  "save";
 
-Preferences pref;
+public Preferences pref;
 
-Menu menu_bar;
+public Menu menu_bar;
 
 public int general_layout;
 
