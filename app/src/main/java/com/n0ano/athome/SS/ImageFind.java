@@ -78,7 +78,7 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 (hidden ? "&all" : "") +
                 "&host=" + C.base(info.ss_host) +
                 "&list=" + info.ss_list;
-        Log.d("SS:get names from " + url);
+        Log.d("DDD-SS", "get names from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
         in_rdr = new URL(url).openStream();
         for (;;) {
@@ -98,10 +98,10 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                     });
                 images.add(new ImageEntry(name, C.IMAGE_REMOTE, (thumb ? info : null)));
             } else
-                Log.d("SS:Unexpected meta data - " + str);
+                Log.d("DDD-SS", "Unexpected meta data - " + str);
         }
     } catch (Exception e) {
-        Log.d("SS:image get execption - " + e);
+        Log.d("DDD-SS", "image get execption - " + e);
     }
     return images;
 }

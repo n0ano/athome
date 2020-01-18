@@ -56,12 +56,12 @@ private InputStream open_http(String image)
                 "&w=" + max_w +
                 "&h=" + max_h +
                 "&r=" + entry.get_rotate();
-        Log.d("SS:get image from " + url);
+        Log.d("DDD-SS", "get image from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.ss_user, info.ss_pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());
 	} catch (Exception e) {
-		Log.d("SS:get http image failed - " + e);
+		Log.d("DDD-SS", "get http image failed - " + e);
 		return null;
 	}
     title = meta.get("T");
@@ -103,13 +103,13 @@ public Bitmap get_bitmap()
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
 	} catch (Exception e) {
-		Log.d("SS:get image failed - " + e);
+		Log.d("DDD-SS", "get image failed - " + e);
 		return null;
 	}
     if (bitmap == null)
-        Log.d("SS:image decode failed");
+        Log.d("DDD-SS", "image decode failed");
     else
-        Log.d("SS:image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
+        Log.d("DDD-SS", "image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
 
     return bitmap;
 }

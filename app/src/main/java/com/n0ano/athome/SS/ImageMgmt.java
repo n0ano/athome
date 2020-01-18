@@ -80,7 +80,7 @@ protected void onCreate(Bundle state)
 
     setTitle("Image mgmt");
 
-    Log.d("SS:ImageMgmt: onCreate");
+    Log.d("DDD-SS", "ImageMgmt: onCreate");
 
 //    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 //        if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -108,7 +108,7 @@ protected void onStart()
 {
 
     super.onStart();
-    Log.d("SS:ImageMgmt: onStart");
+    Log.d("DDD-SS", "ImageMgmt: onStart");
 }
 
 @Override
@@ -116,7 +116,7 @@ protected void onRestart()
 {
 
     super.onRestart();
-    Log.d("SS:ImageMgmt: onRestart");
+    Log.d("DDD-SS", "ImageMgmt: onRestart");
 }
 
 @Override
@@ -124,7 +124,7 @@ protected void onResume()
 {
 
     super.onResume();
-    Log.d("SS:ImageMgmt: onResume");
+    Log.d("DDD-SS", "ImageMgmt: onResume");
 }
 
 @Override
@@ -132,7 +132,7 @@ protected void onPause()
 {
 
     super.onPause();
-    Log.d("SS:ImageMgmt: onPause");
+    Log.d("DDD-SS", "ImageMgmt: onPause");
 }
 
 @Override
@@ -140,7 +140,7 @@ protected void onStop()
 {
 
     super.onStop();
-    Log.d("SS:ImageMgmt: onStop");
+    Log.d("DDD-SS", "ImageMgmt: onStop");
 }
 
 @Override
@@ -148,7 +148,7 @@ protected void onDestroy()
 {
 
     super.onDestroy();
-    Log.d("SS:ImageMgmt: onDestroy");
+    Log.d("DDD-SS", "ImageMgmt: onDestroy");
 }
 
 @Override
@@ -278,7 +278,7 @@ public void rotate(int deg)
         r += 360;
     while (r >= 360)
         r -= 360;
-Log.d(cur_image.get_name() + ": angle - " + r);
+Log.d("DDD-SS", cur_image.get_name() + ": angle - " + r);
     cur_image.set_rotate(r);
     go_image(null, cur_image);
 }
@@ -310,7 +310,7 @@ private void save_list()
     ImageEntry entry;
     int r;
 
-    Log.d("SS:ImageMgmt: save image list");
+    Log.d("DDD-SS", "ImageMgmt: save image list");
     String list = "" + ss_generation;
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);

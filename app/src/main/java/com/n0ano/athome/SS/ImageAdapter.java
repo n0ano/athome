@@ -95,7 +95,7 @@ public View getView(int position, View view, ViewGroup parent)
 
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
-Log.d(image.get_name() + ":touched");
+Log.d("DDD-SS", image.get_name() + ":touched");
             image.set_check(!image.get_check());
             ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
         }
@@ -138,7 +138,7 @@ private void done()
 {
 
     for (ImageEntry img : images) {
-        //Log.d("SS:image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
+        //Log.d("DDD-SS", "image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
         img.enable(act.saved_images.get(img.get_name()));
     }
 

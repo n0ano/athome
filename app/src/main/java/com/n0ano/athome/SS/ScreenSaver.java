@@ -73,7 +73,7 @@ private Faders faders;
 public ScreenSaver(MainActivity act, View v1, View v2)
 {
 
-    Log.d("SS:screen saver started");
+    Log.d("DDD-SS", "screen saver started");
     this.act = act;
     ss_views[0] = v1;
     ss_views[1] = v2;
@@ -152,7 +152,7 @@ public void saver_fade(int delta)
 public void saver_fling(int dir)
 {
 
-//Log.d("SS:state - " + ss_state + ", " + dir);
+//Log.d("DDD-SS", "state - " + ss_state + ", " + dir);
     if (ss_state == C.SAVER_FROZEN)
         saver_fade(dir);
 }
@@ -181,7 +181,7 @@ public void saver_click()
 public void saver_start()
 {
 
-Log.d("SS:saver: start");
+Log.d("DDD-SS", "saver: start");
     ss_state = C.SAVER_SHOWING;
     ss_counter = act.ss_delay;
     act.ss_fade = act.pref.get("ss_fade", 0);
@@ -269,7 +269,7 @@ public void get_names(final ImageFind image_find, final int gen)
                 images = image_find.find_local(new ArrayList<ImageEntry>());
                 images = image_find.find_remote(true, images, false);
                 Collections.sort(images);
-Log.d("SS:get_names - " + images.size() + ", gen - " + image_find.ss_generation);
+Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_generation);
                 ss_generation = image_find.ss_generation;
                 ss_current = images.size();
                 if (ss_current > 0) {
@@ -303,7 +303,7 @@ private void set_images()
         }
     }
     ss_current = images.size();
-Log.d("SS:set_images - " + images.size());
+Log.d("DDD-SS", "set_images - " + images.size());
     if (images.size() > 0) {
         ss_state = C.SAVER_BLOCKED;
         screen_saver(C.SAVER_RESET);
