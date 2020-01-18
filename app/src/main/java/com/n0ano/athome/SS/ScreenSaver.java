@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -278,10 +279,21 @@ public boolean touch()
     return true;
 }
 
+void do_toast(final String msg)
+{
+
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            Toast.makeText(act.getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+        }
+    });
+}
+
 public void get_names(int gen)
 {
 
     if (gen != ss_info.generation) {
+        do_toast("Get new images, gen - " + Integer.valueOf(gen));
         images = image_find.find_local(new ArrayList<ImageEntry>());
         images = image_find.find_remote(true, images, false);
         Collections.sort(images);
@@ -290,11 +302,10 @@ Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_gene
     }
 }
 
-private void set_images()
+private void parse_images(String str)
 {
     int t, r, off;
 
-    String str = pref.get("images", "");
     String[] imgs = str.split(";");
     if (imgs.length > 1) {
         ss_info.generation = Integer.parseInt(imgs[0], 10);
@@ -313,7 +324,7 @@ private void set_images()
         }
     }
     ss_current = images.size();
-Log.d("DDD-SS", "set_images - " + images.size());
+Log.d("DDD-SS", "parse_images - " + images.size());
     if (images.size() > 0) {
         state = SAVER_BLOCKED;
         screen_saver(SAVER_RESET);
@@ -326,7 +337,7 @@ Log.d("DDD-SS", "set_images - " + images.size());
 private void main_loop()
 {
 
-    set_images();
+    parse_images(pref.get("images", ""));
 
     for (;;) {
         try {
