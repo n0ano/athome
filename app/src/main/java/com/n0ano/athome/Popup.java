@@ -657,7 +657,8 @@ private void screen_dialog()
     mgmt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            end_dialog(dialog);
+            //  Don't call end_dialog, we still want the screen saver blocked
+            dialog.dismiss();
             act.screen_mgmt(v);
         }
     });

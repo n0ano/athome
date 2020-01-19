@@ -1,6 +1,8 @@
 package com.n0ano.athome.SS;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
@@ -26,6 +28,8 @@ public class ImageMgmt extends AppCompatActivity
  
 // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an app unique number
 public static int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1001;
+
+public static int IMAGES_UPDATE =       2001;
 
 Preferences pref;
 int debug = 0;
@@ -79,6 +83,8 @@ protected void onCreate(Bundle state)
 
     screen_info = new ScreenInfo(pref);
     if (screen_info.host.isEmpty()) {
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_CANCELED, intent);
         finish();
         return;
     }
@@ -253,8 +259,11 @@ public void go_back(View v)
 
     if (mgmt_view == R.id.mgmt_imageview)
         go_grid();
-    else
+    else {
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_OK, intent);
         finish();
+    }
 }
 
 public void rotate(int deg)
@@ -331,12 +340,6 @@ public void get_saved()
             off += 4;
         saved_images.put(str.substring(off), str.substring(0, off));
     }
-}
-
-public void ok(View v)
-{
-
-    finish();
 }
 
 }

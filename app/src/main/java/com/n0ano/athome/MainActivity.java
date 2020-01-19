@@ -303,6 +303,16 @@ public boolean onTouchEvent(MotionEvent event)
     return super.onTouchEvent(event);
 }
 
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == ImageMgmt.IMAGES_UPDATE) {
+        if (resultCode == RESULT_OK) {
+            Log.d("image update worked");
+        }
+        ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
+    }
+}
+
 private void start_home(Bundle state)
 {
 
@@ -402,7 +412,7 @@ public void screen_mgmt(View v)
 {
 
     Intent intent = new Intent(this, ImageMgmt.class);
-    startActivity(intent);
+    startActivityForResult(intent, ImageMgmt.IMAGES_UPDATE);
 }
 
 public void view_show(int view_id, int[] ids, int main)
