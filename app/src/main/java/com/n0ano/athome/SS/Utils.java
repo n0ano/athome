@@ -9,6 +9,15 @@ import com.n0ano.athome.Log;
 public class Utils
 {
 
+public static int parse_gen(String str)
+{
+
+    int idx = str.indexOf(";");
+    if (idx >= 0)
+        str = str.substring(0, idx);
+    return Integer.parseInt(str);
+}
+
 public static String img_info(ImageEntry entry)
 {
     String info;

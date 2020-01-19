@@ -21,17 +21,15 @@ public class ImageAdapter extends BaseAdapter
 
 ImageMgmt act;
 ArrayList<ImageEntry> images = new ArrayList<ImageEntry>();
-ScreenInfo info;
 
 ImageFind image_find;
 
-public ImageAdapter(ImageMgmt act, ScreenInfo info)
+public ImageAdapter(ImageMgmt act)
 {
 
     this.act = act;
-    this.info = info;
 
-    image_find = new ImageFind((Activity) act, info);
+    image_find = new ImageFind((Activity) act, act.screen_info);
     get_names(image_find);
 }
 
@@ -118,6 +116,7 @@ private void get_names(final ImageFind image_find)
             images = image_find.find_local(new ArrayList<ImageEntry>());
             images = image_find.find_remote(true, images, true);
             Collections.sort(images);
+            act.screen_info.generation = image_find.ss_generation;
             done();
         }
     }).start();

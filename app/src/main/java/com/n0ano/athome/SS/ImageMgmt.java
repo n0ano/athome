@@ -40,9 +40,6 @@ Menu menu_bar;
 int mgmt_view;
 
 public ScreenInfo screen_info;
-public int ss_generation = 0;
-
-private ImageFind image_find;
 
 ImageAdapter image_adapt;
 ImageEntry cur_image;
@@ -92,7 +89,7 @@ protected void onCreate(Bundle state)
     saved_images = Utils.parse_images(pref.get("images", ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
-    image_adapt = new ImageAdapter(this, screen_info);
+    image_adapt = new ImageAdapter(this);
     gv.setAdapter(image_adapt);
 }
 
@@ -306,7 +303,7 @@ private void save_list()
     ImageEntry entry;
     int r;
 
-    String list = "" + ss_generation;
+    String list = "" + screen_info.generation;
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
         list = list + ";" + Utils.img_info(entry) + entry.get_name();
@@ -326,7 +323,7 @@ public void get_saved()
 
     String str = pref.get("images", "");
     String[] strs = str.split(";");
-    ss_generation = Integer.parseInt(strs[0]);
+    screen_info.generation = Integer.parseInt(strs[0]);
 
     saved_images = new HashMap<String, String>();
 

@@ -297,6 +297,7 @@ public boolean touch()
 void do_toast(final String msg)
 {
 
+    Log.d("DDD-SS", msg);
     act.runOnUiThread(new Runnable() {
         public void run() {
             Toast.makeText(act.getApplicationContext(), msg, Toast.LENGTH_LONG).show();
@@ -309,7 +310,7 @@ public void get_names(int gen)
     String info;
 
     if (gen != ss_info.generation) {
-        do_toast("Get new images, gen - " + Integer.valueOf(gen));
+        do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
         images = image_find.find_local(new ArrayList<ImageEntry>());
         images = image_find.find_remote(true, images, false);
         Collections.sort(images);
@@ -318,6 +319,7 @@ public void get_names(int gen)
         HashMap<String, String> map = Utils.parse_images(pref.get("images", ""));
         for (ImageEntry img : images)
             img.enable(map.get(img.get_name()));
+        ss_current = images.size();
     }
 }
 
@@ -327,7 +329,10 @@ public void get_names(int gen)
 private void main_loop()
 {
 
-    images = Utils.parse_names(pref.get("images", ""));
+    String saved = pref.get("images", "");
+    ss_info.generation = Utils.parse_gen(saved);
+
+    images = Utils.parse_names(saved);
     ss_current = images.size();
     if (images.size() > 0) {
         state = SAVER_BLOCKED;
