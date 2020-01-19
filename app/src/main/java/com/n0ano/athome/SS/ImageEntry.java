@@ -2,6 +2,9 @@ package com.n0ano.athome.SS;
 
 import android.graphics.Bitmap;
 
+import com.n0ano.athome.Log;
+import com.n0ano.athome.C;
+
 public class ImageEntry implements Comparable<ImageEntry>
 {
 
@@ -12,35 +15,39 @@ int type;
 int ts;
 boolean checked;
 int rotate;
+
+int generation;
 Bitmap bitmap;
 
-public ImageEntry(String name, int type, int ts, int rotate, ScreenInfo info)
+public ImageEntry(String name, int gen, ScreenInfo info)
 {
+    int idx, ts;
+    char t;
 
-    this.name = name;
-    this.type = type;
-    this.ts = ts;
-    this.rotate = rotate;
-    this.width = 0;
-    this.height = 0;
-    this.bitmap = null;
     this.checked = true;
-    if (info != null)
-        get_thumb(info);
-}
-
-public ImageEntry(String name, int type, ScreenInfo info)
-{
-
-    int idx = name.indexOf(":");
+    idx = 0;
+    t = name.charAt(0);
+    if (t == 'T') {
+        // name from image server list
+        this.type = C.IMAGE_REMOTE;
+        idx = name.indexOf(":");
+        this.ts = Integer.parseInt(name.substring(1, idx), 10);
+    } else {
+        this.type = ((t == 'L' || t == 'l') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
+        if (t == 'l' || t == 'r')
+            this.checked = false;
+        if (name.charAt(1) == 'R') {
+            this.rotate = Integer.parseInt(name.substring(idx + 1, idx + 4), 10);
+            idx += 4;
+        }
+        this.ts = 0;
+    }
     this.name = name.substring(idx + 1);
-    this.type = type;
-    this.ts = Integer.parseInt(name.substring(0, idx), 10);
-    this.rotate = 0;
     this.width = 0;
     this.height = 0;
     this.bitmap = null;
-    this.checked = true;
+    this.generation = gen;
+
     if (info != null)
         get_thumb(info);
 }
@@ -63,14 +70,18 @@ public void set_rotate(int r) { rotate = r; }
 public boolean get_check() { return checked; }
 public void set_check(boolean ck) { checked = ck; }
 
+public int get_generation() { return generation; }
+public void set_generation(int g) { generation = g; }
+
 public void enable(String info)
 {
 
-    checked = false;
+    checked = true;
     if (info != null) {
         if ((info.length() > 1) && (info.charAt(1) == 'R'))
             rotate = Integer.parseInt(info.substring(2,5));
-        checked = true;
+        if (info.charAt(0) == 'l' || info.charAt(0) == 'r')
+            checked = false;
     }
 }
 

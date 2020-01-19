@@ -31,13 +31,15 @@ public ImageGet(ScreenSaver act, ScreenInfo info, ImageEntry entry, View img_sta
 {
 	InputStream in_rdr;
     final Bitmap bitmap;
-    int gen = 0;
+    int gen;
 
     this.act = act;
     this.info = info;
     this.entry = entry;
     this.img_start = img_start;
     this.img_end = img_end;
+
+Log.d("DDD-SS", "ImageGet: " + entry.get_name() + ", type " + entry.get_type());
 
 	try {
         in_rdr = open_image(entry);

@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import com.n0ano.athome.R;
 import com.n0ano.athome.Preferences;
@@ -83,7 +84,6 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
     ss_views[1] = v2;
     hide_views();
 
-    images = new ArrayList<ImageEntry>();
     faders = new Faders(this);
     state = SAVER_BLOCKED;
 
@@ -114,15 +114,26 @@ public void do_fade(View start, View end)
 
 private ImageEntry ss_next(int delta)
 {
+    int first;
+    ImageEntry img;
 
     if (images.size() <= 0)
         return null;
-    ss_current += delta;
-    if (ss_current >= images.size())
-        ss_current = 0;
-    else if (ss_current < 0)
-        ss_current = images.size() - 1;
-    return images.get(ss_current);
+    if (delta == 0)
+        return (ss_current < images.size()) ? images.get(ss_current) : null;
+
+    first = ss_current;
+    while ((ss_current += delta) != first) {
+        if (ss_current >= images.size())
+            ss_current = 0;
+        else if (ss_current < 0)
+            ss_current = images.size() - 1;
+        img = images.get(ss_current);
+Log.d("DDD-SS", "next(" + first +"," + ss_current + "): " + img.get_name() + ", check " + img.get_check());
+        if (img.get_check())
+            return img;
+    }
+    return null;
 }
 
 public void show_image(final Bitmap bitmap, final String title, final View img_start, final View img_end, int gen)
@@ -214,14 +225,18 @@ Log.d("DDD-SS", "saver: start");
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
 
-    ss_views[0].setVisibility(View.GONE);
-    ss_views[0].setAlpha(1.0f);
-    ss_views[0].setScaleX(1.0f);
-    ss_views[0].setScaleY(1.0f);
-    ss_views[1].setVisibility(View.GONE);
-    ss_views[1].setAlpha(1.0f);
-    ss_views[1].setScaleX(1.0f);
-    ss_views[1].setScaleY(1.0f);
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            ss_views[0].setVisibility(View.GONE);
+            ss_views[0].setAlpha(1.0f);
+            ss_views[0].setScaleX(1.0f);
+            ss_views[0].setScaleY(1.0f);
+            ss_views[1].setVisibility(View.GONE);
+            ss_views[1].setAlpha(1.0f);
+            ss_views[1].setScaleX(1.0f);
+            ss_views[1].setScaleY(1.0f);
+        }
+    });
     ss_viewid = 0;
     //
     //  ImageGet will call do_fade once the new image is loaded
@@ -291,43 +306,18 @@ void do_toast(final String msg)
 
 public void get_names(int gen)
 {
+    String info;
 
     if (gen != ss_info.generation) {
         do_toast("Get new images, gen - " + Integer.valueOf(gen));
         images = image_find.find_local(new ArrayList<ImageEntry>());
         images = image_find.find_remote(true, images, false);
         Collections.sort(images);
-Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_generation);
+        Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_generation);
         ss_info.generation = image_find.ss_generation;
-    }
-}
-
-private void parse_images(String str)
-{
-    int t, r, off;
-
-    String[] imgs = str.split(";");
-    if (imgs.length > 1) {
-        ss_info.generation = Integer.parseInt(imgs[0], 10);
-        for (int i = 1; i < imgs.length; i++) {
-            String name = imgs[i];
-            if (!name.isEmpty()) {
-                t = ((name.charAt(0) == 'L') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
-                r = 0;
-                off = 1;
-                if (name.charAt(off) == 'R') {
-                    r = Integer.parseInt(name.substring(off + 1, off + 4), 10);
-                    off += 4;
-                }
-                images.add(new ImageEntry(name.substring(off), t, i, r, null));
-            }
-        }
-    }
-    ss_current = images.size();
-Log.d("DDD-SS", "parse_images - " + images.size());
-    if (images.size() > 0) {
-        state = SAVER_BLOCKED;
-        screen_saver(SAVER_RESET);
+        HashMap<String, String> map = Utils.parse_images(pref.get("images", ""));
+        for (ImageEntry img : images)
+            img.enable(map.get(img.get_name()));
     }
 }
 
@@ -337,7 +327,12 @@ Log.d("DDD-SS", "parse_images - " + images.size());
 private void main_loop()
 {
 
-    parse_images(pref.get("images", ""));
+    images = Utils.parse_names(pref.get("images", ""));
+    ss_current = images.size();
+    if (images.size() > 0) {
+        state = SAVER_BLOCKED;
+        screen_saver(SAVER_RESET);
+    }
 
     for (;;) {
         try {

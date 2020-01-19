@@ -311,6 +311,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Log.d("image update worked");
         }
+Log.d("DDD-SS", "activity result - " + pref.get("images", ""));
         ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
     }
 }

@@ -48,15 +48,15 @@ if (true) return images;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry(path, C.IMAGE_LOCAL, 0, 0, null));
+        images.add(new ImageEntry("l:" + path, info.generation, null));
     }
     return images;
 }
 
 public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, boolean thumb)
 {
+    int idx, ts;
     char type;
-    String str;
     String url;
 	InputStream in_rdr = null;
 
@@ -72,21 +72,21 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
         Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
         in_rdr = new URL(url).openStream();
         for (;;) {
-            str = C.meta_line(in_rdr);
+            final String str = C.meta_line(in_rdr);
             type = str.charAt(0);
             if (type == 'E') {
                 ss_generation = Integer.parseInt(str.substring(1), 10);
                 return images;
             }
             if (type == 'T') {
-                final String name = str.substring(1);
+                idx = str.indexOf(":");
                 if (C.loading_name != null)
                     act.runOnUiThread(new Runnable() {
                         public void run() {
-                            C.loading_name.setText(name.substring(name.indexOf(":")));
+                            C.loading_name.setText(str.substring(str.indexOf(":")));
                         }
                     });
-                images.add(new ImageEntry(name, C.IMAGE_REMOTE, (thumb ? info : null)));
+                images.add(new ImageEntry(str, info.generation, (thumb ? info : null)));
             } else
                 Log.d("DDD-SS", "Unexpected meta data - " + str);
         }

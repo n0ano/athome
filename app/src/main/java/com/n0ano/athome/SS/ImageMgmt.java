@@ -89,7 +89,7 @@ protected void onCreate(Bundle state)
         return;
     }
 
-    get_saved();
+    saved_images = Utils.parse_images(pref.get("images", ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, screen_info);
@@ -306,20 +306,17 @@ private void save_list()
     ImageEntry entry;
     int r;
 
-    Log.d("DDD-SS", "ImageMgmt: save image list");
     String list = "" + ss_generation;
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
-        if (entry.get_check()) {
-            list = list + ";" + ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R");
-            r = entry.get_rotate();
-            if (r != 0)
-                list = list + "R" + String.format("%03d", r);
-            list = list + entry.get_name();
-        }
+        list = list + ";" + Utils.img_info(entry) + entry.get_name();
     }
     image_adapt.notifyDataSetChanged();
-    pref.put("images", list);
+    try {
+        pref.put("images", list);
+    } catch (Exception e) {
+        Log.d("DDD-SS", "pref put failed - " + e);
+    }
     go_back(null);
 }
 
