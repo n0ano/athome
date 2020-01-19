@@ -9,6 +9,13 @@ import com.n0ano.athome.Log;
 public class Utils
 {
 
+public static String get_from(String str)
+{
+
+    int idx = str.indexOf("/");
+    return (idx < 0) ? str : str.substring(0, idx);
+}
+
 public static int parse_gen(String str)
 {
 

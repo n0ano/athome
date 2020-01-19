@@ -307,18 +307,30 @@ void do_toast(final String msg)
 
 public void get_names(int gen)
 {
-    String info;
+    String info, from;
+    String name = "unknown";
 
     if (gen != ss_info.generation) {
         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
         images = image_find.find_local(new ArrayList<ImageEntry>());
         images = image_find.find_remote(true, images, false);
         Collections.sort(images);
+
         Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_generation);
-        ss_info.generation = image_find.ss_generation;
         HashMap<String, String> map = Utils.parse_images(pref.get("images", ""));
         for (ImageEntry img : images)
             img.enable(map.get(img.get_name()));
+
+        if (ss_info.generation > 0) {
+            from = "unknown";
+            if (images.size() > 0) {
+                name = images.get(0).get_name();
+                if (map.get(name) == null)
+                    from = Utils.get_from(name);
+            }
+            callbacks.ss_new(from);
+        }
+        ss_info.generation = image_find.ss_generation;
         ss_current = images.size();
     }
 }

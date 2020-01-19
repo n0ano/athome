@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -221,6 +222,18 @@ protected void onResume()
                     }
                 });
             }
+
+            @Override
+            public void ss_new(final String from)
+            {
+                Log.d("DDD-SS", "new images from " + from);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                        toolbar.setTitle("New:" + from);
+                    }
+                });
+            }
         });
     }
 
@@ -312,6 +325,12 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             Log.d("image update worked");
         }
 Log.d("DDD-SS", "activity result - " + pref.get("images", ""));
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                toolbar.setTitle("AtHome");
+            }
+        });
         ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
     }
 }
@@ -321,6 +340,8 @@ private void start_home(Bundle state)
 
     setContentView(R.layout.activity_main);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    toolbar.setTitle("AtHome");
+    toolbar.setTitleTextColor(Color.WHITE);
     setSupportActionBar(toolbar);
     try {
         ContentResolver resolver = this.getApplicationContext().getContentResolver();
