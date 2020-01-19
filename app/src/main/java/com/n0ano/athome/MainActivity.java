@@ -174,53 +174,55 @@ protected void onResume()
 //test_parse();
 
     restore_state();
-    ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
-        @Override
-        public ScreenInfo ss_start()
-        {
-            Log.d("DDD-SS", "screen saver start");
-            View v = (View)findViewById(R.id.scroll_view);
-            ss_info.width =  v.getWidth();
-            v = (View)findViewById(R.id.scroll_view);
-            ss_info.height =  v.getHeight();
+    if (ss_saver == null) {
+        ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
+            @Override
+            public ScreenInfo ss_start()
+            {
+                Log.d("DDD-SS", "screen saver start");
+                View v = (View)findViewById(R.id.scroll_view);
+                ss_info.width =  v.getWidth();
+                v = (View)findViewById(R.id.scroll_view);
+                ss_info.height =  v.getHeight();
 
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                    icon.setIcon(R.drawable.play);
-                    View v = (View)findViewById(R.id.scroll_view);
-                    v.setAlpha(1.0f);
-                }
-            });
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                        icon.setIcon(R.drawable.play);
+                        View v = (View)findViewById(R.id.scroll_view);
+                        v.setAlpha(1.0f);
+                    }
+                });
 
-            return ss_info;
-        }
+                return ss_info;
+            }
 
-        @Override
-        public void ss_stop()
-        {
-            Log.d("DDD-SS", "screen saver stop");
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                    icon.setIcon(R.drawable.monitor);
-                    display(screen);
-                }
-            });
-        }
+            @Override
+            public void ss_stop()
+            {
+                Log.d("DDD-SS", "screen saver stop");
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                        icon.setIcon(R.drawable.monitor);
+                        display(screen);
+                    }
+                });
+            }
 
-        @Override
-        public void ss_icon(final int icon_id)
-        {
-            Log.d("DDD-SS", "screen icon - " + icon_id);
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                    icon.setIcon(icon_id);
-                }
-            });
-        }
-    });
+            @Override
+            public void ss_icon(final int icon_id)
+            {
+                Log.d("DDD-SS", "screen icon - " + icon_id);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                        icon.setIcon(icon_id);
+                    }
+                });
+            }
+        });
+    }
 
     ss_gesture = new GestureDetectorCompat(this, new MyGesture(ss_saver));
 
