@@ -83,11 +83,13 @@ public View getView(int position, View view, ViewGroup parent)
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
             act.go_image(v, image);
+            act.pref.put("image_last", images.indexOf(image) - 1);
         }
     });
     view.setOnLongClickListener(new View.OnLongClickListener() {
         public boolean onLongClick(View v) {
             act.go_info(v, image);
+            act.pref.put("image_last", images.indexOf(image) - 1);
             return true;
         }
     });

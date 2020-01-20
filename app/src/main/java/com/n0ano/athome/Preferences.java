@@ -73,20 +73,6 @@ public int get(String key, int def)
         return 0;
     return Integer.parseInt(str);
 }
-
-public boolean get(String key, boolean def)
-{
-
-    String str = pref.getString(key, (def ? "true" : "false"));
-    return str.equals("true");
-}
-
-public String get(String key, String def)
-{
-
-    return pref.getString(key, def);
-}
-
 public void put(String key, int value)
 {
 
@@ -95,6 +81,12 @@ public void put(String key, int value)
 	editor.commit();
 }
 
+public boolean get(String key, boolean def)
+{
+
+    String str = pref.getString(key, (def ? "true" : "false"));
+    return str.equals("true");
+}
 public void put(String key, boolean value)
 {
 
@@ -103,6 +95,11 @@ public void put(String key, boolean value)
 	editor.commit();
 }
 
+public String get(String key, String def)
+{
+
+    return pref.getString(key, def);
+}
 public void put(String key, String value)
 {
 

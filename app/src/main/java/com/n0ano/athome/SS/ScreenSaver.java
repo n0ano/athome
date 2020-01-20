@@ -119,19 +119,31 @@ private ImageEntry ss_next(int delta)
 
     if (images.size() <= 0)
         return null;
-    if (delta == 0)
-        return (ss_current < images.size()) ? images.get(ss_current) : null;
 
-    first = ss_current;
-    while ((ss_current += delta) != first) {
-        if (ss_current >= images.size())
-            ss_current = 0;
-        else if (ss_current < 0)
-            ss_current = images.size() - 1;
-        img = images.get(ss_current);
+    if (images.size() < 2)
+        return images.get(0);
+
+    int next = pref.get("image_last", 0);
+    if (delta == 0) {
+        if (next >= images.size()) {
+            next = images.size() - 1;
+            pref.put("image_last", next);
+        }
+        images.get(next);
+    }
+
+    first = next;
+    while ((next += delta) != first) {
+        if (next >= images.size())
+            next = 0;
+        else if (next < 0)
+            next = images.size() - 1;
+        img = images.get(next);
 Log.d("DDD-SS", "next(" + first +"," + ss_current + "): " + img.get_name() + ", check " + img.get_check());
-        if (img.get_check())
+        if (img.get_check()) {
+            pref.put("image_last", next);
             return img;
+        }
     }
     return null;
 }
