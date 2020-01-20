@@ -194,8 +194,6 @@ private void set_menu(int id)
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_right);
         item.setVisible(false);
-        item = menu_bar.findItem(R.id.action_info);
-        item.setVisible(false);
         item = menu_bar.findItem(R.id.action_all);
         item.setVisible(true);
         item = menu_bar.findItem(R.id.action_none);
@@ -207,8 +205,6 @@ private void set_menu(int id)
         item.setVisible(true);
         item = menu_bar.findItem(R.id.action_right);
         item.setVisible(true);
-        item = menu_bar.findItem(R.id.action_info);
-        item.setVisible(true);
         item = menu_bar.findItem(R.id.action_all);
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_none);
@@ -216,6 +212,13 @@ private void set_menu(int id)
         break;
 
     }
+}
+
+public void go_info(View v, final ImageEntry entry)
+{
+
+Log.d("DDD-SS", "info popup for " + entry.get_name());
+    popup.info_dialog(entry);
 }
 
 public void go_image(View v, final ImageEntry entry)

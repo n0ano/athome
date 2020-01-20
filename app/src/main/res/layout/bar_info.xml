@@ -106,6 +106,14 @@
 		android:paddingBottom="20dp" >
 
 		<Button
+			android:id="@+id/cancel"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingRight="30dp"
+			android:text="Cancel"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+		<Button
 			android:id="@+id/ok"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"

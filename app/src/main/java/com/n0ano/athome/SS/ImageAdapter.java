@@ -82,14 +82,12 @@ public View getView(int position, View view, ViewGroup parent)
 
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
-Log.d("DDD-SS", image.get_name() + ":touched");
-            image.set_check(!image.get_check());
-            ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
+            act.go_image(v, image);
         }
     });
     view.setOnLongClickListener(new View.OnLongClickListener() {
         public boolean onLongClick(View v) {
-            act.go_image(v, image);
+            act.go_info(v, image);
             return true;
         }
     });

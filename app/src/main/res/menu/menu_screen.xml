@@ -30,13 +30,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_info"
-        android:icon="@drawable/info"
-        android:orderInCategory="100"
-        android:title="Information"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_save"
         android:icon="@drawable/save"
         android:orderInCategory="100"

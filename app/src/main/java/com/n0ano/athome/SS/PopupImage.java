@@ -53,16 +53,12 @@ public boolean menu_click(int item)
         act.save();
         return true;
 
-    case R.id.action_info:
-        info_action();
-        return true;
-
     }
 
     return false;
 }
 
-public void info_action()
+public void info_dialog(final ImageEntry entry)
 {
 
     final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
@@ -70,27 +66,37 @@ public void info_action()
     dialog.setCanceledOnTouchOutside(false);
 
     TextView tv = (TextView) dialog.findViewById(R.id.info_name);
-    tv.setText(act.cur_image.get_name());
+    tv.setText(entry.get_name());
 
-    CheckBox cb = (CheckBox) dialog.findViewById(R.id.info_selected);
-    cb.setChecked(act.cur_image.get_check());
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.info_selected);
+    cb.setChecked(entry.get_check());
 
     tv = (TextView) dialog.findViewById(R.id.info_type);
-    tv.setText((act.cur_image.get_type() == C.IMAGE_LOCAL) ? "local" : "remote");
+    tv.setText((entry.get_type() == C.IMAGE_LOCAL) ? "local" : "remote");
 
     tv = (TextView) dialog.findViewById(R.id.info_rotate);
-    tv.setText(String.valueOf(act.cur_image.get_rotate()));
+    tv.setText(String.valueOf(entry.get_rotate()));
 
     tv = (TextView) dialog.findViewById(R.id.info_width);
-    tv.setText(String.valueOf(act.cur_image.get_width()));
+    tv.setText(String.valueOf(entry.get_width()));
 
     tv = (TextView) dialog.findViewById(R.id.info_height);
-    tv.setText(String.valueOf(act.cur_image.get_height()));
+    tv.setText(String.valueOf(entry.get_height()));
+
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
+    cancel.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            entry.set_check(cb.isChecked());
+            act.image_adapt.notifyDataSetChanged();
             dialog.dismiss();
         }
     });
