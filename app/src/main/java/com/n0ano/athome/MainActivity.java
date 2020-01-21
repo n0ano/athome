@@ -105,6 +105,7 @@ Egauge egauge;
 Outlets outlets;
 
 boolean running;
+boolean paused;
 
 public Parse parse = new Parse();
 public Popup popup;
@@ -183,6 +184,7 @@ protected void onResume()
             public ScreenInfo ss_start()
             {
                 Log.d("DDD-SS", "screen saver start");
+                paused = true;
                 View v = (View)findViewById(R.id.scroll_view);
                 ss_info.width =  v.getWidth();
                 v = (View)findViewById(R.id.scroll_view);
@@ -204,6 +206,7 @@ protected void onResume()
             public void ss_stop()
             {
                 Log.d("DDD-SS", "screen saver stop");
+                paused = false;
                 runOnUiThread(new Runnable() {
                     public void run() {
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
@@ -1042,6 +1045,24 @@ private void clock()
     });
 }
 
+private void disp_update()
+{
+
+    clock();
+
+    if (weather != null)
+        weather.update();
+
+    if (thermostat != null)
+        thermostat.update();
+
+    if (egauge != null && egauge_layout != 0)
+        egauge.update();
+
+    if (outlets != null)
+        outlets.update();
+}
+
 private void doit()
 {
 
@@ -1064,21 +1085,8 @@ private void doit()
     new Thread(new Runnable() {
         public void run() {
             while (working()) {
-
-                clock();
-
-                if (weather != null)
-                    weather.update();
-
-                if (thermostat != null)
-                    thermostat.update();
-
-                if (egauge != null && egauge_layout != 0)
-                    egauge.update();
-
-                if (outlets != null)
-                    outlets.update();
-
+                if (!paused)
+                    disp_update();
                 SystemClock.sleep(1000);
             }
         }

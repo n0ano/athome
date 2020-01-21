@@ -108,23 +108,23 @@ public static HashMap<String, String> get_meta(InputStream in, HashMap<String, S
         switch (type.charAt(0)) {
 
         case 'E':       // end of meta data
-            Log.d("E:end of metadata");
+            //Log.d("E:end of metadata");
             return map;
 
         case 'X':       // end of meta data, no such file
-            Log.d("X:no file");
+            //Log.d("X:no file");
             return map;
 
         case 'F':       // file name
-            Log.d("F:" + str);
+            //Log.d("F:" + str);
             break;
 
         case 'T':       // title
-            Log.d("T:" + str);
+            //Log.d("T:" + str);
             break;
 
         default:        // unknown tag
-            Log.d(type + ":" + str);
+            //Log.d(type + ":" + str);
             break;
 
         }
