@@ -51,7 +51,7 @@ public ImageGet(ScreenSaver act, ScreenInfo info, ImageEntry entry, View img_sta
     if (bitmap == null)
         Log.d("DDD-SS", "image decode failed");
     else
-        Log.d("DDD-SS", "image retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
+        Log.d("DDD-SS", entry.get_name() + ": retrieved, generation - " + meta.get("E") + ", size - " + bitmap.getWidth() + "x" + bitmap.getHeight());
 
     act.show_image(bitmap, title, img_start, img_end, gen);
 }
@@ -71,7 +71,7 @@ private InputStream open_http(String image)
                 "&w=" + info.width +
                 "&h=" + info.height +
                 "&r=" + entry.get_rotate();
-        Log.d("DDD-SS", "get image from " + url);
+        //Log.d("DDD-SS", "get image from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());

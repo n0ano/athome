@@ -42,7 +42,6 @@ public static String list2str(int gen, ArrayList<ImageEntry> images)
 public static ArrayList<ImageEntry> parse_names(String str)
 {
 
-Log.d("DDD-SS", "parse list - " + str.substring(0, (str.length() < 64) ? str.length() : 64) + "...");
     ArrayList<ImageEntry> images = new ArrayList<ImageEntry>();
     String[] imgs = str.split(";");
     if (imgs.length > 1) {
@@ -54,7 +53,6 @@ Log.d("DDD-SS", "parse list - " + str.substring(0, (str.length() < 64) ? str.len
             }
         }
     }
-Log.d("DDD-SS", "parse_images - " + images.size());
     return images;
 }
 
