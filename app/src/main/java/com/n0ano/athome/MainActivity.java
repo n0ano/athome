@@ -185,16 +185,20 @@ protected void onResume()
             {
                 Log.d("DDD-SS", "screen saver start");
                 paused = true;
-                View v = (View)findViewById(R.id.scroll_view);
-                ss_info.width =  v.getWidth();
-                v = (View)findViewById(R.id.scroll_view);
-                ss_info.height =  v.getHeight();
 
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                        tb.setTitle("AtHome");
+
+                        View v = (View)findViewById(R.id.scroll_view);
+                        ss_info.width =  v.getWidth();
+                        v = (View)findViewById(R.id.scroll_view);
+                        ss_info.height =  v.getHeight();
+
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
                         icon.setIcon(R.drawable.play);
-                        View v = (View)findViewById(R.id.scroll_view);
+                        v = (View)findViewById(R.id.scroll_view);
                         v.setAlpha(1.0f);
                     }
                 });
@@ -234,8 +238,11 @@ protected void onResume()
                 Log.d("DDD-SS", "new images from " + from);
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                        toolbar.setTitle("New:" + from);
+                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                        if (from.charAt(0) == '-')
+                            tb.setTitle("Change:" + from);
+                        else
+                            tb.setTitle("New:" + from);
                     }
                 });
             }
@@ -332,8 +339,8 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 Log.d("DDD-SS", "activity result - " + pref.get("images", ""));
         runOnUiThread(new Runnable() {
             public void run() {
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                toolbar.setTitle("AtHome");
+                Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                tb.setTitle("AtHome");
             }
         });
         ss_saver.screen_saver(ScreenSaver.SAVER_RESET);

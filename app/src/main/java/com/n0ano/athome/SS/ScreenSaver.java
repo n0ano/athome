@@ -329,6 +329,7 @@ public void get_names(int gen)
     String name = "unknown";
 
     if (gen != ss_info.generation) {
+        int count = images.size();
         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
         images = image_find.find_local(new ArrayList<ImageEntry>(), ss_info);
         images = image_find.find_remote(true, images, false, ss_info);
@@ -338,19 +339,22 @@ public void get_names(int gen)
         for (ImageEntry img : images)
             img.enable(map.get(img.get_name()));
 
-        if (ss_info.generation > 0) {
-            from = "unknown";
-            if (images.size() > 0) {
-                name = images.get(0).get_name();
-                if (map.get(name) == null)
-                    from = Utils.get_from(name);
-            }
-            callbacks.ss_new(from);
-        }
-        ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
+        if (images.size() > count) {
+            name = images.get(0).get_name();
+            if (map.get(name) == null)
+                from = Utils.get_from(name);
+            else
+                from = "-unknown-";
+        } else if (images.size() < count)
+            from = "-deleted-";
+        else
+            from = "-changed-";
+        callbacks.ss_new(from);
 
+        ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
         image_list = Utils.list2str(ss_info.generation, images);
         pref.put("images:" + ss_info.list, image_list);
+        pref.put("image_last:" + ss_info.list, images.size());
     }
 }
 
