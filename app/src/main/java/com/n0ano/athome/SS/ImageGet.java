@@ -39,14 +39,11 @@ public ImageGet(ScreenSaver act, ScreenInfo info, ImageEntry entry, View img_sta
     this.img_start = img_start;
     this.img_end = img_end;
 
-Log.d("DDD-SS", "ImageGet: " + entry.get_name() + ", type " + entry.get_type());
-
 	try {
         in_rdr = open_image(entry);
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
         gen = Integer.parseInt(meta.get("E"), 10);
-Log.d("DDD-SS-init", "ImageGet gen - " + gen + "(" + info.generation + ")");
 	} catch (Exception e) {
 		Log.d("DDD-SS", "get image failed - " + e);
 		return;

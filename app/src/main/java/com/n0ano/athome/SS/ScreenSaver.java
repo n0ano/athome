@@ -123,11 +123,11 @@ private ImageEntry ss_next(int delta)
     if (images.size() < 2)
         return images.get(0);
 
-    int next = pref.get("image_last", 0);
+    int next = pref.get("image_last:" + ss_info.list, images.size());
     if (delta == 0) {
         if (next >= images.size()) {
             next = images.size() - 1;
-            pref.put("image_last", next);
+            pref.put("image_last:" + ss_info.list, next);
         }
         images.get(next);
     }
@@ -141,7 +141,7 @@ private ImageEntry ss_next(int delta)
         img = images.get(next);
 Log.d("DDD-SS", "next(" + first +"," + next + "): " + img.get_name() + ", check " + img.get_check());
         if (img.get_check()) {
-            pref.put("image_last", next);
+            pref.put("image_last:" + ss_info.list, next);
             return img;
         }
     }
@@ -204,7 +204,7 @@ public void intr(int type)
 
     case INTR_START:
         if (state == SAVER_COUNTING)
-            saver_start();
+            saver_start(ss_info.list_real);
         else {
             if (state == ScreenSaver.SAVER_FROZEN) {
                 callbacks.ss_icon(R.drawable.play);
@@ -229,10 +229,11 @@ public void intr(int type)
     }
 }
 
-public void saver_start()
+public void saver_start(String list)
 {
 
 Log.d("DDD-SS", "saver_start - " + ss_info.generation);
+    init_list(list);
     ss_info = callbacks.ss_start();
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
@@ -279,7 +280,7 @@ public void screen_saver(int tick)
                 if (state == SAVER_SHOWING)
                     saver_fade(1);
                 else
-                    saver_start();
+                    saver_start("");
             }
         }
         break;
@@ -322,6 +323,12 @@ public void get_names(int gen)
     String info, from;
     String name = "unknown";
 
+    //
+    //  Only check for new pictures on the real list
+    //
+    if (!ss_info.list_real.isEmpty() && ss_info.list.isEmpty())
+        return;
+
     if (gen != ss_info.generation) {
         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
         Log.d("DDD-SS", "Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
@@ -344,7 +351,6 @@ public void get_names(int gen)
             callbacks.ss_new(from);
         }
         ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
-        pref.put("image_last", images.size());
 
         image_list = Utils.list2str(ss_info.generation, images);
         pref.put("image:" + ss_info.list, image_list);
@@ -355,12 +361,12 @@ private void init_list(String list)
 {
 
     String saved = pref.get("images:" + list, "");
+    ss_info.list = list;
     ss_info.generation = Utils.parse_gen(saved);
     if (ss_info.generation == 0)
         get_names(-1);
 
     images = Utils.parse_names(image_list);
-    pref.put("image_last", images.size());
 }
 
 //
@@ -369,11 +375,8 @@ private void init_list(String list)
 private void main_loop()
 {
 
-    init_list(ss_info.list);
-    if (images.size() > 0) {
-        state = SAVER_BLOCKED;
-        screen_saver(SAVER_RESET);
-    }
+    state = SAVER_BLOCKED;
+    screen_saver(SAVER_RESET);
 
     for (;;) {
         if (image_list == null)

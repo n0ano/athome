@@ -11,6 +11,7 @@ public class ScreenInfo
 //
 public String host = "";
 public String list = "";
+public String list_real = "";
 public String server = "";
 public String user = "";
 public String pwd = "";
@@ -31,6 +32,7 @@ public ScreenInfo(Preferences pref)
 
     this.host = pref.get("ss_host", "");
     this.list = C.suffix(host);
+    this.list_real = list;
     this.server = pref.get("ss_server", "");
     this.user = pref.get("ss_user", "");
     this.pwd = pref.get("ss_pwd", "");
