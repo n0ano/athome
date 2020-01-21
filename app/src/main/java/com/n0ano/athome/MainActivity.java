@@ -133,6 +133,8 @@ protected void onCreate(Bundle state)
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
 
+    ss_info = new ScreenInfo(pref);
+
     start_home(state);
 }
 
@@ -500,8 +502,6 @@ private void restore_state()
     general_layout = pref.get("general_layout", Popup.LAYOUT_TABLET);
     on_time = pref.get("general_on", -1);
     off_time = pref.get("general_off", -1);
-
-    ss_info = new ScreenInfo(pref);
 
     egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
     egauge_progress = pref.get("egauge_progress", 1);

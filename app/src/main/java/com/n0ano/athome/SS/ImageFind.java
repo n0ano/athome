@@ -18,18 +18,14 @@ public class ImageFind
 {
 
 private Activity act;
-private ScreenInfo info;
 
-public int ss_generation = -1;
-
-public ImageFind(Activity act, ScreenInfo info)
+public ImageFind(Activity act)
 {
 
     this.act = act;
-    this.info = info;
 }
 
-public ArrayList<ImageEntry> find_local(ArrayList<ImageEntry> images)
+public ArrayList<ImageEntry> find_local(ArrayList<ImageEntry> images, ScreenInfo info)
 {
 
 if (true) return images;
@@ -48,14 +44,15 @@ if (true) return images;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry("l:" + path, info.generation, null));
+        images.add(new ImageEntry("l:" + path, 1, null));
     }
     return images;
 }
 
-public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, boolean thumb)
+public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, boolean thumb, ScreenInfo info)
 {
     int idx, ts;
+    int gen = 0;
     char type;
     String url;
 	InputStream in_rdr = null;
@@ -74,11 +71,16 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
         for (;;) {
             final String str = C.meta_line(in_rdr);
             type = str.charAt(0);
-            if (type == 'E') {
-                ss_generation = Integer.parseInt(str.substring(1), 10);
+            switch (str.charAt(0)) {
+
+            case 'E':
                 return images;
-            }
-            if (type == 'T') {
+
+            case 'G':
+                gen = Integer.parseInt(str.substring(1), 10);
+                break;
+
+            case 'T':
                 idx = str.indexOf(":");
                 if (C.loading_name != null)
                     act.runOnUiThread(new Runnable() {
@@ -86,9 +88,14 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                             C.loading_name.setText(str.substring(str.indexOf(":")));
                         }
                     });
-                images.add(new ImageEntry(str, info.generation, (thumb ? info : null)));
-            } else
+                images.add(new ImageEntry(str, gen, (thumb ? info : null)));
+                break;
+
+            default:
                 Log.d("DDD-SS", "Unexpected meta data - " + str);
+                break;
+
+            }
         }
     } catch (Exception e) {
         Log.d("DDD-SS", "image get execption - " + e);

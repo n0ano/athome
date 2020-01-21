@@ -49,10 +49,10 @@ Preferences pref;
 Thread main_thread;
 
 ArrayList<ImageEntry> images;
-private int ss_current;
 
 private ScreenInfo ss_info;
 private ImageFind image_find;
+public String image_list = null;
 
 private int ss_counter = 0;
 public int state = SAVER_BLOCKED;
@@ -77,7 +77,7 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
 
     ss_info = new ScreenInfo(pref);
 
-    image_find = new ImageFind(act, ss_info);
+    image_find = new ImageFind(act);
 
     this.first = first;
     ss_views[0] = v1;
@@ -139,7 +139,7 @@ private ImageEntry ss_next(int delta)
         else if (next < 0)
             next = images.size() - 1;
         img = images.get(next);
-Log.d("DDD-SS", "next(" + first +"," + ss_current + "): " + img.get_name() + ", check " + img.get_check());
+Log.d("DDD-SS", "next(" + first +"," + next + "): " + img.get_name() + ", check " + img.get_check());
         if (img.get_check()) {
             pref.put("image_last", next);
             return img;
@@ -232,7 +232,7 @@ public void intr(int type)
 public void saver_start()
 {
 
-Log.d("DDD-SS", "saver: start");
+Log.d("DDD-SS", "saver_start - " + ss_info.generation);
     ss_info = callbacks.ss_start();
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
@@ -324,12 +324,13 @@ public void get_names(int gen)
 
     if (gen != ss_info.generation) {
         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
-        images = image_find.find_local(new ArrayList<ImageEntry>());
-        images = image_find.find_remote(true, images, false);
+        Log.d("DDD-SS", "Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
+        images = image_find.find_local(new ArrayList<ImageEntry>(), ss_info);
+        images = image_find.find_remote(true, images, false, ss_info);
         Collections.sort(images);
 
-        Log.d("DDD-SS", "get_names - " + images.size() + ", gen - " + image_find.ss_generation);
-        HashMap<String, String> map = Utils.parse_images(pref.get("images", ""));
+        Log.d("DDD-SS", "get_names - " + images.size());
+        HashMap<String, String> map = Utils.parse_images(pref.get("images:" + ss_info.list, ""));
         for (ImageEntry img : images)
             img.enable(map.get(img.get_name()));
 
@@ -342,9 +343,24 @@ public void get_names(int gen)
             }
             callbacks.ss_new(from);
         }
-        ss_info.generation = image_find.ss_generation;
-        ss_current = images.size();
+        ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
+        pref.put("image_last", images.size());
+
+        image_list = Utils.list2str(ss_info.generation, images);
+        pref.put("image:" + ss_info.list, image_list);
     }
+}
+
+private void init_list(String list)
+{
+
+    String saved = pref.get("images:" + list, "");
+    ss_info.generation = Utils.parse_gen(saved);
+    if (ss_info.generation == 0)
+        get_names(-1);
+
+    images = Utils.parse_names(image_list);
+    pref.put("image_last", images.size());
 }
 
 //
@@ -353,17 +369,15 @@ public void get_names(int gen)
 private void main_loop()
 {
 
-    String saved = pref.get("images", "");
-    ss_info.generation = Utils.parse_gen(saved);
-
-    images = Utils.parse_names(saved);
-    ss_current = images.size();
+    init_list(ss_info.list);
     if (images.size() > 0) {
         state = SAVER_BLOCKED;
         screen_saver(SAVER_RESET);
     }
 
     for (;;) {
+        if (image_list == null)
+            init_list(ss_info.list);
         try {
             Thread.sleep(1000);
             screen_saver(SAVER_TICK);

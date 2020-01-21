@@ -39,7 +39,7 @@ public PopupImage popup;
 Menu menu_bar;
 int mgmt_view;
 
-public ScreenInfo screen_info;
+public ScreenInfo ss_info;
 
 ImageAdapter image_adapt;
 ImageEntry cur_image;
@@ -78,8 +78,8 @@ protected void onCreate(Bundle state)
 //        return;
 //    }
 
-    screen_info = new ScreenInfo(pref);
-    if (screen_info.host.isEmpty()) {
+    ss_info = new ScreenInfo(pref);
+    if (ss_info.host.isEmpty()) {
         Intent intent = new Intent();
         setResult(Activity.RESULT_CANCELED, intent);
         finish();
@@ -236,7 +236,7 @@ public void go_image(View v, final ImageEntry entry)
     iv.setImageResource(R.drawable.no);
     new Thread(new Runnable() {
         public void run() {
-            final Bitmap bitmap = new ImageThumb(screen_info, entry, w, h).get_bitmap();
+            final Bitmap bitmap = new ImageThumb(ss_info, entry, w, h).get_bitmap();
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (bitmap != null)
@@ -285,7 +285,7 @@ public void save()
     if (mgmt_view == R.id.mgmt_imageview)
         save_image();
     else
-        save_list();
+        save_list(ss_info.list);
 }
 
 public void select(boolean all)
@@ -297,26 +297,22 @@ public void select(boolean all)
 private void save_image()
 {
 
-    save_list();
+    save_list(ss_info.list);
 }
 
-private void save_list()
+private void save_list(String list)
 {
 
     ImageEntry entry;
     int r;
 
-    String list = "" + screen_info.generation;
+    String inf = "" + ss_info.generation;
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
-        list = list + ";" + Utils.img_info(entry) + entry.get_name();
+        inf = inf + ";" + entry.info() + entry.get_name();
     }
     image_adapt.notifyDataSetChanged();
-    try {
-        pref.put("images", list);
-    } catch (Exception e) {
-        Log.d("DDD-SS", "pref put failed - " + e);
-    }
+    pref.put("images:" + list, inf);
     go_back(null);
 }
 
@@ -326,7 +322,7 @@ public void get_saved()
 
     String str = pref.get("images", "");
     String[] strs = str.split(";");
-    screen_info.generation = Integer.parseInt(strs[0]);
+    ss_info.generation = Integer.parseInt(strs[0]);
 
     saved_images = new HashMap<String, String>();
 

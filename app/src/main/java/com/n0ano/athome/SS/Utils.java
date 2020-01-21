@@ -19,24 +19,24 @@ public static String get_from(String str)
 public static int parse_gen(String str)
 {
 
+    if (str.isEmpty())
+        return 0;
     int idx = str.indexOf(";");
     if (idx >= 0)
         str = str.substring(0, idx);
     return Integer.parseInt(str);
 }
 
-public static String img_info(ImageEntry entry)
+public static String list2str(int gen, ArrayList<ImageEntry> images)
 {
-    String info;
+    ImageEntry entry;
 
-    if (entry.get_check())
-        info = ((entry.get_type() == C.IMAGE_LOCAL) ? "L" : "R");
-    else
-        info = ((entry.get_type() == C.IMAGE_LOCAL) ? "l" : "r");
-    int r = entry.get_rotate();
-    if (r != 0)
-        info = info + "R" + String.format("%03d", r);
-    return info;
+    String list = "" + gen;
+    for (int i = 0; i < images.size(); i++) {
+        entry = images.get(i);
+        list = list + ";" + entry.info() + entry.get_name();
+    }
+    return list;
 }
 
 public static ArrayList<ImageEntry> parse_names(String str)
@@ -66,7 +66,7 @@ public static HashMap<String, String> parse_images(String str)
     ArrayList<ImageEntry> images = parse_names(str);
     for (int i = 0; i < images.size(); i++) {
         img = images.get(i);
-        map.put(img.get_name(), img_info(img));
+        map.put(img.get_name(), img.info());
     }
     return map;
 }

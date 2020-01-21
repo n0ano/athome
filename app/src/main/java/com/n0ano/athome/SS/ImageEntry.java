@@ -85,6 +85,19 @@ public void enable(String info)
     }
 }
 
+public String info()
+{
+    String inf;
+
+    if (checked)
+        inf = ((type == C.IMAGE_LOCAL) ? "L" : "R");
+    else
+        inf = ((type == C.IMAGE_LOCAL) ? "l" : "r");
+    if (rotate != 0)
+        inf = inf + "R" + String.format("%03d", rotate);
+    return inf;
+}
+
 private void get_thumb(ScreenInfo info)
 {
 

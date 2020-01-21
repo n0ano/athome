@@ -29,7 +29,7 @@ public ImageAdapter(ImageMgmt act)
 
     this.act = act;
 
-    image_find = new ImageFind((Activity) act, act.screen_info);
+    image_find = new ImageFind((Activity) act);
     get_names(image_find);
 }
 
@@ -113,10 +113,10 @@ private void get_names(final ImageFind image_find)
 
     new Thread(new Runnable() {
         public void run() {
-            images = image_find.find_local(new ArrayList<ImageEntry>());
-            images = image_find.find_remote(true, images, true);
+            images = image_find.find_local(new ArrayList<ImageEntry>(), act.ss_info);
+            images = image_find.find_remote(true, images, true, act.ss_info);
             Collections.sort(images);
-            act.screen_info.generation = image_find.ss_generation;
+            act.ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
             done();
         }
     }).start();

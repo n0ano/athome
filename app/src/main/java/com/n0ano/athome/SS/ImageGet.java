@@ -46,6 +46,7 @@ Log.d("DDD-SS", "ImageGet: " + entry.get_name() + ", type " + entry.get_type());
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
         gen = Integer.parseInt(meta.get("E"), 10);
+Log.d("DDD-SS-init", "ImageGet gen - " + gen + "(" + info.generation + ")");
 	} catch (Exception e) {
 		Log.d("DDD-SS", "get image failed - " + e);
 		return;
