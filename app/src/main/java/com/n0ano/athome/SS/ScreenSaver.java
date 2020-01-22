@@ -228,12 +228,8 @@ public void intr(int type)
     }
 }
 
-public void saver_start(String list)
+private void init_list(String list)
 {
-
-    ss_info = callbacks.ss_start();
-    state = SAVER_SHOWING;
-    ss_counter = ss_info.delay;
 
     String saved = pref.get("images:" + list, "");
 Log.d("DDD-SS", "saver_start(" + list + "): " + saved);
@@ -242,6 +238,16 @@ Log.d("DDD-SS", "saver_start(" + list + "): " + saved);
     images = Utils.parse_names(saved);
     if (images.size() <= 0)
         get_names(ss_info.generation + 1);
+}
+
+public void saver_start(String list)
+{
+
+    ss_info = callbacks.ss_start();
+    state = SAVER_SHOWING;
+    ss_counter = ss_info.delay;
+
+    init_list(list);
 
     act.runOnUiThread(new Runnable() {
         public void run() {
@@ -355,6 +361,7 @@ public void get_names(int gen)
         image_list = Utils.list2str(ss_info.generation, images);
         pref.put("images:" + ss_info.list, image_list);
         pref.put("image_last:" + ss_info.list, images.size());
+        init_list(ss_info.list);
     }
 }
 
