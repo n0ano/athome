@@ -88,13 +88,6 @@ public View getView(int position, View view, ViewGroup parent)
             act.pref.put("image_last:" + act.ss_info.list, images.indexOf(image) - 1);
         }
     });
-    view.setOnLongClickListener(new View.OnLongClickListener() {
-        public boolean onLongClick(View v) {
-            act.go_info(v, image);
-            act.pref.put("image_last:" + act.ss_info.list, images.indexOf(image) - 1);
-            return true;
-        }
-    });
 
     ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
 

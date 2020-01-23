@@ -252,6 +252,18 @@ public void go_image(View v, final ImageEntry entry)
             });
         }
     }).start();
+
+    iv.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+            go_back(null);
+        }
+    });
+    iv.setOnLongClickListener(new View.OnLongClickListener() {
+        public boolean onLongClick(View v) {
+            go_info(v, entry);
+            return true;
+        }
+    });
 }
 
 public void go_grid()
