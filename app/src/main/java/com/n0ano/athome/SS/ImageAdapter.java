@@ -84,7 +84,12 @@ public View getView(int position, View view, ViewGroup parent)
 
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
-            act.go_image(v, image);
+            if (Utils.grid_type == Utils.GRID_SHOW)
+                act.go_image(v, image);
+            else if (Utils.grid_type == Utils.GRID_CHECK) {
+                image.set_check(!image.get_check());
+                notifyDataSetChanged();
+            }
             act.pref.put("image_last:" + act.ss_info.list, images.indexOf(image) - 1);
         }
     });
@@ -121,7 +126,7 @@ private void done()
 {
 
     for (ImageEntry img : images) {
-        //Log.d("DDD-SS", "image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
+        Log.d("DDD-SS", "image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
         img.enable(act.saved_images.get(img.get_name()));
     }
 

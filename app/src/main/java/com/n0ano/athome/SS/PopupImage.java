@@ -30,10 +30,6 @@ public boolean menu_click(int item)
 
     switch (item) {
 
-    case R.id.action_undo:
-        act.go_back(null);
-        return true;
-
     case R.id.action_left:
         act.rotate(-90);
         return true;
@@ -41,7 +37,6 @@ public boolean menu_click(int item)
     case R.id.action_right:
         act.rotate(90);
         return true;
-
     case R.id.action_all:
         act.select(true);
         return true;
@@ -52,6 +47,14 @@ public boolean menu_click(int item)
 
     case R.id.action_save:
         act.save();
+        return true;
+
+    case R.id.action_undo:
+        act.go_back(null);
+        return true;
+
+    case R.id.action_mode:
+        act.grid_mode();
         return true;
 
     }

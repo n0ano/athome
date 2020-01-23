@@ -9,8 +9,13 @@ import com.n0ano.athome.Log;
 public class Utils
 {
 
-public static int THUMB_X =     150;
-public static int THUMB_Y =     150;
+public static final int GRID_SHOW =   0;
+public static final int GRID_CHECK =   1;
+
+public static int grid_type = GRID_SHOW;
+
+public static final int THUMB_X =     150;
+public static final int THUMB_Y =     150;
 
 public static String get_from(String str)
 {
@@ -30,6 +35,12 @@ public static int parse_gen(String str)
     return Integer.parseInt(str);
 }
 
+private static String get_info(String name)
+{
+
+    return (name.charAt(1) == 'R') ? name.substring(0, 5) : name.substring(0, 1);
+}
+
 public static String list2str(int gen, ArrayList<ImageEntry> images)
 {
     ImageEntry entry;
@@ -42,15 +53,18 @@ public static String list2str(int gen, ArrayList<ImageEntry> images)
     return list;
 }
 
-public static ArrayList<ImageEntry> parse_names(String str)
+public static ArrayList<ImageEntry> parse_images(String str)
 {
+    int gen;
+    String name;
 
+Log.d("DDD-SS", "parse_images - " + str);
     ArrayList<ImageEntry> images = new ArrayList<ImageEntry>();
     String[] imgs = str.split(";");
     if (imgs.length > 1) {
-        int gen = Integer.parseInt(imgs[0], 10);
+        gen = Integer.parseInt(imgs[0], 10);
         for (int i = 1; i < imgs.length; i++) {
-            String name = imgs[i];
+            name = imgs[i];
             if (!name.isEmpty()) {
                 images.add(new ImageEntry(name, gen, null));
             }
@@ -59,15 +73,22 @@ public static ArrayList<ImageEntry> parse_names(String str)
     return images;
 }
 
-public static HashMap<String, String> parse_images(String str)
+public static HashMap<String, String> parse_names(String str)
 {
-    ImageEntry img;
+    String name, info;
+
+Log.d("DDD-SS", "parse_names - " + str);
 
     HashMap<String, String> map = new HashMap<String, String>();
-    ArrayList<ImageEntry> images = parse_names(str);
-    for (int i = 0; i < images.size(); i++) {
-        img = images.get(i);
-        map.put(img.get_name(), img.info());
+    String[] imgs = str.split(";");
+    if (imgs.length > 1) {
+        for (int i = 1; i < imgs.length; i++) {
+            name = imgs[i];
+            if (!name.isEmpty()) {
+                info = get_info(name);
+                map.put(name.substring(info.length()), info);
+            }
+        }
     }
     return map;
 }

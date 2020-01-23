@@ -2,8 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.n0ano.athome.MainActivity">
-
-    <item
+ 
+     <item
         android:id="@+id/action_left"
         android:icon="@drawable/rotate_l"
         android:orderInCategory="100"
@@ -41,6 +41,13 @@
         android:icon="@drawable/undo"
         android:orderInCategory="100"
         android:title="Edits"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_mode"
+        android:icon="@drawable/image"
+        android:orderInCategory="100"
+        android:title="Grid mode"
         app:showAsAction="always" />
 
 </menu>

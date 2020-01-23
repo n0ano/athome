@@ -49,7 +49,7 @@ private InputStream open_http(String image)
                 "&w=" + max_w +
                 "&h=" + max_h +
                 "&r=" + entry.get_rotate();
-        Log.d("DDD-SS", "get image from " + url);
+        //Log.d("DDD-SS", "get image from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());

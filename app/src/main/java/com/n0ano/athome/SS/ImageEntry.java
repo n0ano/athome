@@ -82,10 +82,10 @@ public void enable(String info)
 
     checked = true;
     if (info != null) {
-        if ((info.length() > 1) && (info.charAt(1) == 'R'))
-            rotate = Integer.parseInt(info.substring(2,5));
         if (info.charAt(0) == 'l' || info.charAt(0) == 'r')
             checked = false;
+        if ((info.length() > 1) && (info.charAt(1) == 'R'))
+            rotate = Integer.parseInt(info.substring(2,5));
     }
 }
 

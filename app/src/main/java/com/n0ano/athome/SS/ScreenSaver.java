@@ -235,7 +235,7 @@ private void init_list(String list)
 Log.d("DDD-SS", "saver_start(" + list + "): " + saved);
     ss_info.list = list;
     ss_info.generation = Utils.parse_gen(saved);
-    images = Utils.parse_names(saved);
+    images = Utils.parse_images(saved);
     if (images.size() <= 0)
         get_names(ss_info.generation + 1);
 }
@@ -341,7 +341,7 @@ public void get_names(int gen)
         images = image_find.find_remote(true, images, false, ss_info);
         Collections.sort(images);
 
-        HashMap<String, String> map = Utils.parse_images(pref.get("images:" + ss_info.list, ""));
+        HashMap<String, String> map = Utils.parse_names(pref.get("images:" + ss_info.list, ""));
         for (ImageEntry img : images)
             img.enable(map.get(img.get_name()));
 

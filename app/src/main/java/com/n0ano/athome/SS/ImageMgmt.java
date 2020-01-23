@@ -97,7 +97,7 @@ public void onCreate(Bundle state)
     image_vm = ViewModelProviders.of(this).get(ImageVM.class);
 Log.d("DDD-SS", "view model - " + image_vm.size());
 
-    saved_images = Utils.parse_images(pref.get("images", ""));
+    saved_images = Utils.parse_names(pref.get("images:" + ss_info.list_real, ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
@@ -207,6 +207,8 @@ private void set_menu(int id)
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_all);
         item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_mode);
+        item.setVisible(true);
         item = menu_bar.findItem(R.id.action_none);
         item.setVisible(true);
         break;
@@ -217,6 +219,8 @@ private void set_menu(int id)
         item = menu_bar.findItem(R.id.action_right);
         item.setVisible(true);
         item = menu_bar.findItem(R.id.action_all);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_mode);
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_none);
         item.setVisible(false);
@@ -335,8 +339,10 @@ public void save()
 
     if (mgmt_view == R.id.mgmt_imageview)
         save_image();
-    else
+    else {
         save_list(ss_info.list);
+        go_back(null);
+    }
 }
 
 public void select(boolean all)
@@ -345,10 +351,26 @@ public void select(boolean all)
     image_adapt.select(all);
 }
 
+public void grid_mode()
+{
+    int icon_id = R.drawable.check;
+
+    if (Utils.grid_type == Utils.GRID_SHOW) {
+        Utils.grid_type = Utils.GRID_CHECK;
+        icon_id = R.drawable.check;
+    } else if (Utils.grid_type == Utils.GRID_CHECK) {
+        Utils.grid_type = Utils.GRID_SHOW;
+        icon_id = R.drawable.image;
+    }
+    MenuItem icon = menu_bar.findItem(R.id.action_mode);
+    icon.setIcon(icon_id);
+}
+
 private void save_image()
 {
 
     save_list(ss_info.list);
+    go_back(null);
 }
 
 private void save_list(String list)
@@ -361,29 +383,10 @@ private void save_list(String list)
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
         inf = inf + ";" + entry.info() + entry.get_name();
+        image_vm.put(entry.get_name(), entry);
     }
     image_adapt.notifyDataSetChanged();
     pref.put("images:" + list, inf);
-    go_back(null);
-}
-
-public void get_saved()
-{
-    int off;
-
-    String str = pref.get("images", "");
-    String[] strs = str.split(";");
-    ss_info.generation = Integer.parseInt(strs[0]);
-
-    saved_images = new HashMap<String, String>();
-
-    for (int i = 1; i < strs.length; i++) {
-        str = strs[i];
-        off = 1;
-        if (str.charAt(1) == 'R')
-            off += 4;
-        saved_images.put(str.substring(off), str.substring(0, off));
-    }
 }
 
 }
