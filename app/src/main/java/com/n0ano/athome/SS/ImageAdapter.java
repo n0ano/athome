@@ -21,15 +21,17 @@ public class ImageAdapter extends BaseAdapter
 
 ImageMgmt act;
 ArrayList<ImageEntry> images = new ArrayList<ImageEntry>();
+ImageVM image_vm;
 
 ImageFind image_find;
 
-public ImageAdapter(ImageMgmt act)
+public ImageAdapter(ImageMgmt act, ImageVM image_vm)
 {
 
     this.act = act;
+    this.image_vm = image_vm;
 
-    image_find = new ImageFind((Activity) act);
+    image_find = new ImageFind((Activity) act, image_vm);
     get_names(image_find);
 }
 

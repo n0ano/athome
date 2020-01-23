@@ -101,7 +101,7 @@ public String info()
 private void get_thumb(ScreenInfo info)
 {
 
-    bitmap = new ImageThumb(info, this, 150, 150).get_bitmap();
+    bitmap = new ImageThumb(info, this, Utils.THUMB_X, Utils.THUMB_Y).get_bitmap();
 }
 
 @Override

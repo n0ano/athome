@@ -65,6 +65,7 @@ END
 	open F, $DIR . $f;
 	$gen = <F>;
 	chop $gen;
+	&out_line("G", $gen);
 	while (<F>) {
 		chop;
 		$dir = $_;

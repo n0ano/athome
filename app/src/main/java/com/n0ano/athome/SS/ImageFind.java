@@ -18,11 +18,13 @@ public class ImageFind
 {
 
 private Activity act;
+private ImageVM image_vm;
 
-public ImageFind(Activity act)
+public ImageFind(Activity act, ImageVM image_vm)
 {
 
     this.act = act;
+    this.image_vm = image_vm;
 }
 
 public ArrayList<ImageEntry> find_local(ArrayList<ImageEntry> images, ScreenInfo info)
@@ -81,14 +83,21 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 break;
 
             case 'T':
-                idx = str.indexOf(":");
+                final String name = str.substring(str.indexOf(":"));
                 if (C.loading_name != null)
                     act.runOnUiThread(new Runnable() {
                         public void run() {
-                            C.loading_name.setText(str.substring(str.indexOf(":")));
+                            C.loading_name.setText(name);
                         }
                     });
-                images.add(new ImageEntry(str, gen, (thumb ? info : null)));
+                ImageEntry img = null;
+                if (image_vm != null)
+                    img = image_vm.get(name, gen, Utils.THUMB_X, Utils.THUMB_Y);
+                if (img == null) {
+                    img = new ImageEntry(str, gen, (thumb ? info : null));
+                    image_vm.put(name, img);
+                }
+                images.add(img);
                 break;
 
             default:

@@ -9,6 +9,9 @@ import com.n0ano.athome.Log;
 public class Utils
 {
 
+public static int THUMB_X =     150;
+public static int THUMB_Y =     150;
+
 public static String get_from(String str)
 {
 

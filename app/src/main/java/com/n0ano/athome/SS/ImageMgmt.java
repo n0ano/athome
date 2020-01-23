@@ -2,10 +2,12 @@ package com.n0ano.athome.SS;
 
 
 import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -15,6 +17,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,11 +46,12 @@ public ScreenInfo ss_info;
 
 ImageAdapter image_adapt;
 ImageEntry cur_image;
+ImageVM image_vm;
 
 public Map<String, String> saved_images;
 
 @Override
-protected void onCreate(Bundle state)
+public void onCreate(Bundle state)
 {
 
     super.onCreate(state);
@@ -86,10 +90,13 @@ protected void onCreate(Bundle state)
         return;
     }
 
+    image_vm = ViewModelProviders.of(this).get(ImageVM.class);
+Log.d("DDD-SS", "view model - " + image_vm.size());
+
     saved_images = Utils.parse_images(pref.get("images", ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
-    image_adapt = new ImageAdapter(this);
+    image_adapt = new ImageAdapter(this, image_vm);
     gv.setAdapter(image_adapt);
 }
 
