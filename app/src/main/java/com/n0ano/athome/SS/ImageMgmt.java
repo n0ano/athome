@@ -17,6 +17,10 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -221,11 +225,36 @@ private void set_menu(int id)
     }
 }
 
-public void go_info(View v, final ImageEntry entry)
+public void set_title(final ImageEntry image, final String title)
 {
 
-Log.d("DDD-SS", "info popup for " + entry.get_name());
-    popup.info_dialog(entry);
+    Log.d("DDD-SS", image.get_name() + ": set new title - " + title);
+
+    new Thread(new Runnable() {
+        public void run() {
+            try {
+                String url;
+                InputStream in_rdr = null;
+                HashMap<String, String> meta;
+
+                url = ss_info.server +
+                        C.CGI_BIN +
+                        "?title" +
+                        "&name=" + URLEncoder.encode(image.get_name()) +
+                        "&text=" + URLEncoder.encode(title);
+                Log.d("DDD-SS", image.get_name() + ":title - " + url);
+                Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
+                in_rdr = new URL(url).openStream();
+                meta = C.get_meta(in_rdr, new HashMap<String, String>());
+            } catch (Exception e) {
+                Log.d("DDD-SS", "image get execption - " + e);
+            }
+        }
+    }).start();
+
+    image.set_title(title);
+    TextView tv = (TextView)findViewById(R.id.mgmt_title);
+    tv.setText(title);
 }
 
 public void go_image(View v, final ImageEntry entry)
@@ -260,10 +289,13 @@ public void go_image(View v, final ImageEntry entry)
     });
     iv.setOnLongClickListener(new View.OnLongClickListener() {
         public boolean onLongClick(View v) {
-            go_info(v, entry);
+            popup.info_dialog(entry);
             return true;
         }
     });
+
+    TextView tv = (TextView)findViewById(R.id.mgmt_title);
+    tv.setText(entry.get_title());
 }
 
 public void go_grid()

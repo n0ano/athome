@@ -59,6 +59,7 @@ private InputStream open_http(String image)
 	}
     title = meta.get("T");
     title = ((title != null) ? title : "");
+    entry.set_title(title);
     dimen(meta.get("D"));
     return in_rdr;
 }

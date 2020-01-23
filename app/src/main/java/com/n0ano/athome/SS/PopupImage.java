@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.n0ano.athome.Preferences;
 import com.n0ano.athome.R;
 import com.n0ano.athome.C;
+import com.n0ano.athome.Log;
 
 public class PopupImage extends ImageMgmt
 {
@@ -83,6 +84,10 @@ public void info_dialog(final ImageEntry entry)
     tv = (TextView) dialog.findViewById(R.id.info_height);
     tv.setText(String.valueOf(entry.get_height()));
 
+    final String title = entry.get_title();
+    final TextView titlev = (TextView) dialog.findViewById(R.id.info_title);
+    titlev.setText(String.valueOf(entry.get_title()));
+
     Button cancel = (Button) dialog.findViewById(R.id.cancel);
     cancel.setOnClickListener(new OnClickListener() {
         @Override
@@ -97,6 +102,9 @@ public void info_dialog(final ImageEntry entry)
         public void onClick(View v) {
             entry.set_check(cb.isChecked());
             act.image_adapt.notifyDataSetChanged();
+            String tstr = titlev.getText().toString();
+            if (!title.equals(tstr))
+                act.set_title(entry, tstr);
             dialog.dismiss();
         }
     });

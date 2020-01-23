@@ -17,6 +17,7 @@ boolean checked;
 int rotate;
 
 int generation;
+String title = "";
 Bitmap bitmap;
 
 public ImageEntry(String name, int gen, ScreenInfo info)
@@ -72,6 +73,9 @@ public void set_check(boolean ck) { checked = ck; }
 
 public int get_generation() { return generation; }
 public void set_generation(int g) { generation = g; }
+
+public String get_title() { return title; }
+public void set_title(String t) { title = t; }
 
 public void enable(String info)
 {
