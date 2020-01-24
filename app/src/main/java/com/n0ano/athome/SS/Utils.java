@@ -35,6 +35,13 @@ public static int parse_gen(String str)
     return Integer.parseInt(str);
 }
 
+public static String last(String name)
+{
+
+    int idx = name.lastIndexOf("/");
+    return (idx < 0) ? name : name.substring(idx + 1);
+}
+
 private static String get_info(String name)
 {
 

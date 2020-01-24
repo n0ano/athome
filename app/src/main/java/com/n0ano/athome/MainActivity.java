@@ -208,6 +208,8 @@ protected void onResume()
                 paused = false;
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                        tb.setTitle("AtHome");
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
                         icon.setIcon(R.drawable.monitor);
                         display(screen);
@@ -234,10 +236,13 @@ protected void onResume()
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                        if (from.charAt(0) == '-')
+                        char c = from.charAt(0);
+                        if (c == '-')
                             tb.setTitle("Change:" + from);
-                        else
+                        else if (c == '+')
                             tb.setTitle("New:" + from);
+                        else
+                            tb.setTitle(from);
                     }
                 });
             }
