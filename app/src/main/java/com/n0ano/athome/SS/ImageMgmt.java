@@ -371,14 +371,15 @@ private void save_list(String list)
     ImageEntry entry;
     int r;
 
-    String inf = "" + ss_info.generation;
+    StringBuilder inf = new StringBuilder();
+    inf.append(ss_info.generation);
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
-        inf = inf + ";" + entry.info() + entry.get_name();
+        inf.append(";" + entry.info() + entry.get_name());
         image_vm.put(entry.get_name(), entry);
     }
     image_adapt.notifyDataSetChanged();
-    pref.put("images:" + list, inf);
+    pref.put("images:" + list, inf.toString());
 }
 
 }
