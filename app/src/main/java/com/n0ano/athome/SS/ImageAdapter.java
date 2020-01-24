@@ -63,7 +63,7 @@ public View getView(int position, View view, ViewGroup parent)
     final ImageEntry image = images.get(position);
     if (view == null) {
         final LayoutInflater layoutInflater = LayoutInflater.from(act);
-        view = layoutInflater.inflate(R.layout.grid_image, null);
+        view = layoutInflater.inflate(R.layout.ss_grid_image, null);
     }
 
     final ImageView iv = (ImageView)view.findViewById(R.id.image);
@@ -72,7 +72,7 @@ public View getView(int position, View view, ViewGroup parent)
     if (image.bitmap_th != null)
         iv.setImageBitmap(image.bitmap_th);
     else {
-        iv.setImageResource(R.drawable.no);
+        iv.setImageResource(R.drawable.ss_no);
         image.get_thumb(act, act.ss_info, iv, new BitmapCallbacks() {
             @Override
             public void gotit() {

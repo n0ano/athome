@@ -192,7 +192,7 @@ protected void onResume()
                         tb.setTitle("AtHome");
 
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                        icon.setIcon(R.drawable.play);
+                        icon.setIcon(R.drawable.ss_play);
                         View v = (View)findViewById(R.id.scroll_view);
                         v.setAlpha(1.0f);
                     }
@@ -211,7 +211,7 @@ protected void onResume()
                         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
                         tb.setTitle("AtHome");
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                        icon.setIcon(R.drawable.monitor);
+                        icon.setIcon(R.drawable.ss_monitor);
                         display(screen);
                     }
                 });

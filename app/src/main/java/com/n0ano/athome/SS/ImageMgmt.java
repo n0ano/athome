@@ -59,7 +59,7 @@ public void onCreate(Bundle state)
 {
 
     super.onCreate(state);
-    setContentView(R.layout.activity_image_mgmt);
+    setContentView(R.layout.ss_activity_image_mgmt);
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -271,7 +271,7 @@ public void go_image(View v, final ImageEntry entry)
     cur_image = entry;
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
-    iv.setImageResource(R.drawable.no);
+    iv.setImageResource(R.drawable.ss_no);
     entry.get_bitmap(this, info, iv, new BitmapCallbacks() {
         @Override
         public void gotit() {
@@ -345,14 +345,14 @@ public void select(boolean all)
 
 public void grid_mode()
 {
-    int icon_id = R.drawable.check;
+    int icon_id = R.drawable.ss_check;
 
     if (Utils.grid_type == Utils.GRID_SHOW) {
         Utils.grid_type = Utils.GRID_CHECK;
-        icon_id = R.drawable.check;
+        icon_id = R.drawable.ss_check;
     } else if (Utils.grid_type == Utils.GRID_CHECK) {
         Utils.grid_type = Utils.GRID_SHOW;
-        icon_id = R.drawable.image;
+        icon_id = R.drawable.ss_image;
     }
     MenuItem icon = menu_bar.findItem(R.id.action_mode);
     icon.setIcon(icon_id);

@@ -17,7 +17,7 @@
         android:id="@+id/mgmt_check"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/check"
+        android:src="@drawable/ss_check"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:visibility="visible" />

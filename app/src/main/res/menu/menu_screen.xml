@@ -5,14 +5,14 @@
  
      <item
         android:id="@+id/action_left"
-        android:icon="@drawable/rotate_l"
+        android:icon="@drawable/ss_rotate_l"
         android:orderInCategory="100"
         android:title="Rotate left"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_right"
-        android:icon="@drawable/rotate_r"
+        android:icon="@drawable/ss_rotate_r"
         android:orderInCategory="100"
         android:title="Rotate right"
         app:showAsAction="never" />
@@ -31,21 +31,21 @@
 
     <item
         android:id="@+id/action_save"
-        android:icon="@drawable/save"
+        android:icon="@drawable/ss_save"
         android:orderInCategory="100"
         android:title="Save"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_undo"
-        android:icon="@drawable/undo"
+        android:icon="@drawable/ss_undo"
         android:orderInCategory="100"
         android:title="Edits"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_mode"
-        android:icon="@drawable/image"
+        android:icon="@drawable/ss_image"
         android:orderInCategory="100"
         android:title="Grid mode"
         app:showAsAction="always" />

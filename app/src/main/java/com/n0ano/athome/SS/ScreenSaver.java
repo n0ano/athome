@@ -153,7 +153,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
     final ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
     act.runOnUiThread(new Runnable() {
         public void run() {
-            iv.setImageResource(R.drawable.no);
+            iv.setImageResource(R.drawable.ss_no);
         }
     });
     entry.get_bitmap(act, ss_info, iv, new BitmapCallbacks() {
@@ -213,13 +213,13 @@ public void intr(int type)
             saver_start(ss_info.list_real);
         else {
             if (state == ScreenSaver.SAVER_FROZEN) {
-                callbacks.ss_icon(R.drawable.play);
+                callbacks.ss_icon(R.drawable.ss_play);
                 state = ScreenSaver.SAVER_SHOWING;
                 ss_counter = ss_info.delay;
                 ss_info.fade = fade_type;
                 saver_fade(1);
             } else {
-                callbacks.ss_icon(R.drawable.pause);
+                callbacks.ss_icon(R.drawable.ss_pause);
                 state = SAVER_FROZEN;
                 fade_type = ss_info.fade;
                 ss_info.fade = 5;

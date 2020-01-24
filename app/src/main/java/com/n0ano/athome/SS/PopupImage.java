@@ -66,7 +66,7 @@ public void info_dialog(final ImageEntry entry)
 {
 
     final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
-    dialog.setContentView(R.layout.bar_info);
+    dialog.setContentView(R.layout.ss_bar_info);
     dialog.setCanceledOnTouchOutside(false);
 
     TextView tv = (TextView) dialog.findViewById(R.id.info_name);
