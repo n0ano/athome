@@ -266,17 +266,18 @@ public void go_image(View v, final ImageEntry entry)
 
     set_menu(R.id.mgmt_imageview);
 
+    ScreenInfo info = ss_info;
     View vv = (View)findViewById(R.id.mgmt_gridview);
-    final int w = vv.getWidth();
-    final int h = vv.getHeight();
+    info.width = vv.getWidth();
+    info.height = vv.getHeight();
 
     cur_image = entry;
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.no);
-    new Thread(new Runnable() {
-        public void run() {
-            final Bitmap bitmap = new ImageThumb(ss_info, entry, w, h).get_bitmap();
+    entry.get_bitmap(info, new BitmapCallbacks() {
+        @Override
+        public void gotit(final Bitmap bitmap) {
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (bitmap != null)
@@ -284,7 +285,7 @@ public void go_image(View v, final ImageEntry entry)
                 }
             });
         }
-    }).start();
+    });
 
     iv.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {

@@ -1,9 +1,16 @@
 package com.n0ano.athome.SS;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.n0ano.athome.Log;
 import com.n0ano.athome.C;
+
+import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
 
 public class ImageEntry implements Comparable<ImageEntry>
 {
@@ -19,8 +26,11 @@ int rotate;
 int generation;
 String title = "";
 Bitmap bitmap;
+Bitmap bitmap_th;
 
-public ImageEntry(String name, int gen, ScreenInfo info)
+private HashMap<String, String> meta;
+
+public ImageEntry(String name, int gen)
 {
     int idx, ts;
     char t;
@@ -48,9 +58,6 @@ public ImageEntry(String name, int gen, ScreenInfo info)
     this.height = 0;
     this.bitmap = null;
     this.generation = gen;
-
-    if (info != null)
-        get_thumb(info);
 }
 
 public String get_name() { return name; }
@@ -102,10 +109,87 @@ public String info()
     return inf;
 }
 
-private void get_thumb(ScreenInfo info)
+public void get_bitmap(final ScreenInfo ss_info, final BitmapCallbacks callback)
 {
 
-    bitmap = new ImageThumb(info, this, Utils.THUMB_X, Utils.THUMB_Y).get_bitmap();
+    new Thread(new Runnable() {
+        public void run() {
+            if (bitmap == null || ss_info.width != width || ss_info.height != height) {
+                bitmap = get_bits(ss_info, ss_info.width, ss_info.height);
+                width = ss_info.width;
+                height = ss_info.height;
+            }
+            callback.gotit(bitmap);
+        }
+    }).start();
+}
+
+public void get_thumb(final ScreenInfo ss_info, final BitmapCallbacks callback)
+{
+
+    new Thread(new Runnable() {
+        public void run() {
+            if (bitmap_th == null)
+                bitmap_th = get_bits(ss_info, Utils.THUMB_X, Utils.THUMB_Y);
+            callback.gotit(bitmap_th);
+        }
+    }).start();
+}
+
+private Bitmap get_bits(ScreenInfo ss_info, int width, int height)
+{
+	InputStream in_rdr;
+
+	try {
+        in_rdr = open_image(ss_info, width, height);
+        bitmap = BitmapFactory.decodeStream(in_rdr);
+        in_rdr.close();
+        generation = Integer.parseInt(meta.get("E"), 10);
+	} catch (Exception e) {
+		Log.d("DDD-SS", "get image failed - " + e);
+		return null;
+	}
+    if (bitmap == null)
+        Log.d("DDD-SS", "image decode failed");
+    return bitmap;
+}
+
+private InputStream open_http(ScreenInfo ss_info, int width, int height)
+{
+    String url;
+	InputStream in_rdr;
+
+	try {
+        url = ss_info.server +
+                C.CGI_BIN +
+                "?get" +
+                "&host=" + C.base(ss_info.host) +
+                "&list=" + ss_info.list +
+                "&name=" + URLEncoder.encode(name) +
+                "&w=" + width +
+                "&h=" + height +
+                "&r=" + rotate;
+        Log.d("DDD-SS", "get image from " + url);
+        Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
+		in_rdr = new URL(url).openStream();
+        meta = C.get_meta(in_rdr, new HashMap<String, String>());
+	} catch (Exception e) {
+		Log.d("DDD-SS", "get http image failed - " + e);
+		return null;
+	}
+    title = meta.get("T");
+    title = ((title != null) ? title : "");
+    return in_rdr;
+}
+
+private InputStream open_image(ScreenInfo ss_info, int width, int height)
+{
+
+    if (type == C.IMAGE_REMOTE)
+        return open_http(ss_info, width, height);
+//    else if (type == C.IMAGE_LOCAL)
+//        return file open
+    return null;
 }
 
 @Override

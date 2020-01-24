@@ -66,7 +66,7 @@ Log.d("DDD-SS", "parse_images - " + str);
         for (int i = 1; i < imgs.length; i++) {
             name = imgs[i];
             if (!name.isEmpty()) {
-                images.add(new ImageEntry(name, gen, null));
+                images.add(new ImageEntry(name, gen));
             }
         }
     }

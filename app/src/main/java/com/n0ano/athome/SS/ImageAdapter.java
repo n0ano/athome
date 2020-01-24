@@ -69,17 +69,20 @@ public View getView(int position, View view, ViewGroup parent)
     final ImageView iv = (ImageView)view.findViewById(R.id.image);
     final ImageView ic = (ImageView)view.findViewById(R.id.mgmt_check);
 
-    iv.setTag(image);
-    if (image.bitmap == null)
-        iv.setImageResource(R.drawable.no);
+    if (image.bitmap_th != null)
+        iv.setImageBitmap(image.bitmap);
     else {
-        if (image.get_rotate() == 0)
-            iv.setImageBitmap(image.bitmap);
-        else {
-            Matrix matrix  = new Matrix();
-            matrix.postRotate((float)image.get_rotate());
-            iv.setImageBitmap(Bitmap.createBitmap(image.bitmap, 0, 0, image.bitmap.getWidth(), image.bitmap.getHeight(), matrix, true));
-        }
+        iv.setImageResource(R.drawable.no);
+        image.get_thumb(act.ss_info, new BitmapCallbacks() {
+            @Override
+            public void gotit(final Bitmap bitmap) {
+                act.runOnUiThread(new Runnable() {
+                    public void run() {
+                        iv.setImageBitmap(bitmap);
+                    }
+                });
+            }
+        });
     }
 
     view.setOnClickListener(new View.OnClickListener() {

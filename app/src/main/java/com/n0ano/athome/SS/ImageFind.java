@@ -46,7 +46,7 @@ if (true) return images;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry("l:" + path, 1, null));
+        images.add(new ImageEntry("l:" + path, 1));
     }
     return images;
 }
@@ -94,7 +94,7 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 if (image_vm != null)
                     img = image_vm.get(name, gen, Utils.THUMB_X, Utils.THUMB_Y);
                 if (img == null) {
-                    img = new ImageEntry(str, gen, (thumb ? info : null));
+                    img = new ImageEntry(str, gen);
                     image_vm.put(name, img);
                 }
                 images.add(img);

@@ -147,23 +147,30 @@ private ImageEntry ss_next(int delta)
     return null;
 }
 
-public void show_image(final Bitmap bitmap, final String title, final View img_start, final View img_end, int gen)
+public void show_image(final ImageEntry entry, final View img_start, final View img_end)
 {
 
+    final ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
     act.runOnUiThread(new Runnable() {
         public void run() {
-            ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
-            if (bitmap == null)
-                iv.setImageResource(R.drawable.no);
-            else
-                iv.setImageBitmap(bitmap);
-            TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
-            tv.setText(title);
-            if (img_start != null)
-                do_fade(img_start, img_end);
+            iv.setImageResource(R.drawable.no);
         }
     });
-    get_names(gen);
+    entry.get_bitmap(ss_info, new BitmapCallbacks() {
+        @Override
+        public void gotit(final Bitmap bitmap) {
+            act.runOnUiThread(new Runnable() {
+                public void run() {
+                    iv.setImageBitmap(bitmap);
+                    TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
+                    tv.setText(entry.get_title());
+                    if (img_start != null)
+                        do_fade(img_start, img_end);
+                    get_names(entry.generation);
+                }
+            });
+        }
+    });
 }
 
 public void saver_fade(int delta)
@@ -176,7 +183,7 @@ public void saver_fade(int delta)
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, ss_info, ss_next(delta), ss_views[old], ss_views[ss_viewid]);
+    show_image(ss_next(delta), ss_views[old], ss_views[ss_viewid]);
 }
 
 public void saver_click()
@@ -265,7 +272,7 @@ public void saver_start(String list)
     //
     //  ImageGet will call do_fade once the new image is loaded
     //
-    ImageGet ig = new ImageGet(this, ss_info, ss_next(1), first, ss_views[ss_viewid]);
+    show_image(ss_next(1), first, ss_views[ss_viewid]);
 }
 
 public void screen_saver(int tick)
