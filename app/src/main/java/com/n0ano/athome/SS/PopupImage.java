@@ -37,12 +37,17 @@ public boolean menu_click(int item)
     case R.id.action_right:
         act.rotate(90);
         return true;
+
     case R.id.action_all:
         act.select(true);
         return true;
 
     case R.id.action_none:
         act.select(false);
+        return true;
+
+    case R.id.action_files:
+        act.show_files();
         return true;
 
     case R.id.action_save:

@@ -30,6 +30,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_files"
+        android:orderInCategory="100"
+        android:title="Show files"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_save"
         android:icon="@drawable/ss_save"
         android:orderInCategory="100"

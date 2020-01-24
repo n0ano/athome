@@ -13,8 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -157,7 +161,7 @@ public boolean onCreateOptionsMenu(Menu menu)
 {
 
     // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_screen, menu);
+    getMenuInflater().inflate(R.menu.ss_menu, menu);
     menu_bar = menu;
     set_menu(R.id.mgmt_gridview);
     return true;
@@ -182,16 +186,23 @@ public void onBackPressed()
     super.onBackPressed();
 }
 
-public void set_view(int visible, int invisible)
+public void set_view(int visible)
 {
     View v;
 
-    v = (View)findViewById(visible);
-    v.setVisibility(View.VISIBLE);
-    v = (View)findViewById(invisible);
+    v = (View)findViewById(R.id.mgmt_loading);
+    v.setVisibility(View.GONE);
+    v = (View)findViewById(R.id.mgmt_gridview);
+    v.setVisibility(View.GONE);
+    v = (View)findViewById(R.id.mgmt_imageview);
+    v.setVisibility(View.GONE);
+    v = (View)findViewById(R.id.mgmt_fileview);
     v.setVisibility(View.GONE);
 
     mgmt_view = visible;
+    v = (View)findViewById(visible);
+    v.setVisibility(View.VISIBLE);
+
 }
 
 private void set_menu(int id)
@@ -211,6 +222,8 @@ private void set_menu(int id)
         item.setVisible(true);
         item = menu_bar.findItem(R.id.action_none);
         item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_files);
+        item.setVisible(true);
         break;
 
     case R.id.mgmt_imageview:
@@ -223,6 +236,8 @@ private void set_menu(int id)
         item = menu_bar.findItem(R.id.action_mode);
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_none);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_files);
         item.setVisible(false);
         break;
 
@@ -269,7 +284,7 @@ public void go_image(View v, final ImageEntry entry)
     ScreenInfo info = ss_info;
 
     cur_image = entry;
-    set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
+    set_view(R.id.mgmt_imageview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.ss_no);
     entry.get_bitmap(this, info, iv, new BitmapCallbacks() {
@@ -298,18 +313,27 @@ public void go_grid()
 {
 
     set_menu(R.id.mgmt_gridview);
-    set_view(R.id.mgmt_gridview, R.id.mgmt_imageview);
+    set_view(R.id.mgmt_gridview);
 }
 
 public void go_back(View v)
 {
 
-    if (mgmt_view == R.id.mgmt_imageview)
+    switch (mgmt_view) {
+
+    case R.id.mgmt_imageview:
         go_grid();
-    else {
+        break;
+
+    case R.id.mgmt_gridview:
         Intent intent = new Intent();
         setResult(Activity.RESULT_OK, intent);
         finish();
+        break;
+
+    case R.id.mgmt_fileview:
+        set_view(R.id.mgmt_gridview);
+        break;
     }
 }
 
@@ -380,6 +404,20 @@ private void save_list(String list)
     }
     image_adapt.notifyDataSetChanged();
     pref.put("images:" + list, inf.toString());
+}
+
+public void show_files()
+{
+    String line;
+    TextView tv;
+    ImageEntry entry;
+
+    Log.d("Show files");
+    set_view(R.id.mgmt_fileview);
+
+    ListView lv = (ListView) findViewById(R.id.mgmt_files);
+    FilesAdapter file_adapt = new FilesAdapter(this);
+    lv.setAdapter(file_adapt);
 }
 
 }

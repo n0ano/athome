@@ -92,4 +92,19 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/mgmt_fileview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/appbar"
+        android:layout_alignParentLeft="true"
+        android:visibility="gone" >
+
+        <ListView
+            android:id="@+id/mgmt_files"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        </LinearLayout>
+
 </RelativeLayout>
