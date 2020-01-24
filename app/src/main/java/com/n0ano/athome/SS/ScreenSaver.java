@@ -156,12 +156,11 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
             iv.setImageResource(R.drawable.no);
         }
     });
-    entry.get_bitmap(ss_info, new BitmapCallbacks() {
+    entry.get_bitmap(act, ss_info, iv, new BitmapCallbacks() {
         @Override
-        public void gotit(final Bitmap bitmap) {
+        public void gotit() {
             act.runOnUiThread(new Runnable() {
                 public void run() {
-                    iv.setImageBitmap(bitmap);
                     TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
                     tv.setText(entry.get_title());
                     if (img_start != null)

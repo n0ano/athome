@@ -70,17 +70,12 @@ public View getView(int position, View view, ViewGroup parent)
     final ImageView ic = (ImageView)view.findViewById(R.id.mgmt_check);
 
     if (image.bitmap_th != null)
-        iv.setImageBitmap(image.bitmap);
+        iv.setImageBitmap(image.bitmap_th);
     else {
         iv.setImageResource(R.drawable.no);
-        image.get_thumb(act.ss_info, new BitmapCallbacks() {
+        image.get_thumb(act, act.ss_info, iv, new BitmapCallbacks() {
             @Override
-            public void gotit(final Bitmap bitmap) {
-                act.runOnUiThread(new Runnable() {
-                    public void run() {
-                        iv.setImageBitmap(bitmap);
-                    }
-                });
+            public void gotit() {
             }
         });
     }

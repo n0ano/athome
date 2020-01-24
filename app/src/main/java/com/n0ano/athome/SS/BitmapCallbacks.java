@@ -5,5 +5,5 @@ import android.graphics.Bitmap;
 public interface BitmapCallbacks
 {
 
-    void gotit(Bitmap bitmap);
+    void gotit();
 }

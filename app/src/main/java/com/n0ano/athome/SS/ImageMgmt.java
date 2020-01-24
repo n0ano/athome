@@ -275,15 +275,9 @@ public void go_image(View v, final ImageEntry entry)
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.no);
-    entry.get_bitmap(info, new BitmapCallbacks() {
+    entry.get_bitmap(this, info, iv, new BitmapCallbacks() {
         @Override
-        public void gotit(final Bitmap bitmap) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    if (bitmap != null)
-                        iv.setImageBitmap(bitmap);
-                }
-            });
+        public void gotit() {
         }
     });
 

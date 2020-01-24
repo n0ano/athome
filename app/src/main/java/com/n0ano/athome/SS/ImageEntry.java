@@ -1,7 +1,9 @@
 package com.n0ano.athome.SS;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.ImageView;
 
 import com.n0ano.athome.Log;
 import com.n0ano.athome.C;
@@ -57,6 +59,7 @@ public ImageEntry(String name, int gen)
     this.width = 0;
     this.height = 0;
     this.bitmap = null;
+    this.bitmap_th = null;
     this.generation = gen;
 }
 
@@ -109,7 +112,7 @@ public String info()
     return inf;
 }
 
-public void get_bitmap(final ScreenInfo ss_info, final BitmapCallbacks callback)
+public void get_bitmap(final Activity act, final ScreenInfo ss_info, final ImageView view, final BitmapCallbacks callback)
 {
 
     new Thread(new Runnable() {
@@ -119,19 +122,29 @@ public void get_bitmap(final ScreenInfo ss_info, final BitmapCallbacks callback)
                 width = ss_info.width;
                 height = ss_info.height;
             }
-            callback.gotit(bitmap);
+            act.runOnUiThread(new Runnable() {
+                public void run() {
+                    view.setImageBitmap(bitmap);
+                }
+            });
+            callback.gotit();
         }
     }).start();
 }
 
-public void get_thumb(final ScreenInfo ss_info, final BitmapCallbacks callback)
+public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final BitmapCallbacks callback)
 {
 
     new Thread(new Runnable() {
         public void run() {
             if (bitmap_th == null)
                 bitmap_th = get_bits(ss_info, Utils.THUMB_X, Utils.THUMB_Y);
-            callback.gotit(bitmap_th);
+            act.runOnUiThread(new Runnable() {
+                public void run() {
+                    view.setImageBitmap(bitmap_th);
+                }
+            });
+            callback.gotit();
         }
     }).start();
 }
