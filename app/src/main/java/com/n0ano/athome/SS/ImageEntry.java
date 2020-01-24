@@ -27,7 +27,7 @@ int rotate;
 
 int generation;
 String title = "";
-Bitmap bitmap;
+static Bitmap bitmap;
 Bitmap bitmap_th;
 
 private HashMap<String, String> meta;
@@ -117,11 +117,9 @@ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final Image
 
     new Thread(new Runnable() {
         public void run() {
-            if (bitmap == null || ss_info.width != width || ss_info.height != height) {
-                bitmap = get_bits(ss_info, ss_info.width, ss_info.height);
-                width = ss_info.width;
-                height = ss_info.height;
-            }
+            bitmap = get_bits(ss_info, ss_info.width, ss_info.height);
+            width = ss_info.width;
+            height = ss_info.height;
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     view.setImageBitmap(bitmap);
