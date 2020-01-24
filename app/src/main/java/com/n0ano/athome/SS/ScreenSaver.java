@@ -159,7 +159,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
     entry.get_bitmap(act, ss_info, iv, new BitmapCallbacks() {
         @Override
         public void gotit() {
-            callbacks.ss_new("(" + images.indexOf(entry) + "/" + images.size() + ")" + Utils.last(entry.get_name()));
+            callbacks.ss_new("(" + (images.indexOf(entry) + 1) + "/" + images.size() + ")" + Utils.last(entry.get_name()));
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
