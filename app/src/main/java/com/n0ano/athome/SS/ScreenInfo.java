@@ -1,10 +1,12 @@
 package com.n0ano.athome.SS;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.view.Display;
 
 import com.n0ano.athome.C;
 import com.n0ano.athome.Preferences;
+import com.n0ano.athome.Log;
 
 public class ScreenInfo
 {
@@ -44,8 +46,10 @@ public ScreenInfo(Activity act, Preferences pref)
     this.fade = pref.get("ss_fade", 0);
 
     Display d = act.getWindowManager().getDefaultDisplay();
-    this.width = d.getWidth();
-    this.height = d.getHeight();
+    Point point = new Point();
+    d.getSize(point);
+    this.width = point.x;
+    this.height = point.y;
 }
 
 }
