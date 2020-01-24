@@ -86,7 +86,7 @@ public void onCreate(Bundle state)
 //        return;
 //    }
 
-    ss_info = new ScreenInfo(pref);
+    ss_info = new ScreenInfo(this, pref);
     if (ss_info.host.isEmpty()) {
         Intent intent = new Intent();
         setResult(Activity.RESULT_CANCELED, intent);
@@ -267,9 +267,6 @@ public void go_image(View v, final ImageEntry entry)
     set_menu(R.id.mgmt_imageview);
 
     ScreenInfo info = ss_info;
-    View vv = (View)findViewById(R.id.mgmt_gridview);
-    info.width = vv.getWidth();
-    info.height = vv.getHeight();
 
     cur_image = entry;
     set_view(R.id.mgmt_imageview, R.id.mgmt_gridview);

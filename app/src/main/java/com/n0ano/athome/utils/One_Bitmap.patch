@@ -1,0 +1,145 @@
+From 69cdbec597452f5ab7adae11444a28423a48ceac Mon Sep 17 00:00:00 2001
+From: Donald Dugger <n0ano@n0ano.com>
+Date: Thu, 23 Jan 2020 21:47:46 -0700
+Subject: [PATCH 21/21] Only use one big bitmap
+
+And let the Android system scale it down to a thumbnail.
+---
+ .../main/java/com/n0ano/athome/SS/ImageAdapter.java  |  8 ++++----
+ .../main/java/com/n0ano/athome/SS/ImageEntry.java    | 20 +-------------------
+ app/src/main/java/com/n0ano/athome/SS/ImageFind.java |  2 +-
+ app/src/main/java/com/n0ano/athome/SS/ImageMgmt.java |  4 ++++
+ .../main/java/com/n0ano/athome/SS/ScreenSaver.java   |  2 +-
+ 5 files changed, 11 insertions(+), 25 deletions(-)
+
+diff --git a/app/src/main/java/com/n0ano/athome/SS/ImageAdapter.java b/app/src/main/java/com/n0ano/athome/SS/ImageAdapter.java
+index 88d7567..e6b17dc 100644
+--- a/app/src/main/java/com/n0ano/athome/SS/ImageAdapter.java
++++ b/app/src/main/java/com/n0ano/athome/SS/ImageAdapter.java
+@@ -69,11 +69,11 @@ public View getView(int position, View view, ViewGroup parent)
+     final ImageView iv = (ImageView)view.findViewById(R.id.image);
+     final ImageView ic = (ImageView)view.findViewById(R.id.mgmt_check);
+ 
+-    if (image.bitmap_th != null)
+-        iv.setImageBitmap(image.bitmap_th);
++    if (image.bitmap != null)
++        iv.setImageBitmap(image.bitmap);
+     else {
+         iv.setImageResource(R.drawable.no);
+-        image.get_thumb(act, act.ss_info, iv, new BitmapCallbacks() {
++        image.get_bitmap(act, act.ss_info, iv, new BitmapCallbacks() {
+             @Override
+             public void gotit() {
+             }
+@@ -112,7 +112,7 @@ private void get_names(final ImageFind image_find)
+     new Thread(new Runnable() {
+         public void run() {
+             images = image_find.find_local(new ArrayList<ImageEntry>(), act.ss_info);
+-            images = image_find.find_remote(true, images, true, act.ss_info);
++            images = image_find.find_remote(true, images, act.ss_info);
+             Collections.sort(images);
+             act.ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
+             done();
+diff --git a/app/src/main/java/com/n0ano/athome/SS/ImageEntry.java b/app/src/main/java/com/n0ano/athome/SS/ImageEntry.java
+index 69fd1d3..73f46e9 100644
+--- a/app/src/main/java/com/n0ano/athome/SS/ImageEntry.java
++++ b/app/src/main/java/com/n0ano/athome/SS/ImageEntry.java
+@@ -28,7 +28,6 @@ int rotate;
+ int generation;
+ String title = "";
+ Bitmap bitmap;
+-Bitmap bitmap_th;
+ 
+ private HashMap<String, String> meta;
+ 
+@@ -59,7 +58,6 @@ public ImageEntry(String name, int gen)
+     this.width = 0;
+     this.height = 0;
+     this.bitmap = null;
+-    this.bitmap_th = null;
+     this.generation = gen;
+ }
+ 
+@@ -115,6 +113,7 @@ public String info()
+ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final ImageView view, final BitmapCallbacks callback)
+ {
+ 
++Log.d("DDD-SS", name + " get bitmap " + ss_info.width + "x" + ss_info.height);
+     new Thread(new Runnable() {
+         public void run() {
+             if (bitmap == null || ss_info.width != width || ss_info.height != height) {
+@@ -132,23 +131,6 @@ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final Image
+     }).start();
+ }
+ 
+-public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final BitmapCallbacks callback)
+-{
+-
+-    new Thread(new Runnable() {
+-        public void run() {
+-            if (bitmap_th == null)
+-                bitmap_th = get_bits(ss_info, Utils.THUMB_X, Utils.THUMB_Y);
+-            act.runOnUiThread(new Runnable() {
+-                public void run() {
+-                    view.setImageBitmap(bitmap_th);
+-                }
+-            });
+-            callback.gotit();
+-        }
+-    }).start();
+-}
+-
+ private Bitmap get_bits(ScreenInfo ss_info, int width, int height)
+ {
+ 	InputStream in_rdr;
+diff --git a/app/src/main/java/com/n0ano/athome/SS/ImageFind.java b/app/src/main/java/com/n0ano/athome/SS/ImageFind.java
+index 08675df..6eec574 100644
+--- a/app/src/main/java/com/n0ano/athome/SS/ImageFind.java
++++ b/app/src/main/java/com/n0ano/athome/SS/ImageFind.java
+@@ -51,7 +51,7 @@ if (true) return images;
+     return images;
+ }
+ 
+-public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, boolean thumb, ScreenInfo info)
++public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, ScreenInfo info)
+ {
+     int idx, ts;
+     int gen = 0;
+diff --git a/app/src/main/java/com/n0ano/athome/SS/ImageMgmt.java b/app/src/main/java/com/n0ano/athome/SS/ImageMgmt.java
+index 979171d..1133b3e 100644
+--- a/app/src/main/java/com/n0ano/athome/SS/ImageMgmt.java
++++ b/app/src/main/java/com/n0ano/athome/SS/ImageMgmt.java
+@@ -10,6 +10,7 @@ import android.os.Bundle;
+ import android.support.v4.app.FragmentActivity;
+ import android.support.v7.app.AppCompatActivity;
+ import android.support.v7.widget.Toolbar;
++import android.view.Display;
+ import android.view.Menu;
+ import android.view.MenuItem;
+ import android.view.View;
+@@ -124,6 +125,9 @@ protected void onRestart()
+ protected void onResume()
+ {
+ 
++    Display d = getWindowManager().getDefaultDisplay();
++    ss_info.width = d.getWidth();
++    ss_info.height = d.getHeight();
+     super.onResume();
+     Log.d("DDD-SS", "ImageMgmt: onResume");
+ }
+diff --git a/app/src/main/java/com/n0ano/athome/SS/ScreenSaver.java b/app/src/main/java/com/n0ano/athome/SS/ScreenSaver.java
+index 389c3d8..f191ac7 100644
+--- a/app/src/main/java/com/n0ano/athome/SS/ScreenSaver.java
++++ b/app/src/main/java/com/n0ano/athome/SS/ScreenSaver.java
+@@ -344,7 +344,7 @@ public void get_names(int gen)
+         int count = images.size();
+         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
+         images = image_find.find_local(new ArrayList<ImageEntry>(), ss_info);
+-        images = image_find.find_remote(true, images, false, ss_info);
++        images = image_find.find_remote(true, images, ss_info);
+         Collections.sort(images);
+ 
+         HashMap<String, String> map = Utils.parse_names(pref.get("images:" + ss_info.list, ""));
+-- 
+2.8.1
+

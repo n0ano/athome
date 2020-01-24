@@ -1,5 +1,8 @@
 package com.n0ano.athome.SS;
 
+import android.app.Activity;
+import android.view.Display;
+
 import com.n0ano.athome.C;
 import com.n0ano.athome.Preferences;
 
@@ -27,7 +30,7 @@ public int offset = 0;
 public int width = 0;
 public int height = 0;
 
-public ScreenInfo(Preferences pref)
+public ScreenInfo(Activity act, Preferences pref)
 {
 
     this.host = pref.get("ss_host", "");
@@ -39,6 +42,10 @@ public ScreenInfo(Preferences pref)
     this.start = pref.get("ss_start", 0);
     this.delay = pref.get("ss_delay", 0);
     this.fade = pref.get("ss_fade", 0);
+
+    Display d = act.getWindowManager().getDefaultDisplay();
+    this.width = d.getWidth();
+    this.height = d.getHeight();
 }
 
 }

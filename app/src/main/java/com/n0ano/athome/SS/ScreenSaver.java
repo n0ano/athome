@@ -75,7 +75,7 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
 
     pref = new Preferences(act);
 
-    ss_info = new ScreenInfo(pref);
+    ss_info = new ScreenInfo(act, pref);
 
     image_find = new ImageFind(act, null);
 

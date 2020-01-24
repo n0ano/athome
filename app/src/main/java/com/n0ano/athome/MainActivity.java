@@ -134,7 +134,7 @@ protected void onCreate(Bundle state)
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
 
-    ss_info = new ScreenInfo(pref);
+    ss_info = new ScreenInfo(this, pref);
 
     start_home(state);
 }
@@ -191,14 +191,9 @@ protected void onResume()
                         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
                         tb.setTitle("AtHome");
 
-                        View v = (View)findViewById(R.id.scroll_view);
-                        ss_info.width =  v.getWidth();
-                        v = (View)findViewById(R.id.scroll_view);
-                        ss_info.height =  v.getHeight();
-
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
                         icon.setIcon(R.drawable.play);
-                        v = (View)findViewById(R.id.scroll_view);
+                        View v = (View)findViewById(R.id.scroll_view);
                         v.setAlpha(1.0f);
                     }
                 });
