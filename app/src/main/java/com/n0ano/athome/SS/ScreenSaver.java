@@ -51,6 +51,7 @@ Preferences pref;
 Thread main_thread = null;
 
 ArrayList<ImageEntry> images;
+ImageLists[] img_lists = new ImageLists[2];
 
 private ScreenInfo ss_info;
 private ImageFind image_find;
@@ -211,7 +212,7 @@ public void intr(int type)
 
     case INTR_START:
         if (state == SAVER_COUNTING)
-            saver_start(ss_info.list_real);
+            saver_start(1);
         else {
             if (state == ScreenSaver.SAVER_FROZEN) {
                 callbacks.ss_icon(R.drawable.ss_play);
@@ -236,27 +237,31 @@ public void intr(int type)
     }
 }
 
-private void init_list(String list, DoneCallback cb)
+private void init_list(int listno, String name, DoneCallback cb)
 {
 
-    String saved = pref.get("images:" + list, "");
-Log.d("DDD-SS", "init_list(" + list + "): " + saved);
-    ss_info.list = list;
-    ss_info.generation = Utils.parse_gen(saved);
-    images = Utils.parse_images(saved);
-Log.d("DDD-SS", "size - " + images.size());
-    if (images.size() <= 0) {
+    if (img_lists[listno] == null)
+        img_lists[listno] = new ImageLists(listno, name);
+    ImageLists list = img_lists[listno];
+    String saved = pref.get("images:" + list.get_name(), "");
+Log.d("DDD-SS", "init_list(" + name + "): " + saved);
+    ss_info.list = list.get_name();
+    images = list.get_images();
+    if (images == null) {
+        ss_info.generation = Utils.parse_gen(saved);
+        images = Utils.parse_images(saved);
+        list.set_images(images);
         get_names(ss_info.generation + 1, cb);
     } else
         if (cb != null)
             cb.done();
 }
 
-public void saver_start(String list)
+public void saver_start(int listno)
 {
 
+    images = img_lists[listno].get_images();
     ss_info = callbacks.ss_start();
-    ss_info.list = list;
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
 
@@ -298,7 +303,7 @@ public void screen_saver(int tick)
                 if (state == SAVER_SHOWING)
                     saver_fade(1);
                 else
-                    saver_start("");
+                    saver_start(0);
             }
         }
         break;
@@ -369,7 +374,7 @@ public void get_names(final int gen, final DoneCallback cb)
         image_list = Utils.list2str(ss_info.generation, images);
         pref.put("images:" + ss_info.list, image_list);
         pref.put("image_last:" + ss_info.list, images.size());
-        init_list(ss_info.list, cb);
+        init_list((ss_info.list.isEmpty() ? 0 : 1), ss_info.list, cb);
     } else {
         if (cb != null)
             cb.done();
@@ -402,17 +407,15 @@ private void do_loop()
     //
     main_thread = new Thread(new Runnable() {
         public void run() {
-            init_list("", new DoneCallback() {
+            init_list(0, "", new DoneCallback() {
                 @Override
                 public void done() {
-                    if (!ss_info.list_real.isEmpty()) {
-                        init_list(ss_info.list_real, new DoneCallback() {
-                            @Override
-                            public void done() {
-                                main_loop();
-                            }
-                        });
-                    }
+                    init_list(1, ss_info.list_real, new DoneCallback() {
+                        @Override
+                        public void done() {
+                            main_loop();
+                        }
+                    });
                 }
             });
         }
