@@ -107,9 +107,7 @@ private void get_names(final ImageFind image_find)
 
     new Thread(new Runnable() {
         public void run() {
-            images = image_find.find_local(new ArrayList<ImageEntry>(), act.ss_info);
-            images = image_find.find_remote(true, images, true, act.ss_info);
-            Collections.sort(images);
+            images = image_find.scan(act.ss_info, true);
             act.ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
             done();
         }

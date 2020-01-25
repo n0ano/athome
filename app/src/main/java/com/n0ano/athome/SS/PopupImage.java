@@ -80,6 +80,9 @@ public void info_dialog(final ImageEntry entry)
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.info_selected);
     cb.setChecked(entry.get_check());
 
+    final CheckBox db = (CheckBox) dialog.findViewById(R.id.info_delete);
+    db.setChecked(false);
+
     tv = (TextView) dialog.findViewById(R.id.info_type);
     tv.setText((entry.get_type() == C.IMAGE_LOCAL) ? "local" : "remote");
 
@@ -109,10 +112,12 @@ public void info_dialog(final ImageEntry entry)
         @Override
         public void onClick(View v) {
             entry.set_check(cb.isChecked());
-            act.image_adapt.notifyDataSetChanged();
             String tstr = titlev.getText().toString();
             if (!title.equals(tstr))
                 act.set_title(entry, tstr);
+            if (db.isChecked())
+                act.rm_image(entry);
+            act.image_adapt.notifyDataSetChanged();
             dialog.dismiss();
         }
     });

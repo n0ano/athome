@@ -236,7 +236,7 @@ public void intr(int type)
     }
 }
 
-private void init_list(int listno, String name, DoneCallback cb)
+private void init_list(int listno, String name, boolean new_list, DoneCallback cb)
 {
 
     if (img_lists[listno] == null)
@@ -248,7 +248,10 @@ Log.d("DDD-SS", "init_list(" + name + "): " + saved);
     images = list.get_images();
     if (images == null) {
         list.set_generation(Utils.parse_gen(saved));
-        ss_info.generation = list.get_generation();
+        int gen = list.get_generation();
+        ss_info.generation = gen;
+        if (gen == 0 || new_list)
+            gen = ss_info.generation + 1;
         images = Utils.parse_images(saved);
         list.set_images(images);
         get_names(((ss_info.generation == 0) ? 1 : ss_info.generation), cb);
@@ -353,9 +356,7 @@ public void get_names(final int gen, final DoneCallback cb)
 
         int count = images.size();
         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
-        images = image_find.find_local(new ArrayList<ImageEntry>(), ss_info);
-        images = image_find.find_remote(true, images, false, ss_info);
-        Collections.sort(images);
+        images = image_find.scan(ss_info, false);
 
         HashMap<String, String> map = Utils.parse_names(pref.get("images:" + ss_info.list, ""));
         for (ImageEntry img : images)
@@ -377,7 +378,7 @@ public void get_names(final int gen, final DoneCallback cb)
         String image_list = Utils.list2str(ss_info.generation, images);
         pref.put("images:" + ss_info.list, image_list);
         pref.put("image_last:" + ss_info.list, images.size());
-        init_list((ss_info.list.isEmpty() ? 0 : 1), ss_info.list, cb);
+        init_list((ss_info.list.isEmpty() ? 0 : 1), ss_info.list, true, cb);
     } else {
         if (cb != null)
             cb.done();
@@ -410,10 +411,10 @@ private void do_loop()
     //
     main_thread = new Thread(new Runnable() {
         public void run() {
-            init_list(0, "", new DoneCallback() {
+            init_list(0, "", false, new DoneCallback() {
                 @Override
                 public void done() {
-                    init_list(1, ss_info.list_real, new DoneCallback() {
+                    init_list(1, ss_info.list_real, false, new DoneCallback() {
                         @Override
                         public void done() {
                             main_loop();

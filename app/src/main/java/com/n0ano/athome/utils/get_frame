@@ -2,7 +2,8 @@
 
 use URI::Escape qw( uri_unescape );
 
-$tm="names&host=lenovo&list=pbw";
+$tm="names&all&host=lenovo&list=lrg";
+$td="delete&list=pbw&name=.pbw%2Fwnbr-2019.jpg";
 $tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&xy&w=600&h=888";
 $query = $ENV{"QUERY_STRING"};
 $type = "get";
@@ -14,7 +15,7 @@ $xy = 0;
 $host = "default";
 $list = "";
 $delta = 1;
-$NOCACHE = 0;
+$NOCACHE = 1;
 $fit = "fit";
 
 $DIR = "Books/Frame/";
@@ -24,6 +25,8 @@ $dirs = ".files";
 foreach my $t (@tokens) {
 	($type = $t)				if $t =~ /^get/;
 	($type = $t)				if $t =~ /^names/;
+	($type = $t)				if $t =~ /^title/;
+	($type = $t)				if $t =~ /^delete/;
 	($hidden = $t)				if $t =~ /^all/;
 	($xy = 1)				if $t =~ /^xy/;
 	($maxw = $t) =~ s/w=//			if $t =~ /^w=/;
@@ -32,14 +35,22 @@ foreach my $t (@tokens) {
 	($host = $t) =~ s/host=//		if $t =~ /^host=/;
 	($list = $t) =~ s/list=//		if $t =~ /^list=/;
 	($name = uri_unescape($t)) =~ s/name=//	if $t =~ /^name=/;
-	($NOCACHE = 1) =~ s/nocache//		if $t =~ /^nocache/;
+	($text = uri_unescape($t)) =~ s/text=// if $t =~ /^text=/;
+	($NOCACHE = 0) =~ s/cache//		if $t =~ /^cache/;
 }
 
 $host = "default"		if $host eq "";
 $host = $host . "-" . $list	if $list ne "";
 $dirs = $dirs . "-" . $list	if $list ne "";
 
+#  Image operations
+#
 get_image($host, $dirs, $name)	if $type eq "get";
+del_image($name, $dirs)		if $type eq "delete";
+set_title($name, $text)		if $type eq "title";
+
+#  List Operations
+#
 get_names($dirs)		if $type eq "names";
 
 sub out_line
@@ -75,7 +86,7 @@ END
 			next		if $_ eq "..";
 			$entry = $dir . "/" . $_;
 			$ts = (stat($DIR . $entry))[9];
-			&out_line("T", $ts . ":" . $entry);
+			&out_line("F", $ts . ":" . $entry);
 		}
 		closedir $dh;
 	}
@@ -120,6 +131,7 @@ END
 	if (-f $t) {
 		open F, $t;
 		$title = <F>;
+		chop $title;
 		close F;
 		&out_line("T", $title);
 	}
@@ -132,6 +144,56 @@ END
 	$F = cache_file($name, $cmd, $maxw, $maxh);
 	print <$F>;
 	close $F;
+}
+
+sub del_image
+{
+	local($n,$d) = @_;
+	local($i,$g,$gen,$lines);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+
+	open F, "<$DIR" . "$d";
+	$g = <F>;
+	chomp($g);
+	$gen = $g + 1;
+	$i = 0;
+	while (<F>) {
+		$lines[$i++] = $_;
+	}
+	close F;
+
+	open F, ">$DIR" . "$d";
+	print F "$gen\n";
+	foreach $line (@lines) {
+		print F $line;
+	}
+	close F;
+
+	unlink $DIR.$n;
+
+	&out_line("E", "");
+}
+
+sub set_title
+{
+	local($n, $t) = @_;
+	local($f);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+
+	$n =~ s/\//_/g;
+	$f = "$DIR" . ".titles/$n";
+	open F, ">$f";
+	print F "$t\n";
+	close F;
+	&out_line("E", "");
 }
 
 sub cache_file

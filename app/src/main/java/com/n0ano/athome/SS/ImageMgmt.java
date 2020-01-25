@@ -275,6 +275,33 @@ private void set_menu(int id)
     }
 }
 
+public void rm_image(final ImageEntry image)
+{
+
+    Log.d("DDD-SS", image.get_name() + ":remove from server");
+
+    new Thread(new Runnable() {
+        public void run() {
+            try {
+                String url;
+                InputStream in_rdr = null;
+                HashMap<String, String> meta;
+
+                url = ss_info.server +
+                        C.CGI_BIN +
+                        "?delete" +
+                        "&name=" + URLEncoder.encode(image.get_name());
+                Log.d("DDD-SS", "remove from " + url);
+                Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
+                in_rdr = new URL(url).openStream();
+                meta = C.get_meta(in_rdr, new HashMap<String, String>());
+            } catch (Exception e) {
+                Log.d("DDD-SS", "image get execption - " + e);
+            }
+        }
+    }).start();
+}
+
 public void set_title(final ImageEntry image, final String title)
 {
 

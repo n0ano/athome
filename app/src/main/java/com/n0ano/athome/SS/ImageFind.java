@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import com.n0ano.athome.C;
@@ -20,6 +21,10 @@ public class ImageFind
 private Activity act;
 private ImageVM image_vm;
 
+ScreenInfo info;
+
+ArrayList<ImageEntry> images;
+
 public ImageFind(Activity act, ImageVM image_vm)
 {
 
@@ -27,10 +32,21 @@ public ImageFind(Activity act, ImageVM image_vm)
     this.image_vm = image_vm;
 }
 
-public ArrayList<ImageEntry> find_local(ArrayList<ImageEntry> images, ScreenInfo info)
+public ArrayList<ImageEntry> scan(ScreenInfo info, boolean thumb)
 {
 
-if (true) return images;
+    this.info = info;
+    images = new ArrayList<ImageEntry>();
+    find_local();
+    find_remote(thumb);
+    Collections.sort(images);
+    return images;
+}
+
+public void find_local()
+{
+
+if (true) return;
     Uri uri;
     Cursor cursor;
     int column_index_data, column_index_folder_name;
@@ -48,10 +64,10 @@ if (true) return images;
 
         images.add(new ImageEntry("l:" + path, 1));
     }
-    return images;
+    return;
 }
 
-public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> images, boolean thumb, ScreenInfo info)
+public void find_remote(boolean thumb)
 {
     int idx, ts;
     int gen = 0;
@@ -64,7 +80,7 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
         url = info.server +
                 C.CGI_BIN +
                 "?names" +
-                (hidden ? "&all" : "") +
+                "&all" +
                 "&host=" + C.base(info.host) +
                 "&list=" + info.list;
         Log.d("DDD-SS", "get names from " + url);
@@ -73,10 +89,10 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
         for (;;) {
             final String str = C.meta_line(in_rdr);
             type = str.charAt(0);
-            switch (str.charAt(0)) {
+            switch (type) {
 
             case 'E':
-                return images;
+                return;
 
             case 'G':
                 gen = Integer.parseInt(str.substring(1), 10);
@@ -110,7 +126,7 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
     } catch (Exception e) {
         Log.d("DDD-SS", "image name execption - " + e);
     }
-    return images;
+    return;
 }
 
 }
