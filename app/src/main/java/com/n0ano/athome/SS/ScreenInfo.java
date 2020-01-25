@@ -8,6 +8,8 @@ import com.n0ano.athome.C;
 import com.n0ano.athome.Preferences;
 import com.n0ano.athome.Log;
 
+import java.util.ArrayList;
+
 public class ScreenInfo
 {
 

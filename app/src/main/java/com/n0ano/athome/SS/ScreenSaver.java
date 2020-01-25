@@ -247,7 +247,8 @@ Log.d("DDD-SS", "init_list(" + name + "): " + saved);
     ss_info.list = list.get_name();
     images = list.get_images();
     if (images == null) {
-        ss_info.generation = Utils.parse_gen(saved);
+        list.set_generation(Utils.parse_gen(saved));
+        ss_info.generation = list.get_generation();
         images = Utils.parse_images(saved);
         list.set_images(images);
         get_names(((ss_info.generation == 0) ? 1 : ss_info.generation), cb);
@@ -259,8 +260,11 @@ Log.d("DDD-SS", "init_list(" + name + "): " + saved);
 public void saver_start(int listno)
 {
 
-    images = img_lists[listno].get_images();
     ss_info = callbacks.ss_start();
+
+    images = img_lists[listno].get_images();
+    ss_info.list = img_lists[listno].get_name();
+    ss_info.generation = img_lists[listno].get_generation();
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
 

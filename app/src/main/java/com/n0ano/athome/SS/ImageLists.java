@@ -19,6 +19,8 @@ public class ImageLists
 
 int listno;
 String name;
+
+int generation;
 ArrayList<ImageEntry> images;
 
 public ImageLists(int listno, String name)
@@ -26,13 +28,18 @@ public ImageLists(int listno, String name)
 
     this.listno = listno;
     this.name = name;
+
+    generation = 0;
 }
 
 public int get_listno() { return listno; }
 
 public String get_name() { return name; }
 
+public int get_generation() { return generation; }
+public void set_generation(int g) { generation = g; }
+
 public ArrayList<ImageEntry> get_images() { return images; }
-public void set_images(ArrayList<ImageEntry> images) { this.images = images; }
+public void set_images(ArrayList<ImageEntry> imgs) { images = imgs; }
 
 }
