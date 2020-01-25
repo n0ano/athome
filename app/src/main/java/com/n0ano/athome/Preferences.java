@@ -65,6 +65,14 @@ private void cfg_v0_v2()
     put("pref_version", PREF_VERSION);
 }
 
+public void rm_key(String key)
+{
+
+	SharedPreferences.Editor editor = pref.edit();
+	editor.remove(key);
+	editor.commit();
+}
+
 public int get(String key, int def)
 {
 
