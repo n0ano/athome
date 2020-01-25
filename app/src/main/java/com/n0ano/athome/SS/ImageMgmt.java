@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -106,6 +107,7 @@ Log.d("DDD-SS", "view model - " + image_vm.size());
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
     gv.setAdapter(image_adapt);
+    gv.setSelection(pref.get("image_last:" + ss_info.list, 0));
 }
 
 @Override
@@ -190,6 +192,8 @@ public void set_view(int visible)
 {
     View v;
 
+    set_menu(visible);
+
     v = (View)findViewById(R.id.mgmt_loading);
     v.setVisibility(View.GONE);
     v = (View)findViewById(R.id.mgmt_gridview);
@@ -218,11 +222,15 @@ private void set_menu(int id)
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_all);
         item.setVisible(true);
-        item = menu_bar.findItem(R.id.action_mode);
-        item.setVisible(true);
         item = menu_bar.findItem(R.id.action_none);
         item.setVisible(true);
         item = menu_bar.findItem(R.id.action_files);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_save);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_undo);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_mode);
         item.setVisible(true);
         break;
 
@@ -233,11 +241,34 @@ private void set_menu(int id)
         item.setVisible(true);
         item = menu_bar.findItem(R.id.action_all);
         item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_none);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_files);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_save);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_undo);
+        item.setVisible(true);
         item = menu_bar.findItem(R.id.action_mode);
+        item.setVisible(false);
+        break;
+
+    case R.id.mgmt_fileview:
+        item = menu_bar.findItem(R.id.action_left);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_right);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_all);
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_none);
         item.setVisible(false);
         item = menu_bar.findItem(R.id.action_files);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_save);
+        item.setVisible(false);
+        item = menu_bar.findItem(R.id.action_undo);
+        item.setVisible(true);
+        item = menu_bar.findItem(R.id.action_mode);
         item.setVisible(false);
         break;
 
@@ -312,7 +343,6 @@ public void go_image(View v, final ImageEntry entry)
 public void go_grid()
 {
 
-    set_menu(R.id.mgmt_gridview);
     set_view(R.id.mgmt_gridview);
 }
 
@@ -418,6 +448,13 @@ public void show_files()
     ListView lv = (ListView) findViewById(R.id.mgmt_files);
     FilesAdapter file_adapt = new FilesAdapter(this);
     lv.setAdapter(file_adapt);
+    lv.setSelection(pref.get("image_last:" + ss_info.list, 0));
+    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+            pref.put("image_last:" + ss_info.list, position);
+       }
+    });
 }
 
 }
