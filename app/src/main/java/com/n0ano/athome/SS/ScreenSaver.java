@@ -113,7 +113,12 @@ public void hide_views()
 public void do_fade(View start, View end)
 {
 
-    faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height);
+    faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new FaderCallbacks() {
+        @Override
+        public void done() {
+            ss_counter = ss_info.delay;
+        }
+    });
 }
 
 private ImageEntry ss_next(int delta)
@@ -296,9 +301,8 @@ public void screen_saver(int tick)
         break;
 
     case SAVER_TICK:
-        if (state != SAVER_BLOCKED) {
+        if (state != SAVER_BLOCKED && ss_counter > 0) {
             if (--ss_counter == 0) {
-                ss_counter = ss_info.delay;
                 if (state == SAVER_SHOWING)
                     saver_fade(1);
                 else

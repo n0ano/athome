@@ -118,6 +118,7 @@ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final Image
     new Thread(new Runnable() {
         public void run() {
             bitmap = get_bits(ss_info, ss_info.width, ss_info.height);
+Log.d("DDD-SS", name + ": got image");
             width = ss_info.width;
             height = ss_info.height;
             act.runOnUiThread(new Runnable() {
@@ -137,6 +138,7 @@ public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageV
         public void run() {
             if (bitmap_th == null)
                 bitmap_th = get_bits(ss_info, Utils.THUMB_X, Utils.THUMB_Y);
+Log.d("DDD-SS", name + ": got thumbnail");
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     view.setImageBitmap(bitmap_th);

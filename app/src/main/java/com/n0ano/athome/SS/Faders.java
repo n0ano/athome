@@ -32,6 +32,7 @@ private Random rand;
 private int duration = 2000;
 
 private int active;
+private FaderCallbacks callbacks;
 
 public Faders(ScreenSaver ctx)
 {
@@ -40,8 +41,10 @@ public Faders(ScreenSaver ctx)
     rand = new Random();
 }
 
-public void fade(int type, View start, View end, int w, int h)
+public void fade(int type, View start, View end, int w, int h, FaderCallbacks callbacks)
 {
+
+    this.callbacks = callbacks;
 
     if (type == 6)
         type = rand.nextInt(5);
@@ -236,15 +239,16 @@ private void fade_done(View view, int which)
         TextView tv = (TextView)view.findViewById(R.id.title);
         if (tv != null)
             tv.setText("");
-        --active;
         break;
 
     case FADE_END:
         view.setVisibility(View.VISIBLE);
-        --active;
         break;
 
     }
+    if (--active <= 0)
+        callbacks.done();
+        
 }
 
 }

@@ -84,7 +84,6 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
 
             case 'F':
                 ImageEntry img = new ImageEntry(str, gen);
-Log.d("DDD-SS", "new file - " + img.get_name());
                 if (image_vm != null)
                     image_vm.put(img.get_name(), img);
                 images.add(img);

@@ -232,7 +232,6 @@ protected void onResume()
             @Override
             public void ss_new(final String from)
             {
-                Log.d("DDD-SS", "new images from " + from);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
