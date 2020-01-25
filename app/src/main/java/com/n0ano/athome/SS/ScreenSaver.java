@@ -55,7 +55,6 @@ ImageLists[] img_lists = new ImageLists[2];
 
 private ScreenInfo ss_info;
 private ImageFind image_find;
-public String image_list = null;
 
 private int ss_counter = 0;
 public int state = SAVER_BLOCKED;
@@ -251,7 +250,7 @@ Log.d("DDD-SS", "init_list(" + name + "): " + saved);
         ss_info.generation = Utils.parse_gen(saved);
         images = Utils.parse_images(saved);
         list.set_images(images);
-        get_names(ss_info.generation + 1, cb);
+        get_names(((ss_info.generation == 0) ? 1 : ss_info.generation), cb);
     } else
         if (cb != null)
             cb.done();
@@ -370,8 +369,8 @@ public void get_names(final int gen, final DoneCallback cb)
             from = "-changed-";
         callbacks.ss_new(from);
 
-        ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
-        image_list = Utils.list2str(ss_info.generation, images);
+        ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : gen);
+        String image_list = Utils.list2str(ss_info.generation, images);
         pref.put("images:" + ss_info.list, image_list);
         pref.put("image_last:" + ss_info.list, images.size());
         init_list((ss_info.list.isEmpty() ? 0 : 1), ss_info.list, cb);
