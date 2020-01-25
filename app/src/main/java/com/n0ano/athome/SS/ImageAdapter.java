@@ -124,7 +124,7 @@ private void done()
 {
 
     for (ImageEntry img : images) {
-        Log.d("DDD-SS", "image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
+        //Log.d("DDD-SS", "image: " + img.get_name() + " - " + act.saved_images.get(img.get_name()));
         img.enable(act.saved_images.get(img.get_name()));
     }
 
