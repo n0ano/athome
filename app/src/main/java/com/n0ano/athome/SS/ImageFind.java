@@ -83,9 +83,20 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 break;
 
             case 'F':
-                ImageEntry img = new ImageEntry(str, gen);
+                final String name = str.substring(str.indexOf(":"));
+                if (C.loading_name != null)
+                    act.runOnUiThread(new Runnable() {
+                        public void run() {
+                            C.loading_name.setText(name);
+                        }
+                    });
+                ImageEntry img = null;
                 if (image_vm != null)
-                    image_vm.put(img.get_name(), img);
+                    img = image_vm.get(name, gen, Utils.THUMB_X, Utils.THUMB_Y);
+                if (img == null) {
+                    img = new ImageEntry(str, gen);
+                    image_vm.put(name, img);
+                }
                 images.add(img);
                 break;
 
