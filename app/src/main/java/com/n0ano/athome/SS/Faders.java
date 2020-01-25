@@ -32,7 +32,7 @@ private Random rand;
 private int duration = 2000;
 
 private int active;
-private FaderCallbacks callbacks;
+private DoneCallback callback;
 
 public Faders(ScreenSaver ctx)
 {
@@ -41,10 +41,10 @@ public Faders(ScreenSaver ctx)
     rand = new Random();
 }
 
-public void fade(int type, View start, View end, int w, int h, FaderCallbacks callbacks)
+public void fade(int type, View start, View end, int w, int h, DoneCallback callback)
 {
 
-    this.callbacks = callbacks;
+    this.callback = callback;
 
     if (type == 6)
         type = rand.nextInt(5);
@@ -246,8 +246,8 @@ private void fade_done(View view, int which)
         break;
 
     }
-    if (--active <= 0)
-        callbacks.done();
+    if (--active <= 0 && callback != null)
+        callback.done();
         
 }
 

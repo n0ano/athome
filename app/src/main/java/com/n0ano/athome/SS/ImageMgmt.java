@@ -318,11 +318,7 @@ public void go_image(View v, final ImageEntry entry)
     set_view(R.id.mgmt_imageview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.ss_no);
-    entry.get_bitmap(this, info, iv, new BitmapCallbacks() {
-        @Override
-        public void gotit() {
-        }
-    });
+    entry.get_bitmap(this, info, iv, null);
 
     iv.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {

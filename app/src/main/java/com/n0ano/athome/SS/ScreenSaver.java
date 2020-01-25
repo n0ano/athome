@@ -48,7 +48,7 @@ public final static int INTR_NEXT =      2;  // next image
 Activity act;
 SS_Callbacks callbacks;
 Preferences pref;
-Thread main_thread;
+Thread main_thread = null;
 
 ArrayList<ImageEntry> images;
 
@@ -90,16 +90,9 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
 
     faders = new Faders(this);
     state = SAVER_BLOCKED;
+    screen_saver(SAVER_RESET);
 
-    //
-    //  Start the main loop in its own thread
-    //
-    main_thread = new Thread(new Runnable() {
-        public void run() {
-            main_loop();
-        }
-    });
-    main_thread.start();
+    do_loop();
 }
 
 public void hide_views()
@@ -113,7 +106,7 @@ public void hide_views()
 public void do_fade(View start, View end)
 {
 
-    faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new FaderCallbacks() {
+    faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new DoneCallback() {
         @Override
         public void done() {
             ss_counter = ss_info.delay;
@@ -165,9 +158,9 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
             iv.setImageResource(R.drawable.ss_no);
         }
     });
-    entry.get_bitmap(act, ss_info, iv, new BitmapCallbacks() {
+    entry.get_bitmap(act, ss_info, iv, new DoneCallback() {
         @Override
-        public void gotit() {
+        public void done() {
             callbacks.ss_new("(" + (images.indexOf(entry) + 1) + "/" + images.size() + ")" + Utils.last(entry.get_name()));
             act.runOnUiThread(new Runnable() {
                 public void run() {
@@ -177,7 +170,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                         do_fade(img_start, img_end);
                 }
             });
-            get_names(entry.generation);
+            get_names(entry.generation, null);
         }
     });
 }
@@ -189,9 +182,6 @@ public void saver_fade(int delta)
     ss_viewid ^= 1;
     ss_counter = ss_info.delay;
 
-    //
-    //  ImageGet will call do_fade once the new image is loaded
-    //
     show_image(ss_next(delta), ss_views[old], ss_views[ss_viewid]);
 }
 
@@ -199,7 +189,8 @@ public void saver_click()
 {
 
     intr_type = INTR_START;
-    main_thread.interrupt();
+    if (main_thread != null)
+        main_thread.interrupt();
 }
 
 public void saver_fling(int dir)
@@ -208,7 +199,8 @@ public void saver_fling(int dir)
     flick_dir = dir;
 
     intr_type = INTR_NEXT;
-    main_thread.interrupt();
+    if (main_thread != null)
+        main_thread.interrupt();
 }
 
 public void intr(int type)
@@ -244,26 +236,29 @@ public void intr(int type)
     }
 }
 
-private void init_list(String list)
+private void init_list(String list, DoneCallback cb)
 {
 
     String saved = pref.get("images:" + list, "");
-Log.d("DDD-SS", "saver_start(" + list + "): " + saved);
+Log.d("DDD-SS", "init_list(" + list + "): " + saved);
     ss_info.list = list;
     ss_info.generation = Utils.parse_gen(saved);
     images = Utils.parse_images(saved);
-    if (images.size() <= 0)
-        get_names(ss_info.generation + 1);
+Log.d("DDD-SS", "size - " + images.size());
+    if (images.size() <= 0) {
+        get_names(ss_info.generation + 1, cb);
+    } else
+        if (cb != null)
+            cb.done();
 }
 
 public void saver_start(String list)
 {
 
     ss_info = callbacks.ss_start();
+    ss_info.list = list;
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
-
-    init_list(list);
 
     act.runOnUiThread(new Runnable() {
         public void run() {
@@ -278,9 +273,6 @@ public void saver_start(String list)
         }
     });
     ss_viewid = 0;
-    //
-    //  ImageGet will call do_fade once the new image is loaded
-    //
     show_image(ss_next(1), first, ss_views[ss_viewid]);
 }
 
@@ -344,12 +336,13 @@ void do_toast(final String msg)
     });
 }
 
-public void get_names(int gen)
+public void get_names(final int gen, final DoneCallback cb)
 {
-    String info, from;
-    String name = "unknown";
 
     if (gen != ss_info.generation) {
+        String info, from;
+        String name = "unknown";
+
         int count = images.size();
         do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
         images = image_find.find_local(new ArrayList<ImageEntry>(), ss_info);
@@ -376,19 +369,21 @@ public void get_names(int gen)
         image_list = Utils.list2str(ss_info.generation, images);
         pref.put("images:" + ss_info.list, image_list);
         pref.put("image_last:" + ss_info.list, images.size());
-        init_list(ss_info.list);
+        init_list(ss_info.list, cb);
+    } else {
+        if (cb != null)
+            cb.done();
     }
 }
 
 //
-//  Main loop runs in its own thread
+//  This routine must be called on a separte
+//  thread from the UI thread
 //
 private void main_loop()
 {
 
-    state = SAVER_BLOCKED;
-    screen_saver(SAVER_RESET);
-
+Log.d("DDD-SS", "Screen saver main loop started");
     for (;;) {
         try {
             Thread.sleep(1000);
@@ -398,6 +393,31 @@ private void main_loop()
             intr(intr_type);
         }
     }
+}
+
+private void do_loop()
+{
+    //
+    //  Start the main loop in its own thread
+    //
+    main_thread = new Thread(new Runnable() {
+        public void run() {
+            init_list("", new DoneCallback() {
+                @Override
+                public void done() {
+                    if (!ss_info.list_real.isEmpty()) {
+                        init_list(ss_info.list_real, new DoneCallback() {
+                            @Override
+                            public void done() {
+                                main_loop();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+    main_thread.start();
 }
 
 }

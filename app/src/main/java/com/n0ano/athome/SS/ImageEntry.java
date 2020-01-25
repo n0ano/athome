@@ -112,7 +112,7 @@ public String info()
     return inf;
 }
 
-public void get_bitmap(final Activity act, final ScreenInfo ss_info, final ImageView view, final BitmapCallbacks callback)
+public void get_bitmap(final Activity act, final ScreenInfo ss_info, final ImageView view, final DoneCallback callback)
 {
 
     new Thread(new Runnable() {
@@ -125,12 +125,13 @@ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final Image
                     view.setImageBitmap(bitmap);
                 }
             });
-            callback.gotit();
+            if (callback != null)
+                callback.done();
         }
     }).start();
 }
 
-public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final BitmapCallbacks callback)
+public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final DoneCallback callback)
 {
 
     new Thread(new Runnable() {
@@ -142,7 +143,8 @@ public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageV
                     view.setImageBitmap(bitmap_th);
                 }
             });
-            callback.gotit();
+            if (callback != null)
+                callback.done();
         }
     }).start();
 }

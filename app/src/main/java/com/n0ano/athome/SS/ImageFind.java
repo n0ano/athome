@@ -95,7 +95,8 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                     img = image_vm.get(name, gen, Utils.THUMB_X, Utils.THUMB_Y);
                 if (img == null) {
                     img = new ImageEntry(str, gen);
-                    image_vm.put(name, img);
+                    if (image_vm != null)
+                        image_vm.put(name, img);
                 }
                 images.add(img);
                 break;
