@@ -82,21 +82,11 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
                 gen = Integer.parseInt(str.substring(1), 10);
                 break;
 
-            case 'T':
-                final String name = str.substring(str.indexOf(":"));
-                if (C.loading_name != null)
-                    act.runOnUiThread(new Runnable() {
-                        public void run() {
-                            C.loading_name.setText(name);
-                        }
-                    });
-                ImageEntry img = null;
+            case 'F':
+                ImageEntry img = new ImageEntry(str, gen);
+Log.d("DDD-SS", "new file - " + img.get_name());
                 if (image_vm != null)
-                    img = image_vm.get(name, gen, Utils.THUMB_X, Utils.THUMB_Y);
-                if (img == null) {
-                    img = new ImageEntry(str, gen);
-                    image_vm.put(name, img);
-                }
+                    image_vm.put(img.get_name(), img);
                 images.add(img);
                 break;
 
@@ -107,7 +97,7 @@ public ArrayList<ImageEntry> find_remote(boolean hidden, ArrayList<ImageEntry> i
             }
         }
     } catch (Exception e) {
-        Log.d("DDD-SS", "image get execption - " + e);
+        Log.d("DDD-SS", "image name execption - " + e);
     }
     return images;
 }

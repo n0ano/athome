@@ -40,7 +40,7 @@ public ImageEntry(String name, int gen)
     this.checked = true;
     idx = 0;
     t = name.charAt(0);
-    if (t == 'T') {
+    if (t == 'F') {
         // name from image server list
         this.type = C.IMAGE_REMOTE;
         idx = name.indexOf(":");

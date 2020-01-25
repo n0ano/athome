@@ -1,6 +1,8 @@
 package com.n0ano.athome.SS;
 
 import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
@@ -65,6 +67,8 @@ private Faders faders;
 int intr_type = INTR_NONE;
 int flick_dir;
 int fade_type;
+
+ImageVM image_vm = null;
 
 public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks callbacks)
 {
@@ -166,9 +170,9 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                     tv.setText(entry.get_title());
                     if (img_start != null)
                         do_fade(img_start, img_end);
-                    get_names(entry.generation);
                 }
             });
+            get_names(entry.generation);
         }
     });
 }
