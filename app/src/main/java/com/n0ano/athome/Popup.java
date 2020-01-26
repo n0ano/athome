@@ -653,6 +653,9 @@ private void screen_dialog()
     final EditText et_pwd = (EditText) dialog.findViewById(R.id.screen_pwd);
     et_pwd.setText(act.ss_info.pwd);
 
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.screen_reset);
+    cb.setChecked(false);
+
     Button mgmt = (Button) dialog.findViewById(R.id.screen_mgmt);
     mgmt.setOnClickListener(new OnClickListener() {
         @Override
@@ -693,6 +696,9 @@ private void screen_dialog()
             }
             act.ss_info.fade = type_pos;
             pref.put("ss_fade", act.ss_info.fade);
+
+            if (cb.isChecked())
+                act.ss_saver.ss_reset();
 
             end_dialog(dialog);
         }

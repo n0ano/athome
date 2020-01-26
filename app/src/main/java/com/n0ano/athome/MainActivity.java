@@ -335,14 +335,14 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Log.d("image update worked");
         }
-Log.d("DDD-SS", "activity result - " + pref.get("images:" + ss_info.list_real, ""));
+Log.d("DDD-SS", "activity result - " + pref.get("images:" + ss_info.list, ""));
         runOnUiThread(new Runnable() {
             public void run() {
                 Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
                 tb.setTitle("AtHome");
             }
         });
-        ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
+        ss_saver.screen_saver(ScreenSaver.SAVER_UPDATE);
     }
 }
 
