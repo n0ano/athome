@@ -73,7 +73,8 @@ public View getView(int position, View view, ViewGroup parent)
         iv.setImageBitmap(image.bitmap_th);
     else {
         iv.setImageResource(R.drawable.ss_no);
-        image.get_thumb(act, act.ss_info, iv, null);
+        iv.setTag(position);
+        image.get_thumb(act, act.ss_info, iv, position, null);
     }
 
     view.setOnClickListener(new View.OnClickListener() {
