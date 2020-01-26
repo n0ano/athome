@@ -193,6 +193,7 @@ protected void onResume()
 
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
                         icon.setIcon(R.drawable.ss_play);
+                        menu_icons(false);
                         View v = (View)findViewById(R.id.scroll_view);
                         v.setAlpha(1.0f);
                     }
@@ -212,36 +213,27 @@ protected void onResume()
                         tb.setTitle("AtHome");
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
                         icon.setIcon(R.drawable.ss_monitor);
+                        menu_icons(true);
+
                         display(screen);
                     }
                 });
             }
 
             @Override
-            public void ss_icon(final int icon_id)
-            {
-                Log.d("DDD-SS", "screen icon - " + icon_id);
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                        icon.setIcon(icon_id);
-                    }
-                });
-            }
-
-            @Override
-            public void ss_new(final String from)
+            public void ss_toolbar(final String from, final int mode)
             {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                        char c = from.charAt(0);
-                        if (c == '-')
-                            tb.setTitle("Change:" + from);
-                        else if (c == '+')
-                            tb.setTitle("New:" + from);
-                        else
+                        if (from != null) {
+                            Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
                             tb.setTitle(from);
+                        }
+
+                        if (mode != 0) {
+                            MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                            icon.setIcon(mode);
+                        }
                     }
                 });
             }
@@ -344,6 +336,28 @@ Log.d("DDD-SS", "activity result - " + pref.get("images:" + ss_info.list, ""));
         });
         ss_saver.screen_saver(ScreenSaver.SAVER_UPDATE);
     }
+}
+
+private void menu_icons(boolean vis)
+{
+    MenuItem icon = menu_bar.findItem(R.id.action_saver);
+
+	icon = menu_bar.findItem(R.id.action_display);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_general);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_screen);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_egauge);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_weather);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_thermostat);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_outlets);
+    icon.setVisible(vis);
+	icon = menu_bar.findItem(R.id.action_about);
+    icon.setVisible(vis);
 }
 
 private void start_home(Bundle state)

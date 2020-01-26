@@ -52,6 +52,8 @@ Thread main_thread = null;
 
 ImageLists img_lists;
 
+String menu_title = null;
+
 private ScreenInfo ss_info;
 private ImageFind finder;
 
@@ -115,6 +117,13 @@ public void do_fade(View start, View end)
     });
 }
 
+private void image_name(String name)
+{
+
+//Log.d("DDD-SS", "image_name - " + name + ", title - " + title);
+    callbacks.ss_toolbar((menu_title == null) ? name : menu_title, 0);
+}
+
 public void show_image(final ImageEntry entry, final View img_start, final View img_end)
 {
 
@@ -127,7 +136,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
     entry.get_bitmap(act, ss_info, iv, new DoneCallback() {
         @Override
         public void done() {
-            callbacks.ss_new("(" + (img_lists.get_index(entry) + 1) + "/" + img_lists.get_size() + ")" + C.last(entry.get_name()));
+            image_name("(" + (img_lists.get_index(entry) + 1) + "/" + img_lists.get_size() + ")" + C.last(entry.get_name()));
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
@@ -181,13 +190,13 @@ public void intr(int type)
             saver_start(0);
         else {
             if (state == ScreenSaver.SAVER_FROZEN) {
-                callbacks.ss_icon(R.drawable.ss_play);
+                callbacks.ss_toolbar(null, R.drawable.ss_play);
                 state = ScreenSaver.SAVER_SHOWING;
                 ss_counter = ss_info.delay;
                 ss_info.fade = fade_type;
                 saver_fade(1);
             } else {
-                callbacks.ss_icon(R.drawable.ss_pause);
+                callbacks.ss_toolbar(null, R.drawable.ss_pause);
                 state = SAVER_FROZEN;
                 fade_type = ss_info.fade;
                 ss_info.fade = 5;
@@ -238,6 +247,7 @@ public void saver_start(int listno)
 {
 
     ss_info = callbacks.ss_start();
+    menu_title = null;
 
     img_lists.set_listno(listno);
     state = SAVER_SHOWING;
@@ -337,14 +347,14 @@ public void upd_list(final int gen, final DoneCallback cb)
     if (img_lists.get_size() > count) {
         name = img_lists.get_image(0).get_name();
         if (map.get(name) == null)
-            from = C.get_from(name);
+            from = "new image:" + C.get_from(name);
         else
-            from = "-unknown-";
+            from = "new image:-unknown-";
     } else if (img_lists.get_size() < count)
-        from = "-deleted-";
+        from = "list:-deleted-";
     else
-        from = "-changed-";
-    callbacks.ss_new(from);
+        from = "list:-changed-";
+    menu_title = from;
 
     img_lists.set_generation((img_lists.get_size() > 0) ? img_lists.get_image(0).get_generation() : gen);
     String image_list = img_lists.list2str();
