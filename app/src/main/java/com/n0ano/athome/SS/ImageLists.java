@@ -48,7 +48,14 @@ public ImageLists(String name1, String name2, Preferences pref, ImageFind finder
 }
 
 public int get_listno() { return listno; }
-public void set_listno(int i) { listno = i; }
+public void set_listno(int i)
+{
+
+    if (name_1st.isEmpty())
+        listno = 0;
+    else
+        listno = i;
+}
 
 public String get_name() { return (listno == 0) ? name_1st : name_2nd; }
 

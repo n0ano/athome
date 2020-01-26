@@ -28,6 +28,7 @@ public final static int SAVER_RESET =   0;  // reset the counter
 public final static int SAVER_TICK =    1;  // timer tic occurred
 public final static int SAVER_BLOCK =   2;  // block saver while popups displayed
 public final static int SAVER_FREEZE =  3;  // toggle frozen state
+public final static int SAVER_UPDATE =  4;  // redo lists and do a SAVER_RESET
 
 //
 //  Screen saver states
@@ -202,6 +203,27 @@ public void intr(int type)
     }
 }
 
+public void ss_reset()
+{
+
+    pref.rm_key("images:" + "");
+    pref.rm_key("image_last:" + "");
+    pref.rm_key("images:" + ss_info.list);
+    pref.rm_key("image_last:" + ss_info.list);
+    redo_lists();
+}
+
+private void redo_lists()
+{
+
+    new Thread(new Runnable() {
+        public void run() {
+            init_list(0, null);
+            init_list(1, null);
+        }
+    }).start();
+}
+
 private void init_list(int listno, DoneCallback cb)
 {
 
@@ -209,11 +231,7 @@ private void init_list(int listno, DoneCallback cb)
     String saved = pref.get("images:" + img_lists.get_name(), "");
     img_lists.parse(saved);
     Log.d("DDD-SS", "init_list: " + img_lists.get_name() + ", size - " + img_lists.get_size() + " => " + saved);
-    if (img_lists.get_size() == 0) {
-        upd_list(0, cb);
-    } else
-        if (cb != null)
-            cb.done();
+    upd_list(0, cb);
 }
 
 public void saver_start(int listno)
@@ -268,6 +286,10 @@ public void screen_saver(int tick)
         }
         break;
 
+    case SAVER_UPDATE:
+        redo_lists();
+
+        // fall thru */
     case SAVER_RESET:
         if (state == SAVER_SHOWING) {
             callbacks.ss_stop();

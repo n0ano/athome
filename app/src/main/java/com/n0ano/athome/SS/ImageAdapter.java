@@ -73,7 +73,8 @@ public View getView(int position, View view, ViewGroup parent)
         iv.setImageBitmap(image.bitmap_th);
     else {
         iv.setImageResource(R.drawable.ss_no);
-        image.get_thumb(act, act.ss_info, iv, null);
+        iv.setTag(position);
+        image.get_thumb(act, act.ss_info, iv, position, null);
     }
 
     view.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +108,7 @@ private void get_names(final ImageFind image_find)
 
     new Thread(new Runnable() {
         public void run() {
-            images = image_find.scan(act.ss_info, "", true);
+            images = image_find.scan(act.ss_info, act.ss_info.list, true);
             act.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
             done();
         }

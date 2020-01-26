@@ -132,18 +132,20 @@ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final Image
     }).start();
 }
 
-public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final DoneCallback callback)
+public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final int pos, final DoneCallback callback)
 {
 
     new Thread(new Runnable() {
         public void run() {
             if (bitmap_th == null)
                 bitmap_th = get_bits(ss_info, C.THUMB_X, C.THUMB_Y);
-            act.runOnUiThread(new Runnable() {
-                public void run() {
-                    view.setImageBitmap(bitmap_th);
-                }
-            });
+            if ((int)(view.getTag()) == pos) {
+                act.runOnUiThread(new Runnable() {
+                    public void run() {
+                        view.setImageBitmap(bitmap_th);
+                    }
+                });
+            }
             if (callback != null)
                 callback.done();
         }

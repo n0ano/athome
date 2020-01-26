@@ -103,7 +103,7 @@ public void onCreate(Bundle state)
     image_vm = ViewModelProviders.of(this).get(ImageVM.class);
 Log.d("DDD-SS", "view model - " + image_vm.size());
 
-    saved_images = C.parse_names(pref.get("images:" + ss_info.list_real, ""));
+    saved_images = C.parse_names(pref.get("images:" + ss_info.list, ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
