@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
 
 public class ImageFind
@@ -32,18 +31,18 @@ public ImageFind(Activity act, ImageVM image_vm)
     this.image_vm = image_vm;
 }
 
-public ArrayList<ImageEntry> scan(ScreenInfo info, boolean thumb)
+public ArrayList<ImageEntry> scan(ScreenInfo info, String list, boolean thumb)
 {
 
     this.info = info;
     images = new ArrayList<ImageEntry>();
-    find_local();
-    find_remote(thumb);
+    find_local(list);
+    find_remote(list, thumb);
     Collections.sort(images);
     return images;
 }
 
-public void find_local()
+public void find_local(String list)
 {
 
 if (true) return;
@@ -62,12 +61,12 @@ if (true) return;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry("l:" + path, 1));
+        images.add(new ImageEntry("l:" + path, list, 1));
     }
     return;
 }
 
-public void find_remote(boolean thumb)
+public void find_remote(String list, boolean thumb)
 {
     int idx, ts;
     int gen = 0;
@@ -82,7 +81,7 @@ public void find_remote(boolean thumb)
                 "?names" +
                 "&all" +
                 "&host=" + C.base(info.host) +
-                "&list=" + info.list;
+                "&list=" + list;
         Log.d("DDD-SS", "get names from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
         in_rdr = new URL(url).openStream();
@@ -108,9 +107,9 @@ public void find_remote(boolean thumb)
                     });
                 ImageEntry img = null;
                 if (image_vm != null)
-                    img = image_vm.get(name, gen, Utils.THUMB_X, Utils.THUMB_Y);
+                    img = image_vm.get(name, gen, C.THUMB_X, C.THUMB_Y);
                 if (img == null) {
-                    img = new ImageEntry(str, gen);
+                    img = new ImageEntry(str, list, gen);
                     if (image_vm != null)
                         image_vm.put(name, img);
                 }

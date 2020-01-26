@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.n0ano.athome.Preferences;
 import com.n0ano.athome.R;
-import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
 
 public class PopupImage extends ImageMgmt
