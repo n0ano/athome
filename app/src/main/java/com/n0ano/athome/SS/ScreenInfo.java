@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Point;
 import android.view.Display;
 
-import com.n0ano.athome.C;
 import com.n0ano.athome.Preferences;
 import com.n0ano.athome.Log;
 
@@ -29,7 +28,6 @@ public int fade = 0;
 //
 //  Dynamic info set at run time
 //
-public int generation = -1;
 public int offset = 0;
 public int width = 0;
 public int height = 0;

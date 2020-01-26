@@ -78,9 +78,9 @@ public View getView(int position, View view, ViewGroup parent)
 
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
-            if (Utils.grid_type == Utils.GRID_SHOW)
+            if (C.grid_type == C.GRID_SHOW)
                 act.go_image(v, image);
-            else if (Utils.grid_type == Utils.GRID_CHECK) {
+            else if (C.grid_type == C.GRID_CHECK) {
                 image.set_check(!image.get_check());
                 notifyDataSetChanged();
             }
@@ -107,8 +107,8 @@ private void get_names(final ImageFind image_find)
 
     new Thread(new Runnable() {
         public void run() {
-            images = image_find.scan(act.ss_info, true);
-            act.ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
+            images = image_find.scan(act.ss_info, "", true);
+            act.generation = ((images.size() > 0) ? images.get(0).get_generation() : 0);
             done();
         }
     }).start();

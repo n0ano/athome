@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
 import com.n0ano.athome.Log;
-import com.n0ano.athome.C;
 
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -26,13 +25,14 @@ boolean checked;
 int rotate;
 
 int generation;
+String list;
 String title = "";
 static Bitmap bitmap;
 Bitmap bitmap_th;
 
 private HashMap<String, String> meta;
 
-public ImageEntry(String name, int gen)
+public ImageEntry(String name, String list, int gen)
 {
     int idx, ts;
     char t;
@@ -56,6 +56,7 @@ public ImageEntry(String name, int gen)
         this.ts = 0;
     }
     this.name = name.substring(idx + 1);
+    this.list = list;
     this.width = 0;
     this.height = 0;
     this.bitmap = null;
@@ -137,7 +138,7 @@ public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageV
     new Thread(new Runnable() {
         public void run() {
             if (bitmap_th == null)
-                bitmap_th = get_bits(ss_info, Utils.THUMB_X, Utils.THUMB_Y);
+                bitmap_th = get_bits(ss_info, C.THUMB_X, C.THUMB_Y);
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     view.setImageBitmap(bitmap_th);
@@ -177,7 +178,7 @@ private InputStream open_http(ScreenInfo ss_info, int width, int height)
                 C.CGI_BIN +
                 "?get" +
                 "&host=" + C.base(ss_info.host) +
-                "&list=" + ss_info.list +
+                "&list=" + list +
                 "&name=" + URLEncoder.encode(name) +
                 "&w=" + width +
                 "&h=" + height +

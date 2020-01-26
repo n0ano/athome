@@ -16,7 +16,6 @@ import java.util.HashMap;
 
 import com.n0ano.athome.R;
 import com.n0ano.athome.Preferences;
-import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
 
 public class ScreenSaver
@@ -50,11 +49,10 @@ SS_Callbacks callbacks;
 Preferences pref;
 Thread main_thread = null;
 
-ArrayList<ImageEntry> images;
-ImageLists[] img_lists = new ImageLists[2];
+ImageLists img_lists;
 
 private ScreenInfo ss_info;
-private ImageFind image_find;
+private ImageFind finder;
 
 private int ss_counter = 0;
 public int state = SAVER_BLOCKED;
@@ -81,7 +79,9 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
 
     ss_info = new ScreenInfo(act, pref);
 
-    image_find = new ImageFind(act, null);
+    finder = new ImageFind(act, null);
+
+    img_lists = new ImageLists(ss_info.list, "", pref, finder);
 
     this.first = first;
     ss_views[0] = v1;
@@ -114,41 +114,6 @@ public void do_fade(View start, View end)
     });
 }
 
-private ImageEntry ss_next(int delta)
-{
-    int first;
-    ImageEntry img;
-
-    if (images.size() <= 0)
-        return null;
-
-    if (images.size() < 2)
-        return images.get(0);
-
-    int next = pref.get("image_last:" + ss_info.list, images.size());
-    if (delta == 0) {
-        if (next >= images.size()) {
-            next = images.size() - 1;
-            pref.put("image_last:" + ss_info.list, next);
-        }
-        return images.get(next);
-    }
-
-    first = next;
-    while ((next += delta) != first) {
-        if (next >= images.size())
-            next = 0;
-        else if (next < 0)
-            next = images.size() - 1;
-        img = images.get(next);
-        if (img.get_check()) {
-            pref.put("image_last:" + ss_info.list, next);
-            return img;
-        }
-    }
-    return null;
-}
-
 public void show_image(final ImageEntry entry, final View img_start, final View img_end)
 {
 
@@ -161,7 +126,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
     entry.get_bitmap(act, ss_info, iv, new DoneCallback() {
         @Override
         public void done() {
-            callbacks.ss_new("(" + (images.indexOf(entry) + 1) + "/" + images.size() + ")" + Utils.last(entry.get_name()));
+            callbacks.ss_new("(" + (img_lists.get_index(entry) + 1) + "/" + img_lists.get_size() + ")" + C.last(entry.get_name()));
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
@@ -170,7 +135,8 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                         do_fade(img_start, img_end);
                 }
             });
-            get_names(entry.generation, null);
+            if (entry.generation != img_lists.get_generation())
+                upd_list(entry.generation, null);
         }
     });
 }
@@ -182,7 +148,7 @@ public void saver_fade(int delta)
     ss_viewid ^= 1;
     ss_counter = ss_info.delay;
 
-    show_image(ss_next(delta), ss_views[old], ss_views[ss_viewid]);
+    show_image(img_lists.next_image(delta), ss_views[old], ss_views[ss_viewid]);
 }
 
 public void saver_click()
@@ -211,7 +177,7 @@ public void intr(int type)
 
     case INTR_START:
         if (state == SAVER_COUNTING)
-            saver_start(1);
+            saver_start(0);
         else {
             if (state == ScreenSaver.SAVER_FROZEN) {
                 callbacks.ss_icon(R.drawable.ss_play);
@@ -236,28 +202,20 @@ public void intr(int type)
     }
 }
 
-private void init_list(int listno, String name, boolean new_list, DoneCallback cb)
+private void init_list(int listno, DoneCallback cb)
 {
 
-    if (img_lists[listno] == null)
-        img_lists[listno] = new ImageLists(listno, name);
-    ImageLists list = img_lists[listno];
-    String saved = pref.get("images:" + list.get_name(), "");
-Log.d("DDD-SS", "init_list(" + name + "): " + saved);
-    ss_info.list = list.get_name();
-    images = list.get_images();
-    if (images == null) {
-        list.set_generation(Utils.parse_gen(saved));
-        int gen = list.get_generation();
-        ss_info.generation = gen;
-        if (gen == 0 || new_list)
-            gen = ss_info.generation + 1;
-        images = Utils.parse_images(saved);
-        list.set_images(images);
-        get_names(((ss_info.generation == 0) ? 1 : ss_info.generation), cb);
-    } else
+    img_lists.set_listno(listno);
+    String saved = pref.get("images:" + img_lists.get_name(), "");
+    img_lists.parse(saved);
+    Log.d("DDD-SS", "init_list: " + img_lists.get_name() + ", size - " + img_lists.get_size() + " => " + saved);
+    if (img_lists.get_size() == 0) {
+        upd_list(0, cb);
+    } else {
+        img_lists.set_generation(C.parse_gen(saved));
         if (cb != null)
             cb.done();
+    }
 }
 
 public void saver_start(int listno)
@@ -265,9 +223,7 @@ public void saver_start(int listno)
 
     ss_info = callbacks.ss_start();
 
-    images = img_lists[listno].get_images();
-    ss_info.list = img_lists[listno].get_name();
-    ss_info.generation = img_lists[listno].get_generation();
+    img_lists.set_listno(listno);
     state = SAVER_SHOWING;
     ss_counter = ss_info.delay;
 
@@ -284,7 +240,7 @@ public void saver_start(int listno)
         }
     });
     ss_viewid = 0;
-    show_image(ss_next(1), first, ss_views[ss_viewid]);
+    show_image(img_lists.next_image(1), first, ss_views[ss_viewid]);
 }
 
 public void screen_saver(int tick)
@@ -309,7 +265,7 @@ public void screen_saver(int tick)
                 if (state == SAVER_SHOWING)
                     saver_fade(1);
                 else
-                    saver_start(0);
+                    saver_start(1);
             }
         }
         break;
@@ -347,42 +303,35 @@ void do_toast(final String msg)
     });
 }
 
-public void get_names(final int gen, final DoneCallback cb)
+public void upd_list(final int gen, final DoneCallback cb)
 {
+    String from;
+    String name = "unknown";
 
-    if (gen != ss_info.generation) {
-        String info, from;
-        String name = "unknown";
+    int count = img_lists.get_size();
+    do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(img_lists.get_generation()));
 
-        int count = images.size();
-        do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(ss_info.generation));
-        images = image_find.scan(ss_info, false);
+    HashMap<String, String> map = C.parse_names(pref.get("images:" + img_lists.get_name(), ""));
+    img_lists.scan(map, ss_info, false);
 
-        HashMap<String, String> map = Utils.parse_names(pref.get("images:" + ss_info.list, ""));
-        for (ImageEntry img : images)
-            img.enable(map.get(img.get_name()));
-
-        if (images.size() > count) {
-            name = images.get(0).get_name();
-            if (map.get(name) == null)
-                from = Utils.get_from(name);
-            else
-                from = "-unknown-";
-        } else if (images.size() < count)
-            from = "-deleted-";
+    if (img_lists.get_size() > count) {
+        name = img_lists.get_image(0).get_name();
+        if (map.get(name) == null)
+            from = C.get_from(name);
         else
-            from = "-changed-";
-        callbacks.ss_new(from);
+            from = "-unknown-";
+    } else if (img_lists.get_size() < count)
+        from = "-deleted-";
+    else
+        from = "-changed-";
+    callbacks.ss_new(from);
 
-        ss_info.generation = ((images.size() > 0) ? images.get(0).get_generation() : gen);
-        String image_list = Utils.list2str(ss_info.generation, images);
-        pref.put("images:" + ss_info.list, image_list);
-        pref.put("image_last:" + ss_info.list, images.size());
-        init_list((ss_info.list.isEmpty() ? 0 : 1), ss_info.list, true, cb);
-    } else {
-        if (cb != null)
-            cb.done();
-    }
+    img_lists.set_generation((img_lists.get_size() > 0) ? img_lists.get_image(0).get_generation() : gen);
+    String image_list = img_lists.list2str();
+    pref.put("images:" + img_lists.get_name(), image_list);
+    pref.put("image_last:" + img_lists.get_name(), img_lists.get_size());
+    if (cb != null)
+        cb.done();
 }
 
 //
@@ -411,10 +360,10 @@ private void do_loop()
     //
     main_thread = new Thread(new Runnable() {
         public void run() {
-            init_list(0, "", false, new DoneCallback() {
+            init_list(0, new DoneCallback() {
                 @Override
                 public void done() {
-                    init_list(1, ss_info.list_real, false, new DoneCallback() {
+                    init_list(1, new DoneCallback() {
                         @Override
                         public void done() {
                             main_loop();

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.n0ano.athome.R;
-import com.n0ano.athome.C;
 import com.n0ano.athome.Log;
 import com.n0ano.athome.Preferences;
 
@@ -52,6 +51,8 @@ Menu menu_bar;
 int mgmt_view;
 
 public ScreenInfo ss_info;
+
+public int generation = 0;
 
 ImageAdapter image_adapt;
 ImageEntry cur_image;
@@ -102,7 +103,7 @@ public void onCreate(Bundle state)
     image_vm = ViewModelProviders.of(this).get(ImageVM.class);
 Log.d("DDD-SS", "view model - " + image_vm.size());
 
-    saved_images = Utils.parse_names(pref.get("images:" + ss_info.list_real, ""));
+    saved_images = C.parse_names(pref.get("images:" + ss_info.list_real, ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
@@ -424,11 +425,11 @@ public void grid_mode()
 {
     int icon_id = R.drawable.ss_check;
 
-    if (Utils.grid_type == Utils.GRID_SHOW) {
-        Utils.grid_type = Utils.GRID_CHECK;
+    if (C.grid_type == C.GRID_SHOW) {
+        C.grid_type = C.GRID_CHECK;
         icon_id = R.drawable.ss_check;
-    } else if (Utils.grid_type == Utils.GRID_CHECK) {
-        Utils.grid_type = Utils.GRID_SHOW;
+    } else if (C.grid_type == C.GRID_CHECK) {
+        C.grid_type = C.GRID_SHOW;
         icon_id = R.drawable.ss_image;
     }
     MenuItem icon = menu_bar.findItem(R.id.action_mode);
@@ -449,7 +450,7 @@ private void save_list(String list)
     int r;
 
     StringBuilder inf = new StringBuilder();
-    inf.append(ss_info.generation);
+    inf.append(generation);
     for (int i = 0; i < image_adapt.getCount(); i++) {
         entry = (ImageEntry)image_adapt.getItem(i);
         inf.append(";" + entry.info() + entry.get_name());
@@ -465,7 +466,7 @@ public void show_files()
     TextView tv;
     ImageEntry entry;
 
-    Log.d("Show files");
+    Log.d("DDD-SS", "Show files");
     set_view(R.id.mgmt_fileview);
 
     ListView lv = (ListView) findViewById(R.id.mgmt_files);
