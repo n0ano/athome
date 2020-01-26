@@ -50,8 +50,9 @@ public ImageEntry(String name, String list, int gen)
         if (t == 'l' || t == 'r')
             this.checked = false;
         if (name.charAt(1) == 'R') {
-            this.rotate = Integer.parseInt(name.substring(idx + 1, idx + 4), 10);
-            idx += 4;
+Log.d("DDD-SS", "ImageEntry - " + name);
+            this.rotate = Integer.parseInt(name.substring(idx + 2, idx + 5), 10);
+            idx += 5;
         }
         this.ts = 0;
     }
