@@ -52,7 +52,7 @@ int mgmt_view;
 
 public ScreenInfo ss_info;
 
-public int generation = 0;
+public int generation;
 
 ImageAdapter image_adapt;
 ImageEntry cur_image;
@@ -99,6 +99,8 @@ public void onCreate(Bundle state)
         finish();
         return;
     }
+
+    generation = C.parse_gen(pref.get("images:" + ss_info.list, ""));
 
     image_vm = ViewModelProviders.of(this).get(ImageVM.class);
 Log.d("DDD-SS", "view model - " + image_vm.size());
@@ -439,6 +441,8 @@ public void grid_mode()
 private void save_image()
 {
 
+    cur_image.bitmap_th = null;
+    image_adapt.notifyDataSetChanged();
     save_list(ss_info.list);
     go_back(null);
 }
