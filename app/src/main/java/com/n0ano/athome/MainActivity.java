@@ -143,6 +143,8 @@ Log.cfg(1, "", "");
 public boolean dispatchTouchEvent(MotionEvent ev)
 {
 
+    if (ss_saver == null)
+        return super.dispatchTouchEvent(ev);
     if (ev.getY() < ss_offset)
         return super.dispatchTouchEvent(ev);
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
@@ -178,67 +180,6 @@ protected void onResume()
 //test_parse();
 
     restore_state();
-    if (ss_saver == null) {
-        ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
-            @Override
-            public ScreenInfo ss_start()
-            {
-                Log.d("DDD-SS", "screen saver start");
-                paused = true;
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                        tb.setTitle("AtHome");
-
-                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                        icon.setIcon(R.drawable.ss_play);
-                        menu_icons(false);
-                        View v = (View)findViewById(R.id.scroll_view);
-                        v.setAlpha(1.0f);
-                    }
-                });
-
-                return ss_info;
-            }
-
-            @Override
-            public void ss_stop()
-            {
-                Log.d("DDD-SS", "screen saver stop");
-                paused = false;
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                        tb.setTitle("AtHome");
-                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                        icon.setIcon(R.drawable.ss_monitor);
-                        menu_icons(true);
-
-                        display(screen);
-                    }
-                });
-            }
-
-            @Override
-            public void ss_toolbar(final String from, final int mode)
-            {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        if (from != null) {
-                            Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                            tb.setTitle(from);
-                        }
-
-                        if (mode != 0) {
-                            MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                            icon.setIcon(mode);
-                        }
-                    }
-                });
-            }
-        });
-    }
 
     ss_gesture = new GestureDetectorCompat(this, new MyGesture(ss_saver));
 
@@ -294,9 +235,12 @@ protected void onSaveInstanceState(Bundle state)
 public boolean onCreateOptionsMenu(Menu menu)
 {
 
+    Log.d("MainActivity: onCreateOptionsMenu");
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_main, menu);
     menu_bar = menu;
+    MenuItem icon = menu_bar.findItem(R.id.action_saver);
+    icon.setVisible(ss_info.start > 0 ? true : false);
     return true;
 }
 
@@ -334,7 +278,7 @@ Log.d("DDD-SS", "activity result - " + pref.get("images:" + ss_info.list, ""));
                 tb.setTitle("AtHome");
             }
         });
-        ss_saver.screen_saver(ScreenSaver.SAVER_UPDATE);
+        ss_control(C.SS_OP_UPDATE);
     }
 }
 
@@ -519,6 +463,107 @@ public int decode_time(String t)
         return (Integer.parseInt(t.substring(0, idx)) * 100) + Integer.parseInt(t.substring(idx + 1));
 }
 
+public void ss_control(int op)
+{
+
+    switch (op) {
+
+    case C.SS_OP_INIT:
+        //
+        //  onCreateOptionsMenu will do this on startup but we need to
+        //    do it here in case the settings change at run time
+        //
+        if (menu_bar != null) {
+            MenuItem icon = menu_bar.findItem(R.id.action_saver);
+            icon.setVisible(ss_info.start > 0 ? true : false);
+        }
+
+        if (ss_info.start <= 0) {
+            ss_saver = null;
+            return;
+        }
+
+        if (ss_saver == null) {
+            ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
+                @Override
+                public ScreenInfo ss_start()
+                {
+                    Log.d("DDD-SS", "screen saver start");
+                    paused = true;
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                            tb.setTitle("AtHome");
+
+                            MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                            icon.setIcon(R.drawable.ss_play);
+                            menu_icons(false);
+                            View v = (View)findViewById(R.id.scroll_view);
+                            v.setAlpha(1.0f);
+                        }
+                    });
+
+                    return ss_info;
+                }
+
+                @Override
+                public void ss_stop()
+                {
+                    Log.d("DDD-SS", "screen saver stop");
+                    paused = false;
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                            tb.setTitle("AtHome");
+                            MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                            icon.setIcon(R.drawable.ss_monitor);
+                            menu_icons(true);
+
+                            display(screen);
+                        }
+                    });
+                }
+
+                @Override
+                public void ss_toolbar(final String from, final int mode)
+                {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (from != null) {
+                                Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                                tb.setTitle(from);
+                            }
+
+                            if (mode != 0) {
+                                MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                                icon.setIcon(mode);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        break;
+
+    case C.SS_OP_RESET:
+        if (ss_saver != null)
+            ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
+        break;
+
+    case C.SS_OP_BLOCK:
+        if (ss_saver != null)
+            ss_saver.screen_saver(ScreenSaver.SAVER_BLOCK);
+        break;
+
+    case C.SS_OP_UPDATE:
+        if (ss_saver != null)
+            ss_saver.screen_saver(ScreenSaver.SAVER_UPDATE);
+        break;
+
+    }
+}
+
 private void restore_state()
 {
 
@@ -558,6 +603,8 @@ private void restore_state()
 
     debug = pref.get("debug", 0);
     Log.cfg(debug, log_uri, log_params);
+
+    ss_control(C.SS_OP_INIT);
 }
 
 private void test_parse()

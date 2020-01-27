@@ -27,7 +27,8 @@ public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, 
 
     //  velocityX > 0 => swipe right
     //            < 0 => swipe left
-    act.saver_fling(velocityX < 0 ? 1 : -1);
+    if (act != null)
+        act.saver_fling(velocityX < 0 ? 1 : -1);
     return true;
 }
 

@@ -138,7 +138,7 @@ private Dialog start_dialog(int id)
 
     dialog.show();
 
-    act.ss_saver.screen_saver(ScreenSaver.SAVER_BLOCK);
+    act.ss_control(C.SS_OP_BLOCK);
 
     return dialog;
 }
@@ -146,7 +146,7 @@ private Dialog start_dialog(int id)
 public void end_dialog(Dialog dialog)
 {
 
-    act.ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
+    act.ss_control(C.SS_OP_RESET);
     dialog.dismiss();
 }
 
@@ -699,6 +699,8 @@ private void screen_dialog()
 
             if (cb.isChecked())
                 act.ss_saver.ss_reset();
+
+            act.ss_control(C.SS_OP_INIT);
 
             end_dialog(dialog);
         }

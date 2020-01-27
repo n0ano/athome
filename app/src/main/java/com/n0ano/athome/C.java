@@ -11,6 +11,11 @@ import java.util.HashMap;
 //
 public class C {
 
+public static final int SS_OP_INIT =    0;
+public static final int SS_OP_RESET =   1;
+public static final int SS_OP_BLOCK =   2;
+public static final int SS_OP_UPDATE =  3;
+
 public static int a2i(String num)
 {
 
