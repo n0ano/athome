@@ -85,9 +85,6 @@ public void info_dialog(final ImageEntry entry)
     tv = (TextView) dialog.findViewById(R.id.info_type);
     tv.setText((entry.get_type() == C.IMAGE_LOCAL) ? "local" : "remote");
 
-    tv = (TextView) dialog.findViewById(R.id.info_rotate);
-    tv.setText(String.valueOf(entry.get_rotate()));
-
     tv = (TextView) dialog.findViewById(R.id.info_width);
     tv.setText(String.valueOf(entry.get_width()));
 

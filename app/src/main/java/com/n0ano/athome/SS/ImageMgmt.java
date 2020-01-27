@@ -55,8 +55,9 @@ public ScreenInfo ss_info;
 public int generation;
 
 ImageAdapter image_adapt;
-ImageEntry cur_image;
 ImageVM image_vm;
+ImageEntry cur_image;
+int cur_rotate;
 
 public Map<String, String> saved_images;
 
@@ -337,7 +338,7 @@ public void set_title(final ImageEntry image, final String title)
     tv.setText(title);
 }
 
-public void go_image(View v, final ImageEntry entry)
+public void go_image(View v, final ImageEntry entry, int r)
 {
 
     set_menu(R.id.mgmt_imageview);
@@ -345,10 +346,11 @@ public void go_image(View v, final ImageEntry entry)
     ScreenInfo info = ss_info;
 
     cur_image = entry;
+    cur_rotate = r;
     set_view(R.id.mgmt_imageview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
     iv.setImageResource(R.drawable.ss_no);
-    entry.get_bitmap(this, info, iv, null);
+    entry.get_bitmap(this, r, info, iv, null);
 
     iv.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
@@ -396,14 +398,12 @@ public void go_back(View v)
 public void rotate(int deg)
 {
 
-    int r = cur_image.get_rotate() + deg;
+    int r = cur_rotate + deg;
     while (r < 0)
         r += 360;
     while (r >= 360)
         r -= 360;
-Log.d("DDD-SS", cur_image.get_name() + ": angle - " + r);
-    cur_image.set_rotate(r);
-    go_image(null, cur_image);
+    go_image(null, cur_image, r);
 }
 
 public void save()
@@ -441,10 +441,19 @@ public void grid_mode()
 private void save_image()
 {
 
-    cur_image.bitmap_th = null;
-    image_adapt.notifyDataSetChanged();
-    save_list(ss_info.list);
-    go_back(null);
+    cur_image.do_rotate(cur_rotate, ss_info, new DoneCallback() {
+        @Override
+        public void done() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    cur_image.bitmap_th = null;
+                    image_adapt.notifyDataSetChanged();
+                    save_list(ss_info.list);
+                    go_back(null);
+                }
+            });
+        }
+    });
 }
 
 private void save_list(String list)

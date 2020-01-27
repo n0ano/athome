@@ -74,13 +74,13 @@ public View getView(int position, View view, ViewGroup parent)
     else {
         iv.setImageResource(R.drawable.ss_no);
         iv.setTag(position);
-        image.get_thumb(act, act.ss_info, iv, position, null);
+        image.get_thumb(act, 0, act.ss_info, iv, position, null);
     }
 
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
             if (C.grid_type == C.GRID_SHOW)
-                act.go_image(v, image);
+                act.go_image(v, image, 0);
             else if (C.grid_type == C.GRID_CHECK) {
                 image.set_check(!image.get_check());
                 notifyDataSetChanged();

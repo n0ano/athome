@@ -22,7 +22,6 @@ int height;
 int type;
 int ts;
 boolean checked;
-int rotate;
 
 int generation;
 String list;
@@ -49,11 +48,6 @@ public ImageEntry(String name, String list, int gen)
         this.type = ((t == 'L' || t == 'l') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
         if (t == 'l' || t == 'r')
             this.checked = false;
-        if (name.charAt(1) == 'R') {
-Log.d("DDD-SS", "ImageEntry - " + name);
-            this.rotate = Integer.parseInt(name.substring(idx + 2, idx + 5), 10);
-            idx += 5;
-        }
         this.ts = 0;
     }
     this.name = name.substring(idx + 1);
@@ -77,8 +71,20 @@ public void set_width(int w) { width = w; }
 public int get_height() { return height; }
 public void set_height(int h) { height = h; }
 
-public int get_rotate() { return rotate; }
-public void set_rotate(int r) { rotate = r; }
+public void do_rotate(final int r, final ScreenInfo info, final DoneCallback cb)
+{
+
+    if (r == 0)
+        return;
+    if (type == C.IMAGE_LOCAL)
+        return;
+    new Thread(new Runnable() {
+        public void run() {
+            rotate_remote(r, info);
+            cb.done();
+        }
+    }).start();
+}
 
 public boolean get_check() { return checked; }
 public void set_check(boolean ck) { checked = ck; }
@@ -96,8 +102,6 @@ public void enable(String info)
     if (info != null) {
         if (info.charAt(0) == 'l' || info.charAt(0) == 'r')
             checked = false;
-        if ((info.length() > 1) && (info.charAt(1) == 'R'))
-            rotate = Integer.parseInt(info.substring(2,5));
     }
 }
 
@@ -109,17 +113,15 @@ public String info()
         inf = ((type == C.IMAGE_LOCAL) ? "L" : "R");
     else
         inf = ((type == C.IMAGE_LOCAL) ? "l" : "r");
-    if (rotate != 0)
-        inf = inf + "R" + String.format("%03d", rotate);
     return inf;
 }
 
-public void get_bitmap(final Activity act, final ScreenInfo ss_info, final ImageView view, final DoneCallback callback)
+public void get_bitmap(final Activity act, final int r, final ScreenInfo ss_info, final ImageView view, final DoneCallback callback)
 {
 
     new Thread(new Runnable() {
         public void run() {
-            bitmap = get_bits(ss_info, ss_info.width, ss_info.height);
+            bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height);
             width = ss_info.width;
             height = ss_info.height;
             act.runOnUiThread(new Runnable() {
@@ -133,13 +135,13 @@ public void get_bitmap(final Activity act, final ScreenInfo ss_info, final Image
     }).start();
 }
 
-public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageView view, final int pos, final DoneCallback callback)
+public void get_thumb(final Activity act, final int r, final ScreenInfo ss_info, final ImageView view, final int pos, final DoneCallback callback)
 {
 
     new Thread(new Runnable() {
         public void run() {
             if (bitmap_th == null)
-                bitmap_th = get_bits(ss_info, C.THUMB_X, C.THUMB_Y);
+                bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
             if ((int)(view.getTag()) == pos) {
                 act.runOnUiThread(new Runnable() {
                     public void run() {
@@ -153,12 +155,12 @@ public void get_thumb(final Activity act, final ScreenInfo ss_info, final ImageV
     }).start();
 }
 
-private Bitmap get_bits(ScreenInfo ss_info, int width, int height)
+private Bitmap get_bits(ScreenInfo ss_info, int r, int width, int height)
 {
 	InputStream in_rdr;
 
 	try {
-        in_rdr = open_image(ss_info, width, height);
+        in_rdr = open_image(ss_info, r, width, height);
         bitmap = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
         generation = Integer.parseInt(meta.get("E"), 10);
@@ -171,7 +173,28 @@ private Bitmap get_bits(ScreenInfo ss_info, int width, int height)
     return bitmap;
 }
 
-private InputStream open_http(ScreenInfo ss_info, int width, int height)
+private void rotate_remote(int r, ScreenInfo ss_info)
+{
+    String url;
+	InputStream in_rdr;
+
+	try {
+        url = ss_info.server +
+                C.CGI_BIN +
+                "?rotate" +
+                "&list=" + list +
+                "&name=" + URLEncoder.encode(name) +
+                "&r=" + r;
+        Log.d("DDD-SS", "rotate image " + url);
+        Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
+		in_rdr = new URL(url).openStream();
+        meta = C.get_meta(in_rdr, new HashMap<String, String>());
+	} catch (Exception e) {
+		Log.d("DDD-SS", "get http image failed - " + e);
+	}
+}
+
+private InputStream open_http(ScreenInfo ss_info, int r, int width, int height)
 {
     String url;
 	InputStream in_rdr;
@@ -185,7 +208,7 @@ private InputStream open_http(ScreenInfo ss_info, int width, int height)
                 "&name=" + URLEncoder.encode(name) +
                 "&w=" + width +
                 "&h=" + height +
-                "&r=" + rotate;
+                "&r=" + r;
         Log.d("DDD-SS", "get image from " + url);
         Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
 		in_rdr = new URL(url).openStream();
@@ -199,11 +222,11 @@ private InputStream open_http(ScreenInfo ss_info, int width, int height)
     return in_rdr;
 }
 
-private InputStream open_image(ScreenInfo ss_info, int width, int height)
+private InputStream open_image(ScreenInfo ss_info, int r, int width, int height)
 {
 
     if (type == C.IMAGE_REMOTE)
-        return open_http(ss_info, width, height);
+        return open_http(ss_info, r, width, height);
 //    else if (type == C.IMAGE_LOCAL)
 //        return file open
     return null;

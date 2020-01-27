@@ -2,8 +2,8 @@
 
 use URI::Escape qw( uri_unescape );
 
-$tm="names&all&host=lenovo&list=lrg";
-$td="delete&list=pbw&name=.pbw%2Fwnbr-2019.jpg";
+$tr="rotate&list=pbw&name=.pbw%2Fwnbr-2019.jpg&r=270";
+$tm="names&all&host=lenovo&list=pbw";
 $tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&xy&w=600&h=888";
 $query = $ENV{"QUERY_STRING"};
 $type = "get";
@@ -19,7 +19,7 @@ $NOCACHE = 1;
 $fit = "fit";
 
 $DIR = "Books/Frame/";
-$dirs = ".files";
+$DLIST = ".files";
 
 @tokens = split(/&/, $query);
 foreach my $t (@tokens) {
@@ -27,6 +27,7 @@ foreach my $t (@tokens) {
 	($type = $t)				if $t =~ /^names/;
 	($type = $t)				if $t =~ /^title/;
 	($type = $t)				if $t =~ /^delete/;
+	($type = $t)				if $t =~ /^rotate/;
 	($hidden = $t)				if $t =~ /^all/;
 	($xy = 1)				if $t =~ /^xy/;
 	($maxw = $t) =~ s/w=//			if $t =~ /^w=/;
@@ -41,17 +42,18 @@ foreach my $t (@tokens) {
 
 $host = "default"		if $host eq "";
 $host = $host . "-" . $list	if $list ne "";
-$dirs = $dirs . "-" . $list	if $list ne "";
+$DLIST = $DLIST . "-" . $list	if $list ne "";
 
 #  Image operations
 #
-get_image($host, $dirs, $name)	if $type eq "get";
-del_image($name, $dirs)		if $type eq "delete";
+get_image($host, $name)	if $type eq "get";
+del_image($name, )		if $type eq "delete";
 set_title($name, $text)		if $type eq "title";
+rot_image($name, $rotate)	if $type eq "rotate";
 
 #  List Operations
 #
-get_names($dirs)		if $type eq "names";
+get_names()			if $type eq "names";
 
 sub out_line
 {
@@ -65,7 +67,6 @@ sub out_line
 
 sub get_names
 {
-	local ($f) = @_;
 	local ($n,$gen,$ts,$dh,$dir,$entry);
 
 	print <<END;
@@ -73,7 +74,7 @@ Content-type: application/octet-stream
 
 END
 
-	open F, $DIR . $f;
+	open F, $DIR . $DLIST;
 	$gen = <F>;
 	chop $gen;
 	&out_line("G", $gen);
@@ -96,7 +97,7 @@ END
 
 sub get_image
 {
-	local ($h,$d,$n) = @_;
+	local ($h,$n) = @_;
 	local ($r,$t,$dim,$gen,$name,$F);
 
 	print <<END;
@@ -104,10 +105,7 @@ Content-type: application/octet-stream
 
 END
 
-	open F, "$DIR" . $d;
-	$gen = <F>;
-	chop $gen;
-	close F;
+	$gen = &get_generation();
 
 	if ($fit eq "full") {
 		$cmd = "<$DIR$n";
@@ -148,7 +146,7 @@ END
 
 sub del_image
 {
-	local($n,$d) = @_;
+	local($n) = @_;
 	local($i,$g,$gen,$lines);
 
 	print <<END;
@@ -156,7 +154,7 @@ Content-type: application/octet-stream
 
 END
 
-	open F, "<$DIR" . "$d";
+	open F, "<$DIR" . "$DLIST";
 	$g = <F>;
 	chomp($g);
 	$gen = $g + 1;
@@ -166,7 +164,7 @@ END
 	}
 	close F;
 
-	open F, ">$DIR" . "$d";
+	open F, ">$DIR" . "$DLIST";
 	print F "$gen\n";
 	foreach $line (@lines) {
 		print F $line;
@@ -178,10 +176,27 @@ END
 	&out_line("E", "");
 }
 
+sub rot_image
+{
+	local($n, $r) = @_;
+	local($suf,$gen);
+
+	print <<END;
+Content-type: application/octet-stream
+
+END
+
+	$suf = "$n";
+	$suf =~ s/.*\.//;
+	system("convert $DIR$n -rotate $r /tmp/$$.$suf; cp /tmp/$$.$suf $DIR$n; rm -f /tmp/$$.$suf");
+	$gen = &get_generation();
+	&out_line("E", $gen);
+}
+
 sub set_title
 {
 	local($n, $t) = @_;
-	local($f);
+	local($f,$gen);
 
 	print <<END;
 Content-type: application/octet-stream
@@ -193,7 +208,8 @@ END
 	open F, ">$f";
 	print F "$t\n";
 	close F;
-	&out_line("E", "");
+	$gen = &get_generation();
+	&out_line("E", $gen);
 }
 
 sub cache_file
@@ -213,4 +229,15 @@ sub cache_file
 	open $I, "<$cname";
 	binmode $I;
 	return $I;
+}
+
+sub get_generation
+{
+	local ($g);
+
+	open LIST, "$DIR" . $DLIST;
+	$g = <LIST>;
+	chop $g;
+	close LIST;
+	return $g;
 }
