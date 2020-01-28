@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -484,6 +485,9 @@ public void ss_control(int op)
         }
 
         if (ss_saver == null) {
+            ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
+            pb.setVisibility(View.VISIBLE);
+            paused = true;
             ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
                 @Override
                 public ScreenInfo ss_start()
@@ -541,6 +545,18 @@ public void ss_control(int op)
                             }
                         }
                     });
+                }
+
+                @Override
+                public void ss_inited()
+                {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
+                            pb.setVisibility(View.GONE);
+                        }
+                    });
+                    paused = false;
                 }
             });
         }

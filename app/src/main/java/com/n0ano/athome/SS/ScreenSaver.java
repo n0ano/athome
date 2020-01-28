@@ -95,7 +95,7 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
     state = SAVER_BLOCKED;
     screen_saver(SAVER_RESET);
 
-    do_loop();
+    do_loop(callbacks);
 }
 
 public void hide_views()
@@ -383,7 +383,7 @@ Log.d("DDD-SS", "Screen saver main loop started");
     }
 }
 
-private void do_loop()
+private void do_loop(final SS_Callbacks cb)
 {
     //
     //  Start the main loop in its own thread
@@ -396,6 +396,7 @@ private void do_loop()
                     init_list(1, new DoneCallback() {
                         @Override
                         public void done() {
+                            cb.ss_inited();
                             main_loop();
                         }
                     });

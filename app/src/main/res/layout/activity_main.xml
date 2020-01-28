@@ -17,7 +17,15 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/toolBack"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+
+            <ProgressBar
+                android:id="@+id/main_progress"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:paddingLeft="10dp" />
+
+            </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
