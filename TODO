@@ -1,3 +1,10 @@
+- Screen Saver
+	. touch to quit saver overrides main display, sometimes
+	. button to start thumbnail download?
+	. redo on decode fail?
+	. progress circle rather than bad image while downloading
+	. local files
+
 - Fahrenheit vs. Celsius
 
 - Configurable refresh reates for eGauge and weather
