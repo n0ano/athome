@@ -45,6 +45,12 @@ public final static int layout_thermostat[] = {
     R.layout.thermostats_table  
 };
 
+public final static int layout_outlets[] = {
+    R.layout.outlets_hidden,                       
+    R.layout.outlets_table,
+    R.layout.outlets_table  
+};
+
 MainActivity act;
 
 private int batt_pos;
@@ -218,6 +224,9 @@ private void general_dialog()
     final CheckBox bt_thermostat = (CheckBox) dialog.findViewById(R.id.general_thermostat);
     bt_thermostat.setChecked(act.thermostat_layout != LAYOUT_NONE);
 
+    final CheckBox bt_outlets = (CheckBox) dialog.findViewById(R.id.general_outlets);
+    bt_outlets.setChecked(act.outlets_layout != LAYOUT_NONE);
+
     final EditText et_on = (EditText) dialog.findViewById(R.id.general_on);
     et_on.setText(act.encode_time(act.on_time));
 
@@ -267,6 +276,9 @@ private void general_dialog()
 
             act.thermostat_layout = (bt_thermostat.isChecked() ? act.general_layout : LAYOUT_NONE);
             pref.put("thermostat_layout", act.thermostat_layout);
+
+            act.outlets_layout = (bt_outlets.isChecked() ? act.general_layout : LAYOUT_NONE);
+            pref.put("outlets_layout", act.outlets_layout);
 
             act.on_time = act.decode_time(et_on.getText().toString());
             pref.put("general_on", act.on_time);

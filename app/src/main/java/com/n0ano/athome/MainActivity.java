@@ -94,6 +94,7 @@ String x10_jwt;
 String tplink_user;
 String tplink_pwd;
 
+public int outlets_layout;
 String outlets_battery = "";
 int outlets_cols;
 int outlets_batt_min;
@@ -441,6 +442,9 @@ public void show_views()
     view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
 
     view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
+
+Log.d("outlets - " + outlets_layout + "(" + Popup.LAYOUT_TABLET +")");
+    view_show(outlets_layout, Popup.layout_outlets, R.id.outlets_main);
 }
 
 public String encode_time(int t)
@@ -602,6 +606,7 @@ private void restore_state()
     ecobee_access = pref.get("ecobee_access", "");
     ecobee_refresh = pref.get("ecobee_refresh", "");
 
+    outlets_layout = pref.get("outlets_layout", Popup.LAYOUT_TABLET);
     outlets_battery = pref.get("outlets_battery", "");
     outlets_cols = pref.get("outlets_cols", OUTLETS_COLS);
     outlets_batt_min = pref.get("outlets_batt_min", BATTERY_LOW);
@@ -1149,17 +1154,25 @@ private void disp_update()
 private void doit()
 {
 
-    final Weather weather = new Weather(this);
-    this.weather = weather;
+    if (weather_layout != Popup.LAYOUT_NONE) {
+        final Weather weather = new Weather(this);
+        this.weather = weather;
+    }
 
-    final Thermostat thermostat = new Thermostat(this);
-    this.thermostat = thermostat;
+    if (thermostat_layout != Popup.LAYOUT_NONE) {
+        final Thermostat thermostat = new Thermostat(this);
+        this.thermostat = thermostat;
+    }
 
-    final Egauge egauge = new Egauge( this);
-    this.egauge = egauge;
+    if (egauge_layout != Popup.LAYOUT_NONE) {
+        final Egauge egauge = new Egauge( this);
+        this.egauge = egauge;
+    }
 
-    final Outlets outlets = new Outlets(this);
-    this.outlets = outlets;
+    if (outlets_layout != Popup.LAYOUT_NONE) {
+        final Outlets outlets = new Outlets(this);
+        this.outlets = outlets;
+    }
 
     this.running = true;
 
