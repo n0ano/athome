@@ -289,6 +289,8 @@ private void general_dialog()
             if (act.thermostat_layout != LAYOUT_NONE)
                 act.thermostat.init_view();
             end_dialog(dialog);
+            act.finish();
+            act.startActivity(act.getIntent());
         }
     });
 }
