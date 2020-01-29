@@ -146,7 +146,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                 }
             });
             if (entry.generation != img_lists.get_generation())
-                upd_list(entry.generation, null);
+                upd_list(entry.generation);
         }
     });
 }
@@ -227,20 +227,20 @@ private void redo_lists()
 
     new Thread(new Runnable() {
         public void run() {
-            init_list(0, null);
-            init_list(1, null);
+            init_list(0);
+            init_list(1);
         }
     }).start();
 }
 
-private void init_list(int listno, DoneCallback cb)
+private void init_list(int listno)
 {
 
     img_lists.set_listno(listno);
     String saved = pref.get("images:" + img_lists.get_name(), "");
     img_lists.parse(saved);
     Log.d("DDD-SS", "init_list: " + img_lists.get_name() + ", size - " + img_lists.get_size() + " => " + saved);
-    upd_list(0, cb);
+    upd_list(0);
 }
 
 public void saver_start(int listno)
@@ -333,7 +333,7 @@ void do_toast(final String msg)
     });
 }
 
-public void upd_list(final int gen, final DoneCallback cb)
+public void upd_list(final int gen)
 {
     String from;
     String name = "unknown";
@@ -360,8 +360,6 @@ public void upd_list(final int gen, final DoneCallback cb)
     String image_list = img_lists.list2str();
     pref.put("images:" + img_lists.get_name(), image_list);
     pref.put("image_last:" + img_lists.get_name(), img_lists.get_size());
-    if (cb != null)
-        cb.done();
 }
 
 //
@@ -390,18 +388,10 @@ private void do_loop(final SS_Callbacks cb)
     //
     main_thread = new Thread(new Runnable() {
         public void run() {
-            init_list(0, new DoneCallback() {
-                @Override
-                public void done() {
-                    init_list(1, new DoneCallback() {
-                        @Override
-                        public void done() {
-                            cb.ss_inited();
-                            main_loop();
-                        }
-                    });
-                }
-            });
+            init_list(0);
+            init_list(1);
+            cb.ss_inited();
+            main_loop();
         }
     });
     main_thread.start();
