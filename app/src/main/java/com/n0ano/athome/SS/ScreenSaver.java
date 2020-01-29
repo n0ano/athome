@@ -240,7 +240,10 @@ private void init_list(int listno)
     String saved = pref.get("images:" + img_lists.get_name(), "");
     img_lists.parse(saved);
     Log.d("DDD-SS", "init_list: " + img_lists.get_name() + ", size - " + img_lists.get_size() + " => " + saved);
-    upd_list(0);
+    int gen = C.parse_gen(saved);
+    img_lists.set_generation(gen);
+    if (gen <= 0)
+        upd_list(0);
 }
 
 public void saver_start(int listno)
