@@ -156,7 +156,7 @@ private Bitmap get_bits(ScreenInfo ss_info, int r, int width, int height)
 		return null;
 	}
     if (bitmap == null)
-        Log.d("DDD-SS", "image decode failed");
+        Log.d("DDD-SS", name + ":image decode failed");
     return bitmap;
 }
 
@@ -196,7 +196,7 @@ private InputStream open_http(ScreenInfo ss_info, int r, int width, int height)
                 "&w=" + width +
                 "&h=" + height +
                 "&r=" + r;
-        Log.d("DDD-SS", "get image from " + url);
+        Log.d("DDD-SS", "get image from :..." + url.substring((ss_info.server + C.CGI_BIN).length()));
         Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
 		in_rdr = new URL(url).openStream();
         meta = C.get_meta(in_rdr, new HashMap<String, String>());
