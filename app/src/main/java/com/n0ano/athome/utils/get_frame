@@ -5,6 +5,7 @@ use URI::Escape qw( uri_unescape );
 $tr="rotate&list=pbw&name=.pbw%2Fwnbr-2019.jpg&r=270";
 $tm="names&all&host=lenovo&list=pbw";
 $tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&xy&w=600&h=888";
+$tf="get&host=lenovo&list=pbw&name=.pbw%2FWwW.Wallpapers2012.com__+%28WwW.Wallpapers2012.com__7%29.jpg&w=1600&h=2560&r=0";
 $query = $ENV{"QUERY_STRING"};
 $type = "get";
 $hidden = "";
@@ -14,6 +15,8 @@ $rotate = 0;
 $xy = 0;
 $host = "default";
 $list = "";
+$name = "";
+$text = "";
 $delta = 1;
 $NOCACHE = 1;
 $fit = "fit";
@@ -35,11 +38,13 @@ foreach my $t (@tokens) {
 	($rotate = $t) =~ s/r=//		if $t =~ /^r=/;
 	($host = $t) =~ s/host=//		if $t =~ /^host=/;
 	($list = $t) =~ s/list=//		if $t =~ /^list=/;
-	($name = uri_unescape($t)) =~ s/name=//	if $t =~ /^name=/;
-	($text = uri_unescape($t)) =~ s/text=// if $t =~ /^text=/;
+	($name = $t) =~ s/name=//		if $t =~ /^name=/;
+	($text = $t) =~ s/text=// 		if $t =~ /^text=/;
 	($NOCACHE = 0) =~ s/cache//		if $t =~ /^cache/;
 }
 
+$name = &sanitize($name);
+$text = &sanitize($text);
 $host = "default"		if $host eq "";
 $host = $host . "-" . $list	if $list ne "";
 $DLIST = $DLIST . "-" . $list	if $list ne "";
@@ -240,4 +245,17 @@ sub get_generation
 	chop $g;
 	close LIST;
 	return $g;
+}
+
+sub sanitize
+{
+	local ($n) = @_;
+
+	#
+	# Android URL encodes a blank as + while Perl doesn't, go figure.
+	#   Fortuantely, Android does encode a + so a simple substitution works
+	#
+	$n =~ s/\+/ /g;
+	$n = uri_unescape($n);
+	return $n;
 }
