@@ -13,6 +13,7 @@ public class Ecobee {
 
 public final static int PERIOD = 60;   // temperature only changes once a minute
 
+public final static String ECO_LOGIN = "https://ecobee.com";
 public final static String ECO_URL = "https://api.ecobee.com";
 public final static String ECO_AUTHORIZE = "/authorize";
 public final static String ECO_REFRESH = "/token";

@@ -341,7 +341,7 @@ private void ecobee_how()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.start_browser(Ecobee.ECO_URL);
+            act.start_browser(Ecobee.ECO_LOGIN);
             end_dialog(dialog);
         }
     });
