@@ -1,13 +1,15 @@
 #!/bin/bash
 
-PHOTO_EMAIL="bjgifford.150@photoshareframe.com"
-SERVER="isis"
-
 cat >/tmp/$$.f
-
-/bin/sed -e "s/^To:.*/To: $PHOTO_EMAIL/" /tmp/$$.f | /usr/sbin/sendmail -i $PHOTO_EMAIL
 
 FROM=`cat /tmp/$$.f | grep "From:"`
 SUBJ=`cat /tmp/$$.f | grep "Subject:"`
-ssh $SERVER bin/save_photo \"$FROM\" \"$SUBJ\" </tmp/$$.f
+
+PBW=`expr "$SUBJ" : '\(Subject: pbw:\).*'`
+if [ "$PBW" != "Subject: pbw:" ]
+then
+	/bin/sed -e "s/^To:.*/To: bjgifford.150@photoshareframe.com/" /tmp/$$.f | /usr/sbin/sendmail -i bjgifford.150@photoshareframe.com
+fi
+
+ssh isis bin/save_photo \"$FROM\" \"$SUBJ\" </tmp/$$.f
 rm /tmp/$$.f

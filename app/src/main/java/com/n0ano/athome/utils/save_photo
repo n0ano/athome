@@ -25,7 +25,6 @@ then
 	NAME="$FROM"
 fi
 NAME=`echo "$NAME" | tr " " "_"`
-mkdir -p $DIR/$NAME
 
 SUBJ=`expr "$2" : 'Subject: \(.*\)'`
 LIST=`expr "$SUBJ" : '^\([^:]*\):'`
@@ -34,8 +33,11 @@ then
 	LIST=".files"
 else
 	SUBJ=`expr "$SUBJ" : '^:[^:]*:\(.*\)'`
+	NAME=".$LIST"
 	LIST=".files-$LIST"
 fi
+
+mkdir -p $DIR/$NAME
 
 mkdir $$.dd
 cd $$.dd
@@ -49,19 +51,20 @@ do
 	else
 		name=$i
 	fi
-	cp $i $DIR/$NAME/$name
-	chmod 0644 $DIR/$NAME/$name
+	convert $i -resize 2048x2048 $DIR/$NAME/$name
+	chmod 0664 $DIR/$NAME/$name
+	chgrp www-data $DIR/$NAME/$name
 	if [ "$SUBJ" != "" ]
 	then
-		uname=`echo "$NAME/$name" | sed -e "s/\//_/g"`
-		echo "$SUBJ" >$DIR/.titles/$uname
+		tfile=`echo "$NAME/$name" | sed -e "s/\//_/g"`
+		echo "$SUBJ" >$DIR/.titles/$tfile
 	fi
 done
 cd ..
 rm -rf $$.dd
-gen=`head -1 "$LIST"`
+gen=`head -1 "$DIR/$LIST"`
 gen=$(($gen + 1))
 echo $gen >$$.f
-(sed -n -e '2,$p' <"$LIST";echo "$NAME") | sort | uniq >>$$.f
-cp $$.f "$LIST"
+(sed -n -e '2,$p' <"$DIR/$LIST";echo "$NAME") | sort | uniq >>$$.f
+cp $$.f "$DIR/$LIST"
 rm -f $$.f
