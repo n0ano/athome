@@ -165,12 +165,13 @@ public static String list2str(int gen, ArrayList<ImageEntry> images)
 {
     ImageEntry entry;
 
-    String list = "" + gen;
+    StringBuilder list = new StringBuilder();
+    list.append(Integer.valueOf(gen));
     for (int i = 0; i < images.size(); i++) {
         entry = images.get(i);
-        list = list + ";" + entry.info() + entry.get_name();
+        list.append(";" + entry.info() + entry.get_name());
     }
-    return list;
+    return list.toString();
 }
 
 public static ArrayList<ImageEntry> parse_images(String str, String list)
