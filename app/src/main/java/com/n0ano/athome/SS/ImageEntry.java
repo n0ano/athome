@@ -118,7 +118,7 @@ public String info()
     return inf;
 }
 
-public void get_bitmap(final Activity act, final int r, final ScreenInfo ss_info, final DoneCallback cb)
+public void get_bitmap(final int r, final ScreenInfo ss_info, final DoneCallback cb)
 {
 
     new Thread(new Runnable() {
@@ -131,7 +131,7 @@ public void get_bitmap(final Activity act, final int r, final ScreenInfo ss_info
     }).start();
 }
 
-public void get_thumb(final Activity act, final int r, final ScreenInfo ss_info, final int pos, final DoneCallback cb)
+public void get_thumb(final int r, final ScreenInfo ss_info, final DoneCallback cb)
 {
 
     new Thread(new Runnable() {

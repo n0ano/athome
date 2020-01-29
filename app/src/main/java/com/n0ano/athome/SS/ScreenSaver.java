@@ -133,7 +133,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
             iv.setImageResource(R.drawable.ss_no);
         }
     });
-    entry.get_bitmap(act, 0, ss_info, new DoneCallback() {
+    entry.get_bitmap(0, ss_info, new DoneCallback() {
         @Override
         public void done() {
             image_name("(" + (img_lists.get_index(entry) + 1) + "/" + img_lists.get_size() + ")" + C.last(entry.get_name()));

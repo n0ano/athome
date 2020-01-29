@@ -353,7 +353,7 @@ public void go_image(View v, final ImageEntry entry, int r)
     final ProgressBar pb = (ProgressBar)findViewById(R.id.mgmt_prog);
     pb.setVisibility(View.VISIBLE);
     iv.setImageBitmap(null);
-    entry.get_bitmap(this, r, info, new DoneCallback() {
+    entry.get_bitmap(r, info, new DoneCallback() {
         @Override
         public void done() {
             runOnUiThread(new Runnable() {

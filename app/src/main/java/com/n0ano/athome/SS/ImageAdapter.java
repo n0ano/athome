@@ -61,6 +61,7 @@ public Object getItem(int position)
 public View getView(final int position, View view, ViewGroup parent)
 {
 
+Log.d("DDD-SS", "render - " + position);
     final ImageEntry image = images.get(position);
     if (view == null) {
         final LayoutInflater layoutInflater = LayoutInflater.from(act);
@@ -80,7 +81,7 @@ public View getView(final int position, View view, ViewGroup parent)
         pb.setVisibility(View.VISIBLE);
         iv.setImageBitmap(null);
         ic.setVisibility(View.GONE);
-        image.get_thumb(act, 0, act.ss_info, position, new DoneCallback() {
+        image.get_thumb(0, act.ss_info, new DoneCallback() {
             @Override
             public void done() {
                 if ((int)iv.getTag() == position) {
@@ -139,12 +140,18 @@ private void get_names(final ImageFind image_find)
             if (gen != act.generation)
                 rm_thumbs();
             act.generation = gen;
-            done();
+            ImageEntry img = images.get(0);
+            img.get_thumb(0, act.ss_info, new DoneCallback() {
+                @Override
+                public void done() {
+                    all_done();
+                }
+            });
         }
     }).start();
 }
 
-private void done()
+private void all_done()
 {
 
     for (ImageEntry img : images) {
