@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +58,7 @@ public Object getItem(int position)
 }
 
 @Override
-public View getView(int position, View view, ViewGroup parent)
+public View getView(final int position, View view, ViewGroup parent)
 {
 
     final ImageEntry image = images.get(position);
@@ -68,13 +69,31 @@ public View getView(int position, View view, ViewGroup parent)
 
     final ImageView iv = (ImageView)view.findViewById(R.id.image);
     final ImageView ic = (ImageView)view.findViewById(R.id.mgmt_check);
+    final ProgressBar pb = (ProgressBar)view.findViewById(R.id.mgmt_progress);
+    iv.setTag(position);
 
-    if (image.bitmap_th != null)
+    if (image.bitmap_th != null) {
+        pb.setVisibility(View.GONE);
         iv.setImageBitmap(image.bitmap_th);
-    else {
-        iv.setImageResource(R.drawable.ss_no);
-        iv.setTag(position);
-        image.get_thumb(act, 0, act.ss_info, iv, position, null);
+        ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
+    } else {
+        pb.setVisibility(View.VISIBLE);
+        iv.setImageBitmap(null);
+        ic.setVisibility(View.GONE);
+        image.get_thumb(act, 0, act.ss_info, position, new DoneCallback() {
+            @Override
+            public void done() {
+                if ((int)iv.getTag() == position) {
+                    act.runOnUiThread(new Runnable() {
+                        public void run() {
+                            pb.setVisibility(View.GONE);
+                            iv.setImageBitmap(image.bitmap_th);
+                            ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     view.setOnClickListener(new View.OnClickListener() {
@@ -88,8 +107,6 @@ public View getView(int position, View view, ViewGroup parent)
             act.pref.put("image_last:" + act.ss_info.list, images.indexOf(image) - 1);
         }
     });
-
-    ic.setVisibility(image.get_check() ? View.VISIBLE : View.GONE);
 
     return view;
 }

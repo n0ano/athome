@@ -13,6 +13,13 @@
         android:layout_alignParentLeft="true"
         android:scaleType="centerCrop" />
 
+    <ProgressBar
+        android:id="@+id/mgmt_progress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone" />
+
     <ImageView
         android:id="@+id/mgmt_check"
         android:layout_width="20dp"

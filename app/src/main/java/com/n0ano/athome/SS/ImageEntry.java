@@ -3,7 +3,9 @@ package com.n0ano.athome.SS;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.n0ano.athome.Log;
 
@@ -116,7 +118,7 @@ public String info()
     return inf;
 }
 
-public void get_bitmap(final Activity act, final int r, final ScreenInfo ss_info, final ImageView view, final DoneCallback callback)
+public void get_bitmap(final Activity act, final int r, final ScreenInfo ss_info, final DoneCallback cb)
 {
 
     new Thread(new Runnable() {
@@ -124,33 +126,18 @@ public void get_bitmap(final Activity act, final int r, final ScreenInfo ss_info
             bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height);
             width = ss_info.width;
             height = ss_info.height;
-            act.runOnUiThread(new Runnable() {
-                public void run() {
-                    view.setImageBitmap(bitmap);
-                }
-            });
-            if (callback != null)
-                callback.done();
+            cb.done();
         }
     }).start();
 }
 
-public void get_thumb(final Activity act, final int r, final ScreenInfo ss_info, final ImageView view, final int pos, final DoneCallback callback)
+public void get_thumb(final Activity act, final int r, final ScreenInfo ss_info, final int pos, final DoneCallback cb)
 {
 
     new Thread(new Runnable() {
         public void run() {
-            if (bitmap_th == null)
-                bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
-            if ((int)(view.getTag()) == pos) {
-                act.runOnUiThread(new Runnable() {
-                    public void run() {
-                        view.setImageBitmap(bitmap_th);
-                    }
-                });
-            }
-            if (callback != null)
-                callback.done();
+            bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
+            cb.done();
         }
     }).start();
 }

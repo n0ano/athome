@@ -19,6 +19,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -349,8 +350,20 @@ public void go_image(View v, final ImageEntry entry, int r)
     cur_rotate = r;
     set_view(R.id.mgmt_imageview);
     final ImageView iv = (ImageView)findViewById(R.id.mgmt_image);
-    iv.setImageResource(R.drawable.ss_no);
-    entry.get_bitmap(this, r, info, iv, null);
+    final ProgressBar pb = (ProgressBar)findViewById(R.id.mgmt_prog);
+    pb.setVisibility(View.VISIBLE);
+    iv.setImageBitmap(null);
+    entry.get_bitmap(this, r, info, new DoneCallback() {
+        @Override
+        public void done() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    pb.setVisibility(View.GONE);
+                    iv.setImageBitmap(entry.bitmap);
+                }
+            });
+        }
+    });
 
     iv.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {

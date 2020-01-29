@@ -81,6 +81,14 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true" />
 
+        <ProgressBar
+            android:id="@+id/mgmt_prog"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
+
 		<TextView
 			android:id="@+id/mgmt_title"
 			android:layout_width="wrap_content"
