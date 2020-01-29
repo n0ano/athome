@@ -23,7 +23,8 @@
                 android:id="@+id/main_progress"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:paddingLeft="10dp" />
+                android:paddingLeft="10dp"
+                android:visibility="gone" />
 
             </android.support.v7.widget.Toolbar>
 
