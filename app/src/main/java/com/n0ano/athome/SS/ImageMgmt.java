@@ -355,7 +355,7 @@ public void go_image(View v, final ImageEntry entry, int r)
     iv.setImageBitmap(null);
     entry.get_bitmap(r, info, new DoneCallback() {
         @Override
-        public void done() {
+        public void done(Object obj) {
             runOnUiThread(new Runnable() {
                 public void run() {
                     pb.setVisibility(View.GONE);
@@ -456,7 +456,7 @@ private void save_image()
 
     cur_image.do_rotate(cur_rotate, ss_info, new DoneCallback() {
         @Override
-        public void done() {
+        public void done(Object obj) {
             runOnUiThread(new Runnable() {
                 public void run() {
                     cur_image.bitmap_th = null;

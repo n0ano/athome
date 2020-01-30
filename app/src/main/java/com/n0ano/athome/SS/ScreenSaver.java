@@ -111,7 +111,7 @@ public void do_fade(View start, View end)
 
     faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new DoneCallback() {
         @Override
-        public void done() {
+        public void done(Object obj) {
             ss_counter = ss_info.delay;
         }
     });
@@ -135,7 +135,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
     });
     entry.get_bitmap(0, ss_info, new DoneCallback() {
         @Override
-        public void done() {
+        public void done(Object obj) {
             image_name("(" + (img_lists.get_index(entry) + 1) + "/" + img_lists.get_size() + ")" + C.last(entry.get_name()));
             act.runOnUiThread(new Runnable() {
                 public void run() {

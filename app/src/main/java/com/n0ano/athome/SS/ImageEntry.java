@@ -94,7 +94,7 @@ public void do_rotate(final int r, final ScreenInfo info, final DoneCallback cb)
     new Thread(new Runnable() {
         public void run() {
             rotate_remote(r, info);
-            cb.done();
+            cb.done(null);
         }
     }).start();
 }
@@ -143,7 +143,7 @@ public void get_bitmap(final int r, final ScreenInfo ss_info, final DoneCallback
                 bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height);
             width = ss_info.width;
             height = ss_info.height;
-            cb.done();
+            cb.done(null);
         }
     }).start();
 }
@@ -158,7 +158,7 @@ public void get_thumb(final int r, final ScreenInfo ss_info, final DoneCallback 
                 bitmap_th = Bitmap.createScaledBitmap(b, C.THUMB_X, C.THUMB_Y, false);
             } else
                 bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
-            cb.done();
+            cb.done(null);
         }
     }).start();
 }

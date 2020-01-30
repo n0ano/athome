@@ -82,7 +82,7 @@ public View getView(final int position, View view, ViewGroup parent)
         ic.setVisibility(View.GONE);
         image.get_thumb(0, act.ss_info, new DoneCallback() {
             @Override
-            public void done() {
+            public void done(Object obj) {
                 if ((int)iv.getTag() == position) {
                     act.runOnUiThread(new Runnable() {
                         public void run() {
@@ -142,7 +142,7 @@ private void get_names(final ImageFind image_find)
             ImageEntry img = images.get(0);
             img.get_thumb(0, act.ss_info, new DoneCallback() {
                 @Override
-                public void done() {
+                public void done(Object obj) {
                     all_done();
                 }
             });

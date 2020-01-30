@@ -247,7 +247,7 @@ private void fade_done(View view, int which)
 
     }
     if (--active <= 0 && callback != null)
-        callback.done();
+        callback.done(null);
         
 }
 
