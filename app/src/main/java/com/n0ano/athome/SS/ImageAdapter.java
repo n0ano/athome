@@ -61,7 +61,6 @@ public Object getItem(int position)
 public View getView(final int position, View view, ViewGroup parent)
 {
 
-Log.d("DDD-SS", "render - " + position);
     final ImageEntry image = images.get(position);
     if (view == null) {
         final LayoutInflater layoutInflater = LayoutInflater.from(act);

@@ -2,6 +2,8 @@ package com.n0ano.athome.SS;
 
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -209,6 +211,30 @@ public static HashMap<String, String> parse_names(String str)
         }
     }
     return map;
+}
+
+//  x,y = desired dimenstions
+//  w,h = actual dimensions
+//
+public static int scalex(int x, int y, int w, int h)
+{
+
+    float rx = (float)x/(float)w;
+    float ry = (float)y/(float)h;
+    if ((rx * h) > y)
+        return x;
+    else
+        return (int)(ry * w);
+}
+public static int scaley(int x, int y, int w, int h)
+{
+
+    float rx = (float)x/(float)w;
+    float ry = (float)y/(float)h;
+    if ((rx * h) > y)
+        return y;
+    else
+        return (int)(ry * h);
 }
 
 }

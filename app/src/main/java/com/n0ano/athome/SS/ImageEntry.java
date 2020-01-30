@@ -3,12 +3,15 @@ package com.n0ano.athome.SS;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.n0ano.athome.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.URL;
@@ -41,9 +44,9 @@ public ImageEntry(String name, String list, int gen)
     this.checked = true;
     idx = 0;
     t = name.charAt(0);
-    if (t == 'F') {
+    if (t == 'F' || t == 'f') {
         // name from image server list
-        this.type = C.IMAGE_REMOTE;
+        this.type = ((t == 'F') ? C.IMAGE_REMOTE : C.IMAGE_LOCAL);
         idx = name.indexOf(":");
         this.ts = Integer.parseInt(name.substring(1, idx), 10);
     } else {
@@ -59,6 +62,14 @@ public ImageEntry(String name, String list, int gen)
     this.bitmap = null;
     this.bitmap_th = null;
     this.generation = gen;
+if (type == C.IMAGE_LOCAL) {
+    try {
+        ExifInterface exif = new ExifInterface(this.name);
+        //Log.d("DDD-SS", this.name + " => " + exif.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION));
+    } catch (Exception e) {
+        //Log.d("DDD-SS", this.name + " => no Comment attribute");
+    }
+}
 }
 
 public String get_name() { return name; }
@@ -123,7 +134,13 @@ public void get_bitmap(final int r, final ScreenInfo ss_info, final DoneCallback
 
     new Thread(new Runnable() {
         public void run() {
-            bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height);
+            if (type == C.IMAGE_LOCAL) {
+                Bitmap b = get_bits(ss_info, r, ss_info.width, ss_info.height);
+                int w = C.scalex(ss_info.width, ss_info.height, b.getWidth(), b.getHeight());
+                int h = C.scaley(ss_info.width, ss_info.height, b.getWidth(), b.getHeight());
+                bitmap = Bitmap.createScaledBitmap(b, w, h, false);
+            } else
+                bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height);
             width = ss_info.width;
             height = ss_info.height;
             cb.done();
@@ -136,7 +153,11 @@ public void get_thumb(final int r, final ScreenInfo ss_info, final DoneCallback 
 
     new Thread(new Runnable() {
         public void run() {
-            bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
+            if (type == C.IMAGE_LOCAL) {
+                Bitmap b = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
+                bitmap_th = Bitmap.createScaledBitmap(b, C.THUMB_X, C.THUMB_Y, false);
+            } else
+                bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
             cb.done();
         }
     }).start();
@@ -209,13 +230,26 @@ private InputStream open_http(ScreenInfo ss_info, int r, int width, int height)
     return in_rdr;
 }
 
+private InputStream open_local(ScreenInfo ss_info, int r, int width, int height)
+{
+
+    try {
+        InputStream inp = new FileInputStream(new File(name));
+        meta = new HashMap<String, String>();
+        meta.put("E", "0");
+        return inp;
+    } catch (Exception e) {
+        return null;
+    }
+}
+
 private InputStream open_image(ScreenInfo ss_info, int r, int width, int height)
 {
 
     if (type == C.IMAGE_REMOTE)
         return open_http(ss_info, r, width, height);
-//    else if (type == C.IMAGE_LOCAL)
-//        return file open
+    else if (type == C.IMAGE_LOCAL)
+        return open_local(ss_info, r, width, height);
     return null;
 }
 

@@ -45,7 +45,6 @@ public ArrayList<ImageEntry> scan(ScreenInfo info, String list, boolean thumb)
 public void find_local(String list)
 {
 
-if (true) return;
     Uri uri;
     Cursor cursor;
     int column_index_data, column_index_folder_name;
@@ -61,7 +60,7 @@ if (true) return;
     while (cursor.moveToNext()) {
         path = cursor.getString(column_index_data);
 
-        images.add(new ImageEntry("l:" + path, list, 1));
+        images.add(new ImageEntry("f" + cursor.getPosition() + ":" + path, list, 0));
     }
     return;
 }

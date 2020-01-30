@@ -15,6 +15,7 @@ public class ScreenInfo
 //
 //  Static info stored in preferences
 //
+public Activity act = null;
 public String host = "";
 public String list = "";
 public String server = "";
@@ -34,6 +35,7 @@ public int height = 0;
 public ScreenInfo(Activity act, Preferences pref)
 {
 
+    this.act = act;
     this.host = pref.get("ss_host", "");
     this.list = C.suffix(host);
     this.server = pref.get("ss_server", "");
