@@ -21,6 +21,9 @@ public final static String CGI_BIN = "/cgi-bin/explore.dd/get_frame";
 public final static int IMAGE_LOCAL =   0;
 public final static int IMAGE_REMOTE =  1;
 
+public final static int ASPECT_FIT =        0;
+public final static int ASPECT_STRETCH =    1;
+
 public static final int GRID_SHOW =   0;
 public static final int GRID_CHECK =   1;
 
@@ -118,6 +121,14 @@ public static HashMap<String, String> get_meta(InputStream in, HashMap<String, S
 
         case 'F':       // file name
             //Log.d("DDD-SS", "F:" + str);
+            break;
+
+        case 'W':       // image width
+            //Log.d("DDD-SS", "W:" + str);
+            break;
+
+        case 'H':       // file name
+            //Log.d("DDD-SS", "H:" + str);
             break;
 
         case 'T':       // title

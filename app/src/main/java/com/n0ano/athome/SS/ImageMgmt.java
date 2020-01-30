@@ -105,7 +105,7 @@ public void onCreate(Bundle state)
     generation = C.parse_gen(pref.get("images:" + ss_info.list, ""));
 
     image_vm = ViewModelProviders.of(this).get(ImageVM.class);
-Log.d("DDD-SS", "view model - " + image_vm.size());
+    Log.d("DDD-SS", "view model - " + image_vm.size());
 
     saved_images = C.parse_names(pref.get("images:" + ss_info.list, ""));
 
@@ -355,11 +355,11 @@ public void go_image(View v, final ImageEntry entry, int r)
     iv.setImageBitmap(null);
     entry.get_bitmap(r, info, new DoneCallback() {
         @Override
-        public void done(Object obj) {
+        public void done(final Object obj) {
             runOnUiThread(new Runnable() {
                 public void run() {
                     pb.setVisibility(View.GONE);
-                    iv.setImageBitmap(entry.bitmap);
+                    iv.setImageBitmap((Bitmap)obj);
                 }
             });
         }

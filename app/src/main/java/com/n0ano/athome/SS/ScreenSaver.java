@@ -135,11 +135,11 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
     });
     entry.get_bitmap(0, ss_info, new DoneCallback() {
         @Override
-        public void done(Object obj) {
+        public void done(final Object obj) {
             image_name("(" + (img_lists.get_index(entry) + 1) + "/" + img_lists.get_size() + ")" + C.last(entry.get_name()));
             act.runOnUiThread(new Runnable() {
                 public void run() {
-                    iv.setImageBitmap(entry.bitmap);
+                    iv.setImageBitmap((Bitmap)obj);
                     TextView tv = (TextView)((RelativeLayout)img_end).findViewById(R.id.title);
                     tv.setText(entry.get_title());
                     if (img_start != null)

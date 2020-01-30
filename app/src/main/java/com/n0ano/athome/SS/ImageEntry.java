@@ -31,7 +31,6 @@ boolean checked;
 int generation;
 String list;
 String title = "";
-static Bitmap bitmap;
 Bitmap bitmap_th;
 
 private HashMap<String, String> meta;
@@ -59,7 +58,6 @@ public ImageEntry(String name, String list, int gen)
     this.list = list;
     this.width = 0;
     this.height = 0;
-    this.bitmap = null;
     this.bitmap_th = null;
     this.generation = gen;
 if (type == C.IMAGE_LOCAL) {
@@ -134,16 +132,8 @@ public void get_bitmap(final int r, final ScreenInfo ss_info, final DoneCallback
 
     new Thread(new Runnable() {
         public void run() {
-            if (type == C.IMAGE_LOCAL) {
-                Bitmap b = get_bits(ss_info, r, ss_info.width, ss_info.height);
-                int w = C.scalex(ss_info.width, ss_info.height, b.getWidth(), b.getHeight());
-                int h = C.scaley(ss_info.width, ss_info.height, b.getWidth(), b.getHeight());
-                bitmap = Bitmap.createScaledBitmap(b, w, h, false);
-            } else
-                bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height);
-            width = ss_info.width;
-            height = ss_info.height;
-            cb.done(null);
+            Bitmap bitmap = get_bits(ss_info, r, ss_info.width, ss_info.height, C.ASPECT_FIT);
+            cb.done(bitmap);
         }
     }).start();
 }
@@ -153,25 +143,43 @@ public void get_thumb(final int r, final ScreenInfo ss_info, final DoneCallback 
 
     new Thread(new Runnable() {
         public void run() {
-            if (type == C.IMAGE_LOCAL) {
-                Bitmap b = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
-                bitmap_th = Bitmap.createScaledBitmap(b, C.THUMB_X, C.THUMB_Y, false);
-            } else
-                bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y);
+            bitmap_th = get_bits(ss_info, r, C.THUMB_X, C.THUMB_Y, C.ASPECT_STRETCH);
             cb.done(null);
         }
     }).start();
 }
 
-private Bitmap get_bits(ScreenInfo ss_info, int r, int width, int height)
+private Bitmap get_bits(ScreenInfo ss_info, int r, int w, int h, int aspect)
 {
 	InputStream in_rdr;
+    Bitmap b, bitmap;
 
 	try {
-        in_rdr = open_image(ss_info, r, width, height);
-        bitmap = BitmapFactory.decodeStream(in_rdr);
+        in_rdr = open_image(ss_info, r, w, h);
+        b = BitmapFactory.decodeStream(in_rdr);
         in_rdr.close();
-        generation = Integer.parseInt(meta.get("E"), 10);
+        if (type == C.IMAGE_LOCAL) {
+            width = b.getWidth();
+            height = b.getHeight();
+            if (aspect == C.ASPECT_FIT) {
+                w = C.scalex(ss_info.width, ss_info.height, width, height);
+                h = C.scaley(ss_info.width, ss_info.height, width, height);
+            } else {
+                w = ss_info.width;
+                h = ss_info.height;
+            }
+            bitmap = Bitmap.createScaledBitmap(b, w, h, false);
+            generation = 0;
+        } else {
+            bitmap = b;
+            generation = Integer.parseInt(meta.get("E"), 10);
+            String str = meta.get("W");
+            if (str != null)
+                width = Integer.parseInt(str, 10);
+            str = meta.get("H");
+            if (str != null)
+                height = Integer.parseInt(str, 10);
+        }
 	} catch (Exception e) {
 		Log.d("DDD-SS", "get image failed - " + e);
 		return null;
