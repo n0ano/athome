@@ -74,6 +74,7 @@ public int weather_layout;
 public int weather_progress;
 
 public String weather_id;
+public String weather_key;
 
 public int thermostat_layout;
 public String ecobee_api;
@@ -600,6 +601,7 @@ private void restore_state()
     weather_progress = pref.get("weather_progress", 1);
 
     weather_id = pref.get("wunder_id", "");
+    weather_key = pref.get("wunder_key", "");
 
     thermostat_layout = pref.get("thermostat_layout", Popup.LAYOUT_TABLET);
     ecobee_api = pref.get("ecobee_api", "");
@@ -1010,6 +1012,7 @@ public void show_cfg()
         cfg.put("tplink_pwd", pref.get("tplink_pwd", ""));
         cfg.put("tplink_user", pref.get("tplink_user", ""));
         cfg.put("wunder_id", pref.get("wunder_id", ""));
+        cfg.put("wunder_key", pref.get("wunder_key", ""));
         cfg.put("x10_jwt", pref.get("x10_jwt", ""));
         cfg.put("x10_url", pref.get("x10_url", ""));
         et.setText(cfg.toString(2));

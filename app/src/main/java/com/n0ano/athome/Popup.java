@@ -448,8 +448,11 @@ private void weather_dialog()
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.weather_progress);
     cb.setChecked(act.weather_progress != 0);
 
-    final EditText et = (EditText) dialog.findViewById(R.id.weather_id);
-    et.setText(act.weather_id);
+    final EditText et_id = (EditText) dialog.findViewById(R.id.weather_id);
+    et_id.setText(act.weather_id);
+
+    final EditText et_key = (EditText) dialog.findViewById(R.id.weather_key);
+    et_key.setText(act.weather_key);
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
@@ -458,8 +461,11 @@ private void weather_dialog()
             act.weather_progress = (cb.isChecked() ? 1 : 0);
             pref.put("weather_progress", act.weather_progress);
 
-            act.weather_id = et.getText().toString();
+            act.weather_id = et_id.getText().toString();
             pref.put("wunder_id", act.weather_id);
+
+            act.weather_key = et_key.getText().toString();
+            pref.put("wunder_key", act.weather_key);
 
             act.show_views();
             end_dialog(dialog);

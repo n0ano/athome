@@ -8,7 +8,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,22 +32,27 @@ private final static int MINMAX_NONE =  0;  // No min/max data yet
 private final static int MINMAX_VALID = 1;  // min/max data available
 private final static int MINMAX_SET =   2;  // min/max data set in GaugeView
 
-public final static String WUNDER_URL = "https://stationdata.wunderground.com";
-public final static String WUNDER_API = "/cgi-bin/stationlookup";
-public final static String WUNDER_STATION = "station=";
-public final static String WUNDER_QUERY = "&units=english&v=2.0&format=xml";
+public final static String WUNDER_URL = "https://api.weather.com";
+public final static String WUNDER_API = "/v2/pws/observations/current";
+public final static String WUNDER_ID = "stationId=";
+public final static String WUNDER_KEY = "&apiKey=";
+public final static String WUNDER_QUERY = "&units=e&format=json&numericPrecision=decimal";
 
 MainActivity act;
 
 public int period = PERIOD;        // Weather only changes once a minute
 
-Map<String, String> data = new HashMap<String, String>();
+JSONObject units = null;
 
-ArrayList<Float> baro_hist = new ArrayList<Float>();
-Float baro_cum = 0.0f;
-Float baro_avg = 0.0f;
+ArrayList<Double> baro_hist = new ArrayList<Double>();
+Double baro_cum = 0.0;
+Double baro_avg = 0.0;
 int baro_icon;
-int minmax = MINMAX_NONE;
+
+float min_temp = 200.0f;
+float max_temp = -100.0f;
+String min_temp_time;
+String max_temp_time;
 
 // Weather: class constructor
 //
@@ -53,48 +62,55 @@ public Weather(MainActivity act)
 {
 
 	this.act = act;
-    init_data(true);
 }
 
-// Java doesn't have associative arrays but we can accomplish the
-//   same thing with a HashMap.  Unfortunately, we can't statically\
-//   initialize a HashMap so we have do that in a function;
-//
-private void init_data(boolean all)
+private JSONObject find_station(String id, JSONObject json)
 {
+    JSONObject station;
+    String sid;
 
-    /*
-     * Data we need an initial value for
-     */
-    data.put("tempf", "--");
-    data.put("winddir", "0");
-    data.put("windspeedmph", "--");
-    data.put("dailyrainin", "--");
-    data.put("baromin", "--");
-    /*
-     * Data we care about
-     */
-    if (all) {
-        data.put("maxtemp", "");
-        data.put("maxtemp_time", "");
-        data.put("mintemp", "");
-        data.put("mintemp_time", "");
-        data.put("humidity", "");
+    JSONArray observe = json.optJSONArray("observations");
+    int max = observe.length();
+    for (int i = 0; i < max; i++) {
+        station = (JSONObject)observe.opt(0);
+        sid = station.optString("stationID", "");
+        if (sid.equals(id))
+            return station;
     }
+    return null;
 }
 
-private void get_info_wunder(String resp)
+private void get_info_wunder(JSONObject json)
 {
     String key;
     String val;
 
-    Set keys = data.keySet();
-    for (Iterator itr = keys.iterator(); itr.hasNext();) {
-        key = (String)itr.next();
-        val = act.parse.xml_get(key, resp, 1);
-        data.put(key, (val != null) ? val : "");
+    JSONObject station = find_station(act.weather_id, json);
+    units = (JSONObject)station.opt("imperial");
+
+    int wdir = station.optInt("winddir", 0);
+    double humid = station.optDouble("humidity", 0.0);
+    try {
+Log.d("units - " + units);
+        units.put("winddir", wdir);
+        units.put("humidity", humid);
+    } catch (Exception e) {
+        Log.d("error putting winddir/humidity - " + e);
     }
-    Float f = Float.valueOf(data.get("baromin"));
+
+    double temp = json.optDouble("temp", 1000.0);
+    if (temp < 1000.0) {
+        if (temp < min_temp) {
+            min_temp = (float)temp;
+            min_temp_time = Calendar.getInstance().getTime().toString();
+        }
+        if (temp > max_temp) {
+            max_temp = (float)temp;
+            max_temp_time = Calendar.getInstance().getTime().toString();
+        }
+    }
+
+    Double f = Double.valueOf(units.optDouble("pressure", 0.0));
     baro_hist.add(f);
     int max = baro_hist.size();
     if (max > MAX_BARO) {
@@ -109,9 +125,6 @@ private void get_info_wunder(String resp)
         baro_icon = R.drawable.barometer_down;
     else
         baro_icon = R.drawable.barometer;
-
-    if (minmax == MINMAX_NONE)
-        minmax = MINMAX_VALID;
 }
 
 private void get_wunder()
@@ -119,14 +132,18 @@ private void get_wunder()
 
     String resp = act.call_api("GET",
                                WUNDER_URL + WUNDER_API,
-                               WUNDER_STATION + act.weather_id + WUNDER_QUERY,
+                               WUNDER_ID + act.weather_id +
+                               WUNDER_KEY + act.weather_key +
+                               WUNDER_QUERY,
                                "",
                                null);
-//Log.d("under:" + resp);
-    if (resp.isEmpty() || resp.contains("<conds></conds>"))
+Log.d("wunder:" + resp);
+    try {
+        JSONObject json = new JSONObject(resp);
+        get_info_wunder(json);
+    } catch (Exception e) {
         Log.d("get_wunder: no data for station " + act.weather_id);
-    else
-        get_info_wunder(resp);
+    }
 }
 
 private void detail_dialog()
@@ -136,16 +153,16 @@ private void detail_dialog()
     dialog.setContentView(R.layout.detail);
 
     TextView tv = (TextView) dialog.findViewById(R.id.detail_max);
-    tv.setText(data.get("maxtemp"));
+    tv.setText(Double.toString(max_temp));
 
     tv = (TextView) dialog.findViewById(R.id.detail_min);
-    tv.setText(data.get("mintemp"));
+    tv.setText(Double.toString(min_temp));
 
     tv = (TextView) dialog.findViewById(R.id.detail_max_time);
-    tv.setText(data.get("maxtemp_time"));
+    tv.setText(max_temp_time);
 
     tv = (TextView) dialog.findViewById(R.id.detail_min_time);
-    tv.setText(data.get("mintemp_time"));
+    tv.setText(min_temp_time);
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
@@ -173,7 +190,6 @@ public void update()
     //  Get the data
     //
     if (period++ >= PERIOD) {
-        init_data(false);
         get_wunder();
         period = 1;
     }
@@ -188,27 +204,24 @@ public void update()
             GaugeView gv;
 
             if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null) {
-                if (minmax == MINMAX_VALID) {
-                    minmax = MINMAX_SET;
-                    gv.set_minmax(data.get("mintemp"), data.get("maxtemp"));
-                }
-                gv.set_value(data.get("tempf"));
+                gv.set_minmax(min_temp, max_temp);
+                gv.set_value((float)units.optDouble("temp", 0.0));
             }
 
             if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
-                iv.setRotation(Integer.valueOf(data.get("winddir")));
+                iv.setRotation(Integer.valueOf(units.optInt("winddir", 0)));
 
             if ((tv = (TextView) act.findViewById(R.id.weather_speed)) != null)
-                tv.setText(data.get("windspeedmph"));
+                tv.setText(String.format("%.1f", units.optDouble("windSpeed", 0.0)));
 
             if ((tv = (TextView) act.findViewById(R.id.weather_rain)) != null)
-                tv.setText(data.get("dailyrainin") + " in");
+                tv.setText(String.format("%.1f", units.optDouble("precipTotal", 0.0)));
 
             if ((iv = (ImageView) act.findViewById(R.id.weather_bar_dir)) != null)
                 iv.setImageResource(baro_icon);
 
             if ((tv = (TextView) act.findViewById(R.id.weather_barometer)) != null)
-                tv.setText(data.get("baromin") + " in");
+                tv.setText(String.format("%.1f", units.optDouble("pressure", 0.0)));
 
             if ((iv = (ImageView) act.findViewById(R.id.weather_timeout)) != null)
                 act.set_timeout(iv, period, PERIOD);
