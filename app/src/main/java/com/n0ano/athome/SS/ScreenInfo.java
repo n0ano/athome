@@ -21,6 +21,7 @@ public String list = "";
 public String server = "";
 public String user = "";
 public String pwd = "";
+public boolean enable = true;
 public int start = 0;        // seconds, 0 = none
 public int delay = 0;        // seconds
 public int fade = 0;
@@ -41,6 +42,7 @@ public ScreenInfo(Activity act, Preferences pref)
     this.server = pref.get("ss_server", "");
     this.user = pref.get("ss_user", "");
     this.pwd = pref.get("ss_pwd", "");
+    this.enable = pref.get("ss_enable", true);
     this.start = pref.get("ss_start", 0);
     this.delay = pref.get("ss_delay", 0);
     this.fade = pref.get("ss_fade", 0);

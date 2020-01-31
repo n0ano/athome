@@ -84,7 +84,7 @@ public boolean menu_click(int item)
     switch (item) {
 
     case R.id.action_saver:
-        act.ss_saver.saver_click();
+        act.saver_click();
         return true;
 
     case R.id.action_display:
@@ -662,11 +662,14 @@ private void screen_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_screen);
 
+    final CheckBox cb_enable = (CheckBox) dialog.findViewById(R.id.screen_enable);
+    cb_enable.setChecked(act.ss_info.enable);
+
     final EditText ss_start = (EditText) dialog.findViewById(R.id.screen_start);
-    ss_start.setText(act.ss_info.start > 0 ? C.i2a(act.ss_info.start) : "");
+    ss_start.setText(act.ss_info.start == 0 ? "" : C.i2a(act.ss_info.start));
 
     final EditText ss_delay = (EditText) dialog.findViewById(R.id.screen_delay);
-    ss_delay.setText(act.ss_info.start > 0 ? C.i2a(act.ss_info.delay) : "");
+    ss_delay.setText(act.ss_info.delay == 0 ? "" : C.i2a(act.ss_info.delay));
 
     final Spinner ss_fade = (Spinner) dialog.findViewById(R.id.screen_type);
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, Faders.types);
@@ -715,6 +718,8 @@ private void screen_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            act.ss_info.enable = cb_enable.isChecked();
+            pref.put("ss_enable", act.ss_info.enable);
             act.ss_info.host = et_host.getText().toString();
             pref.put("ss_host", act.ss_info.host);
             act.ss_info.list = C.suffix(act.ss_info.host);
@@ -731,14 +736,14 @@ private void screen_dialog()
                 act.ss_info.start = 0;
             }
             pref.put("ss_start", act.ss_info.start);
-            if (act.ss_info.start > 0) {
-                try {
-                    act.ss_info.delay = C.a2i(ss_delay.getText().toString());
-                } catch (Exception e) {
-                    act.ss_info.delay = SS_DELAY;
-                }
-                pref.put("ss_delay", act.ss_info.delay);
+
+            try {
+                act.ss_info.delay = C.a2i(ss_delay.getText().toString());
+            } catch (Exception e) {
+                act.ss_info.delay = SS_DELAY;
             }
+            pref.put("ss_delay", act.ss_info.delay);
+
             act.ss_info.fade = type_pos;
             pref.put("ss_fade", act.ss_info.fade);
 

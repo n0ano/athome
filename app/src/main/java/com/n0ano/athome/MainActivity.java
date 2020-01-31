@@ -243,7 +243,7 @@ public boolean onCreateOptionsMenu(Menu menu)
     getMenuInflater().inflate(R.menu.menu_main, menu);
     menu_bar = menu;
     MenuItem icon = menu_bar.findItem(R.id.action_saver);
-    icon.setVisible(ss_info.start > 0 ? true : false);
+    icon.setVisible(ss_info.enable);
     return true;
 }
 
@@ -475,6 +475,13 @@ public int decode_time(String t)
         return (Integer.parseInt(t.substring(0, idx)) * 100) + Integer.parseInt(t.substring(idx + 1));
 }
 
+public void saver_click()
+{
+
+    if (ss_saver != null)
+        ss_saver.saver_click();
+}
+
 public void ss_control(int op)
 {
 
@@ -487,10 +494,10 @@ public void ss_control(int op)
         //
         if (menu_bar != null) {
             MenuItem icon = menu_bar.findItem(R.id.action_saver);
-            icon.setVisible(ss_info.start > 0 ? true : false);
+            icon.setVisible(ss_info.enable);
         }
 
-        if (ss_info.start <= 0) {
+        if (!ss_info.enable) {
             ss_saver = null;
             return;
         }
@@ -993,6 +1000,7 @@ public void show_cfg()
         cfg.put("egauge_layout", pref.get("egauge_layout", ""));
         cfg.put("egauge_progress", pref.get("egauge_progress", ""));
         cfg.put("general_layout", pref.get("general_layout", ""));
+        cfg.put("ss_enable", pref.get("ss_start", ""));
         cfg.put("ss_start", pref.get("ss_start", ""));
         cfg.put("ss_delay", pref.get("ss_delay", ""));
         cfg.put("ss_fade", pref.get("ss_fade", ""));

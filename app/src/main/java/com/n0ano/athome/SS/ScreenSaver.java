@@ -190,7 +190,9 @@ public void intr(int type)
         if (state == SAVER_COUNTING)
             saver_start(0);
         else {
-            if (state == ScreenSaver.SAVER_FROZEN) {
+            if (state == ScreenSaver.SAVER_BLOCKED)
+                saver_start(0);
+            else if (state == ScreenSaver.SAVER_FROZEN) {
                 callbacks.ss_toolbar(null, R.drawable.ss_play);
                 state = ScreenSaver.SAVER_SHOWING;
                 ss_counter = ss_info.delay;
