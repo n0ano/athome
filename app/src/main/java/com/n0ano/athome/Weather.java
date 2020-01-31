@@ -80,12 +80,14 @@ private JSONObject find_station(String id, JSONObject json)
     return null;
 }
 
-private void get_info_wunder(JSONObject json)
+private boolean get_info_wunder(JSONObject json)
 {
     String key;
     String val;
 
     JSONObject station = find_station(act.weather_id, json);
+    if (station == null)
+        return false;
     units = (JSONObject)station.opt("imperial");
 
     int wdir = station.optInt("winddir", 0);
@@ -96,6 +98,7 @@ Log.d("units - " + units);
         units.put("humidity", humid);
     } catch (Exception e) {
         Log.d("error putting winddir/humidity - " + e);
+        return false;
     }
 
     double temp = json.optDouble("temp", 1000.0);
@@ -125,6 +128,7 @@ Log.d("units - " + units);
         baro_icon = R.drawable.barometer_down;
     else
         baro_icon = R.drawable.barometer;
+    return true;
 }
 
 private void get_wunder()
@@ -143,6 +147,7 @@ Log.d("wunder:" + resp);
         get_info_wunder(json);
     } catch (Exception e) {
         Log.d("get_wunder: no data for station " + act.weather_id);
+        units = null;
     }
 }
 
@@ -190,9 +195,11 @@ public void update()
     //  Get the data
     //
     if (period++ >= PERIOD) {
-        get_wunder();
         period = 1;
+        get_wunder();
     }
+    if (units == null)
+        return;
 
     //
     //  Display it

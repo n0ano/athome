@@ -376,6 +376,12 @@ public void display_toggle(View V)
     display(!screen);
 }
 
+public void toast(String msg)
+{
+
+    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+}
+
 public void display(final boolean onoff)
 {
 
@@ -387,7 +393,7 @@ public void display(final boolean onoff)
                 Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, onoff ? screen_bright : 0);
             } catch (Exception e) {
                 Log.d("can't change brightness " + e);
-                Toast.makeText(getApplicationContext(), "Can't change brightness - permissions?", Toast.LENGTH_LONG).show();
+                toast("Can't change brightness - permissions?");
             }
             View view = (View) findViewById(R.id.scroll_view);
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
@@ -924,7 +930,7 @@ public void remote_doit(String type, String url, String cfg)
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 if (!ok)
-                    Toast.makeText(getApplicationContext(), "No config - bad host name?", Toast.LENGTH_LONG).show();
+                    toast("No config - bad host name?");
                 doit();
             }
         });

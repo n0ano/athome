@@ -135,7 +135,7 @@ private Dialog start_dialog(int id)
         cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                end_dialog(dialog);
+                end_dialog(dialog, false);
             }
         });
     }
@@ -149,11 +149,15 @@ private Dialog start_dialog(int id)
     return dialog;
 }
 
-public void end_dialog(Dialog dialog)
+public void end_dialog(Dialog dialog, boolean restart)
 {
 
     act.ss_control(C.SS_OP_RESET);
     dialog.dismiss();
+    if (restart) {
+        act.finish();
+        act.startActivity(act.getIntent());
+    }
 }
 
 public void display_dialog()
@@ -185,7 +189,7 @@ public void device_dialog(final OutletsDevice dev)
         public void onClick(View v) {
             dev.set_hold(cb.isChecked());
             dev.set_state(dev.get_state(), act);
-            end_dialog(dialog);
+            end_dialog(dialog, true);
         }
     });
 }
@@ -246,7 +250,7 @@ private void general_dialog()
         @Override
         public void onClick(View v) {
             act.show_log();
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 
@@ -255,7 +259,7 @@ private void general_dialog()
         @Override
         public void onClick(View v) {
             act.show_cfg();
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 
@@ -288,9 +292,7 @@ private void general_dialog()
             act.show_views();
             if (act.thermostat_layout != LAYOUT_NONE)
                 act.thermostat.init_view();
-            end_dialog(dialog);
-            act.finish();
-            act.startActivity(act.getIntent());
+            end_dialog(dialog, true);
         }
     });
 }
@@ -299,6 +301,12 @@ private void egauge_dialog()
 {
 
     final Dialog dialog = start_dialog(R.layout.bar_egauge);
+
+    if (act.egauge_layout == LAYOUT_NONE) {
+        end_dialog(dialog, false);
+        act.toast("eGauge disabled");
+        return;
+    }
 
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.egauge_progress);
     cb.setChecked(act.egauge_progress != 0);
@@ -324,7 +332,7 @@ private void egauge_dialog()
             pref.put("egauge_url", act.egauge_url);
 
             act.show_views();
-            end_dialog(dialog);
+            end_dialog(dialog, true);
         }
     });
 }
@@ -342,7 +350,7 @@ private void ecobee_how()
         @Override
         public void onClick(View v) {
             act.start_browser(Ecobee.ECO_LOGIN);
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 }
@@ -378,7 +386,6 @@ private void ecobee_doauth(final String api, final String pin)
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            end_dialog(dialog);
             act.ecobee_api = api;
             pref.put("ecobee_api", act.ecobee_api);
             new Thread(new Runnable() {
@@ -386,6 +393,7 @@ private void ecobee_doauth(final String api, final String pin)
                     act.thermostat.ecobee.ecobee_authorize(act.ecobee_api);
                 }
             }).start();
+            end_dialog(dialog, false);
         }
     });
 }
@@ -418,7 +426,7 @@ private void ecobee_dialog()
         @Override
         public void onClick(View v) {
             String api = api_tv.getText().toString();
-            end_dialog(dialog);
+            end_dialog(dialog, false);
             ecobee_dopin(api);
         }
     });
@@ -433,7 +441,7 @@ private void ecobee_dialog()
             pref.put("ecobee_api", act.ecobee_api);
             pref.put("ecobee_access", act.ecobee_access);
             pref.put("ecobee_refresh", act.ecobee_refresh);
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 }
@@ -444,6 +452,12 @@ private void weather_dialog()
     String name, pname;
 
     final Dialog dialog = start_dialog(R.layout.bar_weather);
+
+    if (act.weather_layout == LAYOUT_NONE) {
+        end_dialog(dialog, false);
+        act.toast("Weather disabled");
+        return;
+    }
 
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.weather_progress);
     cb.setChecked(act.weather_progress != 0);
@@ -468,7 +482,7 @@ private void weather_dialog()
             pref.put("wunder_key", act.weather_key);
 
             act.show_views();
-            end_dialog(dialog);
+            end_dialog(dialog, true);
         }
     });
 }
@@ -480,12 +494,18 @@ private void thermostat_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_thermostat);
 
+    if (act.thermostat_layout == LAYOUT_NONE) {
+        end_dialog(dialog, false);
+        act.toast("Thermostats disabled");
+        return;
+    }
+
     Button eb = (Button) dialog.findViewById(R.id.thermostat_ecobee);
     eb.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
             ecobee_dialog();
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 
@@ -493,7 +513,7 @@ private void thermostat_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 }
@@ -505,6 +525,11 @@ private void outlets_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_outlets);
 
+    if (act.outlets_layout == LAYOUT_NONE) {
+        end_dialog(dialog, false);
+        act.toast("Outlets disabled");
+        return;
+    }
     int max_dev = act.outlets.outlets_adapter.getCount();
     String[] names = new String[max_dev + 1];
     names[0] = "- none -";
@@ -575,7 +600,7 @@ private void outlets_dialog()
             pref.put("outlets_batt_min", act.outlets_batt_min);
             act.outlets_batt_max = C.a2i(max.getText().toString());
             pref.put("outlets_batt_max", act.outlets_batt_max);
-            end_dialog(dialog);
+            end_dialog(dialog, true);
         }
     });
 }
@@ -600,8 +625,8 @@ private void x10_dialog()
             pref.put("x10_url", act.x10_url);
             act.x10_jwt = jt.getText().toString();
             pref.put("x10_jwt", act.x10_jwt);
-            end_dialog(dialog);
             act.outlets.startup();
+            end_dialog(dialog, true);
         }
     });
 }
@@ -626,8 +651,8 @@ private void tplink_dialog()
             pref.put("tplink_user", act.tplink_user);
             act.tplink_pwd = pt.getText().toString();
             pref.put("tplink_pwd", act.tplink_pwd);
-            end_dialog(dialog);
             act.outlets.startup();
+            end_dialog(dialog, true);
         }
     });
 }
@@ -722,7 +747,7 @@ private void screen_dialog()
 
             act.ss_control(C.SS_OP_INIT);
 
-            end_dialog(dialog);
+            end_dialog(dialog, true);
         }
     });
 }
@@ -760,7 +785,7 @@ private void developer_dialog()
             pref.put("debug", act.debug);
             Log.cfg(act.debug, act.log_uri, act.log_params);
 
-            end_dialog(dialog);
+            end_dialog(dialog, true);
         }
     });
 }
@@ -780,7 +805,7 @@ public void remote_server(final String type, final String cfg)
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            end_dialog(dialog);
+            end_dialog(dialog, false);
             new Thread(new Runnable() {
                 public void run() {
                     act.remote_doit(type, et.getText().toString(), cfg);
@@ -800,7 +825,7 @@ private void about_dialog()
         @Override
         public void onClick(View v) {
             act.start_browser(ATHOME_MANUAL);
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 
@@ -808,7 +833,7 @@ private void about_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            end_dialog(dialog);
+            end_dialog(dialog, false);
         }
     });
 }
