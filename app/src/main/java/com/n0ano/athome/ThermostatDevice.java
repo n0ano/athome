@@ -14,8 +14,8 @@ private String name;
 private int index;
 private String code;
 private String url;
-private String temp;
-private String humid;
+private float temp;
+private long humid;
 private String mode;
 private int h_min;
 private int h_max;
@@ -60,31 +60,23 @@ public void set_range(String mode, int h_min, int h_max, int c_min, int c_max, i
 }
 
 public int get_h_min() { return h_min; }
-
 public int get_h_max() { return h_max; }
-
 public int get_c_min() { return c_min; }
-
 public int get_c_max() { return c_max; }
-
 public int get_c_delta() { return c_delta; }
 
 public View get_view() { return view; }
+public void set_view(View v) { view = v; }
 
-public void set_view(View view) { this.view = view; }
+public float get_temp() { return temp; }
+public void set_temp(float t) { temp = t; }
 
-public String get_temp() { return temp; }
-
-public void set_temp(final String temp) { this.temp = temp; }
-
-public String get_humid() { return humid; }
-
-public void set_humid(final String humid) { this.humid = humid; }
+public long get_humid() { return humid; }
+public void set_humid(long h) { humid = h; }
 
 public String get_mode() { return mode; }
 
 public int get_hold() { return hold; }
-
-public void set_hold(int hold) { this.hold = hold; }
+public void set_hold(int h) { hold = h; }
 
 }

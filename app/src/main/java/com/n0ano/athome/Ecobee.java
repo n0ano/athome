@@ -2,6 +2,9 @@ package com.n0ano.athome;
 
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,44 +41,55 @@ public Ecobee(MainActivity act)
 
 public void get_devices(ThermostatAdapter adapter)
 {
+    JSONObject json, info;
+    JSONArray list;
+    int max;
     String resp;
     String name, id;
     String mode, hmin, hmax, cmin, cmax, cdelta;
 
-    if ((resp = runtime()) == null)
+    if ((json = runtime()) == null)
         return;
-    int idx = 0;
-    while ((name = act.parse.json_get("name", resp, ++idx)) != null) {
-        id = act.parse.json_get("identifier", resp, idx);
-        adapter.add_device(new ThermostatDevice(name,
-                                                idx,
-                                                id,
+
+    list = json.optJSONArray("thermostatList");
+    if (list == null)
+        return;
+
+    max = list.length();
+    for (int i = 0; i < max; i++) {
+        info = (JSONObject)C.json_get(list, i);
+        adapter.add_device(new ThermostatDevice(info.optString("name", ""),
+                                                i + 1,
+                                                info.optString("identifier", ""),
                                                 View.inflate(act, R.layout.thermostat, null)));
     }
-    if ((resp = ecobee_query("includeSettings", "")) == null)
+
+    if ((json = ecobee_query("includeSettings", "")) == null)
         return;
 
-    --idx;
-    for (int i = 0; i < idx; i++) {
-        mode = act.parse.json_get("hvacMode", resp, i + 1);
-        hmin = act.parse.json_get("heatRangeLow", resp, i + 1);
-        hmax = act.parse.json_get("heatRangeHigh", resp, i + 1);
-        cmin = act.parse.json_get("coolRangeLow", resp, i + 1);
-        cmax = act.parse.json_get("coolRangeHigh", resp, i + 1);
-        cdelta = act.parse.json_get("heatCoolMinDelta", resp, i + 1);
-        adapter.getItem(i).set_range(mode,
-                                     C.a2i(hmin),
-                                     C.a2i(hmax),
-                                     C.a2i(cmin),
-                                     C.a2i(cmax),
-                                     C.a2i(cdelta));
-    }
+    list = json.optJSONArray("thermostatList");
+    if (list == null)
+        return;
 
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            act.thermostat.init_view();
+    max = list.length();
+    for (int i = 0; i < max; i++) {
+        info = (JSONObject)C.json_get(list, i);
+        JSONObject settings = info.optJSONObject("settings");
+        if (settings != null) {
+            mode = settings.optString("hvacMode", "");
+            hmin = settings.optString("heatRangeLow", "");
+            hmax = settings.optString("heatRangeHigh", "");
+            cmin = settings.optString("coolRangeLow", "");
+            cmax = settings.optString("coolRangeHigh", "");
+            cdelta = settings.optString("heatCoolMinDelta", "");
+            adapter.getItem(i).set_range(mode,
+                                         C.a2i(hmin),
+                                         C.a2i(hmax),
+                                         C.a2i(cmin),
+                                         C.a2i(cmax),
+                                         C.a2i(cdelta));
         }
-    });
+    }
 }
 
 private String ecobee_param(String info, String id)
@@ -94,6 +108,7 @@ private String ecobee_param(String info, String id)
 //
 public String ecobee_get_pin(String api)
 {
+    JSONObject json;
     String resp;
 
     resp = act.call_api("GET",
@@ -102,15 +117,19 @@ public String ecobee_get_pin(String api)
                                    "&scope=smartWrite",
                                "",
                                null);
-    act.ecobee_access = act.parse.json_get("code", resp, 1);
+    if ((json = C.str2json(resp)) == null)
+        return "";
+
+    act.ecobee_access = json.optString("code", "");
     Preferences pref = act.pref;
     pref.put("ecobee_access", act.ecobee_access);
-    String pin = act.parse.json_get("ecobeePin", resp, 1);
+    String pin = json.optString("ecobeePin", "");
     return pin;
 }
 
 private void ecobee_token(String type, String code, String api)
 {
+    JSONObject json;
     String resp;
     String token;
 
@@ -121,10 +140,14 @@ private void ecobee_token(String type, String code, String api)
                             "&client_id=" + api,
                         "",
                         null);
-    if ((token = act.parse.json_get("access_token", resp, 1)) == null)
+    if ((json = C.str2json(resp)) == null)
         return;
-    act.ecobee_access = act.parse.json_get("access_token", resp, 1);
-    act.ecobee_refresh = act.parse.json_get("refresh_token", resp, 1);
+
+    token = json.optString("access_token", "");
+    if (token.isEmpty())
+        return;
+    act.ecobee_access = token;
+    act.ecobee_refresh = json.optString("refresh_token", "");
     Preferences pref = act.pref;
     pref.put("ecobee_access", act.ecobee_access);
     pref.put("ecobee_refresh", act.ecobee_refresh);
@@ -150,20 +173,26 @@ private void ecobee_refresh()
     ecobee_token("refresh_token", act.ecobee_refresh, act.ecobee_api);
 }
 
-private String ecobee_query(String info, String id)
+private JSONObject ecobee_query(String info, String id)
 {
-    String resp;
+    JSONObject json;
+    JSONObject status;
 
-    resp = act.call_api("GET",
+    String resp = act.call_api("GET",
                                ECO_URL + ECO_DATA,
                                ecobee_param(info, id),
                                "Bearer " + act.ecobee_access,
                                null);
-    String code = act.parse.json_get("code", resp, 1);
-    if (code == null || !code.equals("0"))
-        return null;
-    else
-        return resp;
+    try {
+        json = C.str2json(resp);
+        status = (JSONObject)json.get("status");
+        if (status.getInt("code") == 0)
+            return json;
+        Log.d("Ecobee: query(" + resp + ") bad status");
+    } catch (Exception e) {
+        Log.d("Ecobee: query(" + resp + ") json parse error - " + e);
+    }
+    return null;
 }
 
 public void ecobee_resume(ThermostatDevice dev)
@@ -225,9 +254,9 @@ public void ecobee_hold(int heat, ThermostatDevice dev)
                                body);
 }
 
-private String runtime()
+private JSONObject runtime()
 {
-    String resp;
+    JSONObject resp;
 
     if ((resp = ecobee_query("includeRuntime", "")) == null) {
         ecobee_refresh();
@@ -237,31 +266,20 @@ private String runtime()
     return resp;
 }
 
-public void ecobee_getstate(ThermostatDevice dev)
+public void get_therm(JSONObject info, ThermostatDevice dev)
 {
 
-    String resp = ecobee_query("includeEvents", dev.get_code());
-    if (resp == null)
-        return;
-    int mode = Thermostat.HOLD_RUNNING;
-    if (act.parse.json_get("type", resp, dev.get_index()).equals("hold"))
-        mode = act.parse.json_get("endDate", resp, dev.get_index()).equals("2035-01-01") ?
-                        Thermostat.HOLD_PERMANENT :
-                        Thermostat.HOLD_TEMPORARY;
-    dev.set_hold(mode);
-}
-
-public void get_therm(String resp, int idx, ThermostatDevice dev)
-{
-
-    dev.set_temp(act.parse.json_get("%1,actualTemperature", resp, idx));
-    dev.set_humid(act.parse.json_get("actualHumidity", resp, idx));
+    if (info != null) {
+        dev.set_temp(((float)info.optLong("actualTemperature", 0)) / 10.0f);
+        dev.set_humid(info.optLong("actualHumidity", 0));
+    }
 }
 
 public void get_data(ThermostatAdapter adapter)
 {
     int i;
-    String resp;
+    JSONObject resp, info;
+    JSONArray list;
     ThermostatDevice dev;
 
     //
@@ -269,9 +287,14 @@ public void get_data(ThermostatAdapter adapter)
     //
     if ((resp = runtime()) == null)
         return;
+    list = resp.optJSONArray("thermostatList");
+    if (list == null)
+        return;
+
     for (i = 0; i < adapter.getCount(); i++) {
         dev = adapter.getItem(i);
-        get_therm(resp, dev.get_index(), dev);
+        info = (JSONObject)C.json_get(list, dev.get_index() - 1);
+        get_therm(info.optJSONObject("runtime"), dev);
     }
 }
 

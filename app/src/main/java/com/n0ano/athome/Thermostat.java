@@ -67,6 +67,12 @@ public void enumerate()
         public void run() {
             thermostat_adapter.clear();
             ecobee.get_devices(thermostat_adapter);
+
+            act.runOnUiThread(new Runnable() {
+                public void run() {
+                    act.thermostat.init_view();
+                }
+            });
         }
     }).start();
 }
@@ -116,8 +122,7 @@ private void hold_dialog(final ThermostatDevice dev)
     final NumberPicker np = (NumberPicker) dialog.findViewById(R.id.hold_temp);
     np.setMinValue(dev.get_h_min()/10);
     np.setMaxValue(dev.get_h_max()/10);
-    String t = dev.get_temp();
-    int temp = C.a2i(t.substring(0, t.length() - 2));
+    int temp = (int)dev.get_temp();
     np.setValue(temp);
     np.setWrapSelectorWheel(false);
 

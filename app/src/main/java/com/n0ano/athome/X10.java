@@ -2,6 +2,9 @@ package com.n0ano.athome;
 
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,8 +23,6 @@ final static String X10_STATE_MAP = " \"state\":\"";
 
 MainActivity act;
 
-String cur_state = null;
-
 Map<String, String> onoff_state = new HashMap<String, String>();
 
 // X10: class constructor
@@ -36,8 +37,9 @@ public X10(final MainActivity act)
 
 public void get_devices(OutletsAdapter adapter, DoitCallback cb)
 {
-    int i, hi, idx;
-    String name, hcode;
+    JSONObject json, info;
+    JSONArray devices, house;
+    String code, name;
 
     final String resp = act.call_api("GET",
                                act.x10_url + X10_API,
@@ -45,17 +47,34 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
                                "",
                                null);
 
-    hi = 0;
-    while ((hcode = act.parse.json_get("code", resp, ++hi)) != null) {
-        i = 0;
-        onoff_state.put(hcode, "0000000000000000");
-        String devices = act.parse.json_get("devices", resp, hi);
-        while ((name = act.parse.json_list(devices, ++i)) != null) {
-            if (!name.isEmpty())
-                adapter.add_device(new OutletsDevice(name,
-                                                     i,
-                                                     hcode,
-                                                     View.inflate(act, R.layout.outlet, null)));
+    try {
+        json = C.str2json(resp);
+        house = json.optJSONArray("house");
+    } catch (Exception e) {
+        Log.d("X10 get devices(" + resp + ") json parse error - " + e);
+        cb.doit(null);
+        return;
+    }
+
+    int max = house.length();
+    for (int i = 0; i < max; i++) {
+        if ((info = (JSONObject)C.json_get(house, i)) == null)
+            continue;
+        code = info.optString("code", "");
+        onoff_state.put(code, "0000000000000000");
+        devices = info.optJSONArray("devices");
+        int dmax = devices.length();
+        for (int j = 0; j < dmax; j++) {
+            try {
+                name = (String)devices.get(j);
+                if (!name.isEmpty())
+                    adapter.add_device(new OutletsDevice(name,
+                                                         j + 1,
+                                                         code,
+                                                         View.inflate(act, R.layout.outlet, null)));
+            } catch (Exception e) {
+                Log.d("X10 JSON array reference error - " + e);
+            }
         }
     }
 
@@ -84,13 +103,13 @@ private boolean get_state(int idx, String map)
 {
 
     if (map.length() < 16) {
-        Log.d("Bad state map - " + map);
+        Log.d("X10 Bad state map - " + map);
         return false;
     }
     return ((map.charAt(16 - idx) == '0') ? false : true);
 }
 
-private void on_off(String resp, OutletsAdapter outlets_adapter)
+private void set_onoff(OutletsAdapter outlets_adapter)
 {
     int i;
     boolean state;
@@ -102,46 +121,48 @@ private void on_off(String resp, OutletsAdapter outlets_adapter)
             String code = dev.get_code();
             int idx = dev.get_index();
             state = get_state(idx, onoff_state.get(code));
-Log.d(dev.get_name() + ": set state - " + state);
             dev.set_state(state);
         }
     }
 }
 
-private void get_status(String resp)
-{
-    String code, line;
-
-    int i = 0;
-    while ((code = act.parse.json_get("code", resp, ++i)) != null) {
-        if ((line = act.parse.json_get("state", resp, i)) == null) {
-            Log.d("X10 bad state data: " + resp);
-            return;
-        }
-        onoff_state.put(code, line);
-    }
-}
-
 public boolean get_data(OutletsAdapter outlets_adapter)
 {
+    JSONObject json, info;
+    String code, value, state;
 
     //
     //  Get the data and display any changes
     //
-    String old = cur_state;
-    String cur_state = act.call_api("GET",
+    String resp = act.call_api("GET",
                                act.x10_url + X10_API,
                                X10_GET,
                                "",
                                null);
-    if (act.parse.json_get("house", cur_state, 1) == null) {
-        Log.d("X10 bad get data: " + cur_state);
+
+    if ((json = C.str2json(resp)) == null)
+        return false;
+
+    JSONArray house = json.optJSONArray("house");
+    if (house == null) {
+        Log.d("X10 house info missing - " + resp);
         return false;
     }
 
-    get_status(cur_state);
-    on_off(cur_state, outlets_adapter);
-    return true;
+    boolean ret = false;
+    int max = house.length();
+    for (int i = 0; i < max; i++) {
+        if ((info = (JSONObject)C.json_get(house, i)) == null)
+            continue;
+        code = info.optString("code", "");
+        value = info.optString("state", "");
+        if (onoff_state.get(code) != value) {
+            ret = true;
+            onoff_state.put(code, value);
+        }
+    }
+    set_onoff(outlets_adapter);
+    return ret;
 }
 
 }

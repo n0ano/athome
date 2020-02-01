@@ -2,6 +2,9 @@ package com.n0ano.athome;
 
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 // Created by n0ano on 10/10/16.
 //
 // Class to handle weather data
@@ -10,9 +13,11 @@ public class Tplink {
 
 private final static int PERIOD = 60;   // weather only changes once a minute
 
-final static String TPLINK_URL = "https://wap.tplinkcloud.com";
+private final static int TPLINK_OFFLINE = -20571;
 
-final static String TPLINK_UUID = "621dd649-160c-41dd-9ceb-5a46ad8fb90e";
+private final static String TPLINK_URL = "https://wap.tplinkcloud.com";
+
+private final static String TPLINK_UUID = "621dd649-160c-41dd-9ceb-5a46ad8fb90e";
 
 MainActivity act;
 
@@ -33,7 +38,7 @@ public Tplink(final MainActivity act)
 private boolean current_state(OutletsDevice dev)
 {
 
-    String state = act.call_api("POST",
+    String resp = act.call_api("POST",
                                 dev.get_url(),
                                 "token=" + token,
                                 "",
@@ -44,19 +49,31 @@ private boolean current_state(OutletsDevice dev)
                                     "\"requestData\":\"{\\\"system\\\":{\\\"get_sysinfo\\\":{}}}\"" +
                                     "}}"
                                );
-    String onoff = act.parse.json_get("relay_state\\", state, 1);
-    if (onoff != null)
+    try {
+        JSONObject json = C.str2json(resp);
+        if (json.getInt("error_code") == TPLINK_OFFLINE) {
+            Log.d("TPLink: " + dev.get_name() + " offline");
+            return false;
+        }
+        JSONObject result = (JSONObject)json.get("result");
+        JSONObject info = C.str2json(result.optString("responseData", ""));
+
+        JSONObject system = (JSONObject)info.get("system");
+        JSONObject sysinfo = (JSONObject)system.get("get_sysinfo");
+        String onoff = sysinfo.optString("relay_state", "");
         return onoff.equals("1");
+    } catch (Exception e) {
+        Log.d("TPLink current state(" + resp + ") json parse error - " + e);
+    }
     return false;
 }
 
 public void get_devices(OutletsAdapter adapter, DoitCallback cb)
 {
-    int i;
     String resp;
-    String alias;
-
-    adapter = adapter;
+    JSONObject json, result, info;
+    JSONArray list;
+    OutletsDevice dev;
 
     resp = act.call_api("POST",
                         TPLINK_URL,
@@ -71,23 +88,40 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
                             "\"terminalUUID\":\"" + TPLINK_UUID + "\"" +
                             "}}"
                        );
-    token = act.parse.json_get("token", resp, 1);
+    try {
+        json = C.str2json(resp);
+        result = (JSONObject)json.get("result");
+    } catch (Exception e) {
+        Log.d("TPLink get devices(" + resp + ") json parse error " + e);
+        cb.doit(null);
+        return;
+    }
+
+    token = result.optString("token", "");
     resp = act.call_api("POST",
                         TPLINK_URL,
                         "token=" + token,
                         "",
                         "{\"method\":\"getDeviceList\"}"
                        );
-    i = 0;
-    while ((alias = act.parse.json_get("alias", resp, ++i)) != null) {
-        String id = act.parse.json_get("deviceId", resp, i);
-        String url = act.parse.json_get("appServerUrl", resp, i);
-        OutletsDevice dev = new OutletsDevice(alias,
-                                              id,
-                                              url,
-                                              View.inflate(act, R.layout.outlet, null));
-        dev.set_state(current_state(dev));
+    try {
+        json = C.str2json(resp);
+        result = (JSONObject)json.get("result");
+        list = result.optJSONArray("deviceList");
+    } catch (Exception e) {
+        Log.d("TPLink get_devices(" + resp + ") parse error - " + e);
+        cb.doit(null);
+        return;
+    }
 
+    int max = list.length();
+    for (int i = 0; i < max; i++) {
+        info = (JSONObject)C.json_get(list, i);
+        dev = new OutletsDevice(info.optString("alias", ""),
+                                info.optString("deviceId", ""),
+                                info.optString("appServerUrl", ""),
+                                View.inflate(act, R.layout.outlet, null));
+        dev.set_state(current_state(dev));
         adapter.add_device(dev);
     }
 

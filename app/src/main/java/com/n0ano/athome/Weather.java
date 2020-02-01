@@ -148,9 +148,9 @@ private boolean get_info_wunder(JSONObject json)
         w_data.put("temp", temp);
         w_data.put("humidity", humid);
         w_data.put("winddir", wdir);
-        w_data.put("windSpeed", wdir);
-        w_data.put("pressure", wdir);
-        w_data.put("precipTotal", wdir);
+        w_data.put("windSpeed", windSpeed);
+        w_data.put("pressure", pressure);
+        w_data.put("precipTotal", precipTotal);
     } catch (Exception e) {
         Log.d("error putting winddir/humidity - " + e);
         return false;
@@ -233,10 +233,10 @@ public void ui_show()
         iv.setRotation(Integer.valueOf(w_data.optInt("winddir", 0)));
 
     if ((tv = (TextView) act.findViewById(R.id.weather_speed)) != null)
-        tv.setText(String.format("%.1f", w_data.optDouble("windSpeed", 0.0)));
+        tv.setText(String.format("%.1f", (float)w_data.optDouble("windSpeed", 0.0)));
 
     if ((tv = (TextView) act.findViewById(R.id.weather_rain)) != null)
-        tv.setText(String.format("%.1f", w_data.optDouble("precipTotal", 0.0)));
+        tv.setText(String.format("%.1f", (float)w_data.optDouble("precipTotal", 0.0)));
 
     if ((iv = (ImageView) act.findViewById(R.id.weather_bar_dir)) != null)
         iv.setImageResource(baro_icon);

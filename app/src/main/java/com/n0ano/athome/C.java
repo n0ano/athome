@@ -3,6 +3,9 @@ package com.n0ano.athome;
 import android.os.SystemClock;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -36,6 +39,40 @@ public static String suffix(String str)
 
     int idx = str.lastIndexOf(":");
     return (idx >= 0) ? str.substring(idx + 1) : "";
+}
+
+public static JSONObject str2json(String str)
+{
+    JSONObject json;
+
+    try {
+        json = new JSONObject(str);
+    } catch (Exception e) {
+        Log.d("JSON parse error(" + str + ") - " + e);
+        return null;
+    }
+    return json;
+}
+
+public static String json2str(JSONObject json)
+{
+
+    try {
+        return json.toString();
+    } catch (Exception e) {
+        return "";
+    }
+}
+
+public static Object json_get(JSONArray json, int i)
+{
+
+    try {
+        return json.get(i);
+    } catch (Exception e) {
+        Log.d("JSON get error - " + e);
+        return null;
+    }
 }
 
 public static boolean working()
