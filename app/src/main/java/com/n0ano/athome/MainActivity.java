@@ -107,7 +107,6 @@ Thermostat thermostat;
 Egauge egauge;
 Outlets outlets;
 
-boolean running;
 boolean paused;
 
 public Parse parse = new Parse();
@@ -194,7 +193,7 @@ protected void onPause()
 {
 
     super.onPause();
-    this.running = false;
+    C.running = false;
     Log.d("MainActivity: onPause");
 }
 
@@ -349,27 +348,6 @@ public void start_browser(String uri)
     startActivity(intent);
 }
 
-public void set_progress()
-{
-    ImageView iv;
-
-    if (egauge_layout != Popup.LAYOUT_NONE) {
-        if ((iv = (ImageView) findViewById(R.id.egauge_timeout)) != null)
-            if (egauge_progress > 0)
-                set_timeout(iv, egauge.period, Egauge.PERIOD);
-            else
-                iv.setVisibility(View.GONE);
-    }
-
-    if (weather_layout != Popup.LAYOUT_NONE) {
-        if ((iv = (ImageView) findViewById(R.id.weather_timeout)) != null)
-            if (weather_progress > 0)
-                set_timeout(iv, weather.period, Weather.PERIOD);
-            else
-                iv.setVisibility(View.GONE);
-    }
-}
-
 public void display_toggle(View V)
 {
 
@@ -432,7 +410,6 @@ public void view_show(int view_id, int[] ids, int main)
     parent.removeView(v);
     v = getLayoutInflater().inflate(id, parent, false);
     parent.addView(v, index);
-    set_progress();
 }
 
 public void show_views()
@@ -844,7 +821,7 @@ public void show_log()
     TextView tv;
 
     Log.d("Show log");
-    this.running = false;
+    C.running = false;
     setContentView(R.layout.log);
 
     Button bt = findViewById(R.id.log_return);
@@ -950,7 +927,7 @@ public void show_cfg()
     TextView tv;
 
     Log.d("Show cfg");
-    this.running = false;
+    C.running = false;
     setContentView(R.layout.config);
 
     Button bt = findViewById(R.id.cfg_return);
@@ -1124,12 +1101,6 @@ public void go_hold(View v)
     thermostat.go_hold(v);
 }
 
-private boolean working()
-{
-
-    return this.running;
-}
-
 private void clock()
 {
 
@@ -1153,53 +1124,69 @@ private void clock()
 private void disp_update()
 {
 
-    clock();
+    runOnUiThread(new Runnable() {
+        public void run() {
+            clock();
 
-    if (weather != null)
-        weather.update();
+            if (weather_layout != Popup.LAYOUT_NONE)
+                weather.show();
 
-    if (thermostat != null)
-        thermostat.update();
+            if (thermostat_layout != Popup.LAYOUT_NONE)
+                thermostat.show();
 
-    if (egauge != null && egauge_layout != 0)
-        egauge.update();
+            if (egauge_layout != Popup.LAYOUT_NONE)
+                egauge.show();
 
-    if (outlets != null)
-        outlets.update();
+            if (outlets_layout != Popup.LAYOUT_NONE)
+                outlets.show();
+        }
+    });
 }
 
 private void doit()
 {
 
-    if (weather_layout != Popup.LAYOUT_NONE) {
-        final Weather weather = new Weather(this);
-        this.weather = weather;
-    }
+    if (weather_layout != Popup.LAYOUT_NONE)
+        weather = new Weather(this, new DoitCallback() {
+            @Override
+            public void doit(Object obj) {
+                weather.show();
+            }
+        });
 
-    if (thermostat_layout != Popup.LAYOUT_NONE) {
-        final Thermostat thermostat = new Thermostat(this);
-        this.thermostat = thermostat;
-    }
+    if (thermostat_layout != Popup.LAYOUT_NONE)
+        thermostat = new Thermostat(this, new DoitCallback() {
+            @Override
+            public void doit(Object obj) {
+                thermostat.show();
+            }
+        });
 
-    if (egauge_layout != Popup.LAYOUT_NONE) {
-        final Egauge egauge = new Egauge( this);
-        this.egauge = egauge;
-    }
+    if (egauge_layout != Popup.LAYOUT_NONE)
+        egauge = new Egauge(this, new DoitCallback() {
+            @Override
+            public void doit(Object obj) {
+                egauge.show();
+            }
+        });
 
-    if (outlets_layout != Popup.LAYOUT_NONE) {
-        final Outlets outlets = new Outlets(this);
-        this.outlets = outlets;
-    }
+    if (outlets_layout != Popup.LAYOUT_NONE)
+        outlets = new Outlets(this, new DoitCallback() {
+            @Override
+            public void doit(Object obj) {
+                outlets.show();
+            }
+        });
 
-    this.running = true;
+    C.running = true;
 
     show_views();
 
     new Thread(new Runnable() {
         public void run() {
-            while (working()) {
+            while (C.working()) {
                 if (!paused)
-                    disp_update();
+                    clock();
                 SystemClock.sleep(1000);
             }
         }

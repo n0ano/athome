@@ -22,9 +22,10 @@ import java.util.Set;
 //
 // Class to handle weather data
 //
-public class Weather {
+public class Weather
+{
 
-public final static int PERIOD = 60;   // weather only changes once a minute
+public final static int PERIOD = (60*1000);   // weather only changes once a minute
 
 private final static int MAX_BARO = 10; // barometer trends over 10 minutes
 
@@ -38,11 +39,14 @@ public final static String WUNDER_ID = "stationId=";
 public final static String WUNDER_KEY = "&apiKey=";
 public final static String WUNDER_QUERY = "&units=e&format=json&numericPrecision=decimal";
 
+private final static String DATA_TEMPLATE =
+"{\"temp\":0.0,\"winddir\":0,\"windSpeed\":0.0,\"precipTotal\":0.0,\"pressure\":0.0,\"humidity\":0.0}";
+
 MainActivity act;
 
-public int period = PERIOD;        // Weather only changes once a minute
+private Thread data_thread;
 
-JSONObject units = null;
+JSONObject w_data;
 
 ArrayList<Double> baro_hist = new ArrayList<Double>();
 Double baro_cum = 0.0;
@@ -58,10 +62,25 @@ String max_temp_time;
 //
 //   act - activity that instantiated the class
 //
-public Weather(MainActivity act)
+public Weather(MainActivity act, final DoitCallback cb)
 {
 
 	this.act = act;
+
+    try {
+        w_data = new JSONObject(DATA_TEMPLATE);
+    } catch (Exception e) {
+        Log.d("DDD", "Weather can't create basic data object - " + e);
+        return;
+    }
+
+    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+        @Override
+        public void doit(Object obj) {
+            get_wunder();
+            cb.doit(null);
+        }
+    });
 }
 
 private JSONObject find_station(String id, JSONObject json)
@@ -88,20 +107,12 @@ private boolean get_info_wunder(JSONObject json)
     JSONObject station = find_station(act.weather_id, json);
     if (station == null)
         return false;
-    units = (JSONObject)station.opt("imperial");
+    JSONObject units = (JSONObject)station.opt("imperial");
 
     int wdir = station.optInt("winddir", 0);
     double humid = station.optDouble("humidity", 0.0);
-    try {
-Log.d("units - " + units);
-        units.put("winddir", wdir);
-        units.put("humidity", humid);
-    } catch (Exception e) {
-        Log.d("error putting winddir/humidity - " + e);
-        return false;
-    }
 
-    double temp = json.optDouble("temp", 1000.0);
+    double temp = units.optDouble("temp", 1000.0);
     if (temp < 1000.0) {
         if (temp < min_temp) {
             min_temp = (float)temp;
@@ -113,7 +124,7 @@ Log.d("units - " + units);
         }
     }
 
-    Double f = Double.valueOf(units.optDouble("pressure", 0.0));
+    double f = Double.valueOf(units.optDouble("pressure", 0.0));
     baro_hist.add(f);
     int max = baro_hist.size();
     if (max > MAX_BARO) {
@@ -128,6 +139,22 @@ Log.d("units - " + units);
         baro_icon = R.drawable.barometer_down;
     else
         baro_icon = R.drawable.barometer;
+
+    double windSpeed = units.optDouble("windSpeed", 0.0);
+    double pressure = units.optDouble("pressure", 0.0);
+    double precipTotal = units.optDouble("precitTotal", 0.0);
+
+    try {
+        w_data.put("temp", temp);
+        w_data.put("humidity", humid);
+        w_data.put("winddir", wdir);
+        w_data.put("windSpeed", wdir);
+        w_data.put("pressure", wdir);
+        w_data.put("precipTotal", wdir);
+    } catch (Exception e) {
+        Log.d("error putting winddir/humidity - " + e);
+        return false;
+    }
     return true;
 }
 
@@ -147,7 +174,6 @@ Log.d("wunder:" + resp);
         get_info_wunder(json);
     } catch (Exception e) {
         Log.d("get_wunder: no data for station " + act.weather_id);
-        units = null;
     }
 }
 
@@ -188,50 +214,43 @@ public void go_temp_detail(View v)
     detail_dialog();
 }
 
-public void update()
+public void ui_show()
 {
-
-    //
-    //  Get the data
-    //
-    if (period++ >= PERIOD) {
-        period = 1;
-        get_wunder();
-    }
-    if (units == null)
-        return;
 
     //
     //  Display it
     //
+    TextView tv;
+    ImageView iv;
+    GaugeView gv;
+
+    if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null) {
+        gv.set_minmax(min_temp, max_temp);
+        gv.set_value((float)w_data.optDouble("temp", 0.0));
+    }
+
+    if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
+        iv.setRotation(Integer.valueOf(w_data.optInt("winddir", 0)));
+
+    if ((tv = (TextView) act.findViewById(R.id.weather_speed)) != null)
+        tv.setText(String.format("%.1f", w_data.optDouble("windSpeed", 0.0)));
+
+    if ((tv = (TextView) act.findViewById(R.id.weather_rain)) != null)
+        tv.setText(String.format("%.1f", w_data.optDouble("precipTotal", 0.0)));
+
+    if ((iv = (ImageView) act.findViewById(R.id.weather_bar_dir)) != null)
+        iv.setImageResource(baro_icon);
+
+    if ((tv = (TextView) act.findViewById(R.id.weather_barometer)) != null)
+        tv.setText(String.format("%.1f", w_data.optDouble("pressure", 0.0)));
+}
+
+public void show()
+{
+
     act.runOnUiThread(new Runnable() {
         public void run() {
-            TextView tv;
-            ImageView iv;
-            GaugeView gv;
-
-            if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null) {
-                gv.set_minmax(min_temp, max_temp);
-                gv.set_value((float)units.optDouble("temp", 0.0));
-            }
-
-            if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
-                iv.setRotation(Integer.valueOf(units.optInt("winddir", 0)));
-
-            if ((tv = (TextView) act.findViewById(R.id.weather_speed)) != null)
-                tv.setText(String.format("%.1f", units.optDouble("windSpeed", 0.0)));
-
-            if ((tv = (TextView) act.findViewById(R.id.weather_rain)) != null)
-                tv.setText(String.format("%.1f", units.optDouble("precipTotal", 0.0)));
-
-            if ((iv = (ImageView) act.findViewById(R.id.weather_bar_dir)) != null)
-                iv.setImageResource(baro_icon);
-
-            if ((tv = (TextView) act.findViewById(R.id.weather_barometer)) != null)
-                tv.setText(String.format("%.1f", units.optDouble("pressure", 0.0)));
-
-            if ((iv = (ImageView) act.findViewById(R.id.weather_timeout)) != null)
-                act.set_timeout(iv, period, PERIOD);
+            ui_show();
         }
     });
 }

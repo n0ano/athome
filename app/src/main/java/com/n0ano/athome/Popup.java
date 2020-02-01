@@ -188,8 +188,8 @@ public void device_dialog(final OutletsDevice dev)
         @Override
         public void onClick(View v) {
             dev.set_hold(cb.isChecked());
-            dev.set_state(dev.get_state(), act);
-            end_dialog(dialog, true);
+            dev.show();
+            end_dialog(dialog, false);
         }
     });
 }
@@ -289,9 +289,6 @@ private void general_dialog()
             act.off_time = act.decode_time(et_off.getText().toString());
             pref.put("general_off", act.off_time);
 
-            act.show_views();
-            if (act.thermostat_layout != LAYOUT_NONE)
-                act.thermostat.init_view();
             end_dialog(dialog, true);
         }
     });
@@ -625,7 +622,6 @@ private void x10_dialog()
             pref.put("x10_url", act.x10_url);
             act.x10_jwt = jt.getText().toString();
             pref.put("x10_jwt", act.x10_jwt);
-            act.outlets.startup();
             end_dialog(dialog, true);
         }
     });
@@ -651,7 +647,6 @@ private void tplink_dialog()
             pref.put("tplink_user", act.tplink_user);
             act.tplink_pwd = pt.getText().toString();
             pref.put("tplink_pwd", act.tplink_pwd);
-            act.outlets.startup();
             end_dialog(dialog, true);
         }
     });

@@ -10,19 +10,18 @@ import android.widget.TextView;
 //
 // Class to handle weather data
 //
-public class Egauge {
+public class Egauge
+{
 
-public final static int PERIOD = 10;   // check eGauge every 10 seconds
+public final static int PERIOD = (10 * 1000);   // check eGauge every 10 seconds
 
 public final static String EGAUGE_API = "/cgi-bin/egauge";
 public final static String EGAUGE_QUERY = "tot&inst";
 
 MainActivity act;
 
-int period = PERIOD;
-
-int use_watt;
-int gen_watt;
+int use_watt = 0;
+int gen_watt = 0;
 
 int width = 0;
 
@@ -30,10 +29,34 @@ int width = 0;
 //
 //   act - activity that instantiated the class
 //
-public Egauge(MainActivity act)
+public Egauge(MainActivity act, final DoitCallback cb)
 {
 
 	this.act = act;
+
+    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+        @Override
+        public void doit(Object obj) {
+            get_data();
+            cb.doit(null);
+        }
+    });
+}
+
+private void get_data()
+{
+
+
+    //
+    // Get the data
+    //
+    String resp = act.call_api("GET",
+                               act.egauge_url + EGAUGE_API,
+                               EGAUGE_QUERY,
+                               "",
+                               null);
+    use_watt = get_value("Total Usage", resp);
+    gen_watt = get_value("Total Generation", resp);
 }
 
 private int get_value(String name, String resp)
@@ -101,73 +124,62 @@ private int gen_icon(int watts)
     return R.drawable.panel_red;
 }
 
-public void update()
+public void ui_show()
 {
-
-    //
-    // Get the data
-    //
-    if (period++ >= PERIOD) {
-        String resp = act.call_api("GET",
-                                   act.egauge_url + EGAUGE_API,
-                                   EGAUGE_QUERY,
-                                   "",
-                                   null);
-        use_watt = get_value("Total Usage", resp);
-        gen_watt = get_value("Total Generation", resp);
-        period = 1;
-    }
 
     //
     //  Display it
     //
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            TextView tv;
-            ImageView iv;
+    TextView tv;
+    ImageView iv;
 
-int disp_x = Resources.getSystem().getDisplayMetrics().widthPixels;
-int disp_y = Resources.getSystem().getDisplayMetrics().heightPixels;
-//Log.d("display = " + disp_x + "x" + disp_y);
+    int disp_x = Resources.getSystem().getDisplayMetrics().widthPixels;
+    int disp_y = Resources.getSystem().getDisplayMetrics().heightPixels;
+    //Log.d("display = " + disp_x + "x" + disp_y);
 
-LinearLayout ll = (LinearLayout)act.findViewById(R.id.egauge);
-//Logandroid and.d("layout = " + ll.getWidth() + "x" + ll.getHeight() + " => " + disp_x + "x" + disp_y);
+    LinearLayout ll = (LinearLayout)act.findViewById(R.id.egauge);
+    //Logandroid and.d("layout = " + ll.getWidth() + "x" + ll.getHeight() + " => " + disp_x + "x" + disp_y);
 
-//ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
-//ViewGroup.LayoutParams vp = vv.getLayoutParams();
-//Log.d("clock = " + vp.width + "x" + vp.height);
+    //ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
+    //ViewGroup.LayoutParams vp = vv.getLayoutParams();
+    //Log.d("clock = " + vp.width + "x" + vp.height);
 
-if (width == 0 && disp_x < 1000) {
-    width = 180;
-    ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
-    if (vv != null) {
-        ViewGroup.LayoutParams vp = vv.getLayoutParams();
-        vp.width = width;
-        vp.height = width;
-        vv.setLayoutParams(vp);
+    if (width == 0 && disp_x < 1000) {
+        width = 180;
+        ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
+        if (vv != null) {
+            ViewGroup.LayoutParams vp = vv.getLayoutParams();
+            vp.width = width;
+            vp.height = width;
+            vv.setLayoutParams(vp);
+        }
     }
+
+    int grid_watt = gen_watt - use_watt;
+
+    if ((tv = (TextView) act.findViewById(R.id.grid_watt)) != null)
+        tv.setText(k_watts(grid_watt));
+
+    if ((tv = (TextView) act.findViewById(R.id.house_watt)) != null)
+        tv.setText(k_watts(use_watt));
+
+    if ((tv = (TextView) act.findViewById(R.id.panel_watt)) != null)
+        tv.setText(k_watts(gen_watt));
+    if ((iv = (ImageView) act.findViewById(R.id.panel_image)) != null)
+        iv.setImageResource(gen_icon(gen_watt));
+    if ((iv = (ImageView) act.findViewById(R.id.panel_arrow)) != null)
+        iv.setImageResource(gen_arrow(gen_watt));
+
+    if ((iv = (ImageView) act.findViewById(R.id.grid_arrow)) != null)
+        set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
 }
 
-            int grid_watt = gen_watt - use_watt;
+public void show()
+{
 
-            if ((tv = (TextView) act.findViewById(R.id.grid_watt)) != null)
-                tv.setText(k_watts(grid_watt));
-
-            if ((tv = (TextView) act.findViewById(R.id.house_watt)) != null)
-                tv.setText(k_watts(use_watt));
-
-            if ((tv = (TextView) act.findViewById(R.id.panel_watt)) != null)
-                tv.setText(k_watts(gen_watt));
-            if ((iv = (ImageView) act.findViewById(R.id.panel_image)) != null)
-                iv.setImageResource(gen_icon(gen_watt));
-            if ((iv = (ImageView) act.findViewById(R.id.panel_arrow)) != null)
-                iv.setImageResource(gen_arrow(gen_watt));
-
-            if ((iv = (ImageView) act.findViewById(R.id.grid_arrow)) != null)
-                set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
-
-            if ((iv = (ImageView) act.findViewById(R.id.egauge_timeout)) != null)
-                act.set_timeout(iv, period, PERIOD);
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            ui_show();
         }
     });
 }

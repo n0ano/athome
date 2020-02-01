@@ -16,15 +16,14 @@ import android.widget.TextView;
 //
 // Class to handle weather data
 //
-public class Thermostat {
+public class Thermostat
+{
 
 public final static int HOLD_RUNNING   = 0;
 public final static int HOLD_TEMPORARY = 1;
 public final static int HOLD_PERMANENT = 2;
 
-private final static int PERIOD = 10;   // check outlets every 10 seconds
-
-private int period = PERIOD;        // Weather only changes once a minute
+private final static int PERIOD = (10 * 1000);   // check outlets every 10 seconds
 
 MainActivity act;
 Ecobee ecobee;
@@ -35,7 +34,7 @@ ThermostatAdapter thermostat_adapter;
 //
 //   act - activity that instantiated the class
 //
-public Thermostat(final MainActivity act)
+public Thermostat(final MainActivity act, final DoitCallback cb)
 {
 
 	this.act = act;
@@ -43,16 +42,30 @@ public Thermostat(final MainActivity act)
     this.ecobee = new Ecobee(act);
 
     thermostat_adapter = new ThermostatAdapter(act);
-    startup();
+
+    //
+    //  Enumerate thermostats
+    //
+    enumerate();
+
+    //
+    //  Thread to get data from the thermostats
+    //
+    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+        @Override
+        public void doit(Object obj) {
+            ecobee.get_data(thermostat_adapter);
+            cb.doit(null);
+        }
+    });
 }
 
-public void startup()
+public void enumerate()
 {
 
     new Thread(new Runnable() {
         public void run() {
             thermostat_adapter.clear();
-
             ecobee.get_devices(thermostat_adapter);
         }
     }).start();
@@ -197,35 +210,32 @@ public void go_hold(View v)
     hold_dialog((ThermostatDevice) v.getTag());
 }
 
-public void update()
+public void ui_show()
 {
 
-    if (period++ >= PERIOD) {
-        period = 1;
-
-        //
-        //  Get the data
-        //
-        ecobee.update(thermostat_adapter);
-
-        //
-        //  Show the data
-        //
-        act.runOnUiThread(new Runnable() {
-            public void run() {
-                int max_devices = thermostat_adapter.getCount();
-                for (int i = 0; i < max_devices; i++) {
-                    ThermostatDevice dev = thermostat_adapter.getItem(i);
-                    View v = dev.get_view();
-                    GaugeView gv = (GaugeView) v.findViewById(R.id.thermostat_temp);
-                    gv.set_value(dev.get_temp());
-//                    tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ?
+    //
+    //  Show the data
+    //
+    int max_devices = thermostat_adapter.getCount();
+    for (int i = 0; i < max_devices; i++) {
+        ThermostatDevice dev = thermostat_adapter.getItem(i);
+        View v = dev.get_view();
+        GaugeView gv = (GaugeView) v.findViewById(R.id.thermostat_temp);
+        gv.set_value(dev.get_temp());
+//      tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ?
 //                                            act.getResources().getColor(R.color.fore) :
 //                                            act.getResources().getColor(R.color.hold));
-                }
-            }
-        });
     }
+}
+
+public void show()
+{
+
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            ui_show();
+        }
+    });
 }
 
 }

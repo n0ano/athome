@@ -251,14 +251,14 @@ public void ecobee_getstate(ThermostatDevice dev)
     dev.set_hold(mode);
 }
 
-private void get_data(String resp, int idx, ThermostatDevice dev)
+public void get_therm(String resp, int idx, ThermostatDevice dev)
 {
 
     dev.set_temp(act.parse.json_get("%1,actualTemperature", resp, idx));
     dev.set_humid(act.parse.json_get("actualHumidity", resp, idx));
 }
 
-public void update(ThermostatAdapter adapter)
+public void get_data(ThermostatAdapter adapter)
 {
     int i;
     String resp;
@@ -271,7 +271,7 @@ public void update(ThermostatAdapter adapter)
         return;
     for (i = 0; i < adapter.getCount(); i++) {
         dev = adapter.getItem(i);
-        get_data(resp, dev.get_index(), dev);
+        get_therm(resp, dev.get_index(), dev);
     }
 }
 

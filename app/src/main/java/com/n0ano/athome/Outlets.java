@@ -9,13 +9,14 @@ import android.widget.TableRow;
 //
 // Class to handle weather data
 //
-public class Outlets {
+public class Outlets
+{
 
-private final static int PERIOD = 10;   // check outlets every 10 seconds
-
-private int period = PERIOD;        // Weather only changes once a minute
+private final static int PERIOD = (10 * 1000);   // check outlets every 10 seconds
 
 MainActivity act;
+DoitCallback cb_show;
+
 X10 x10;
 Tplink tplink;
 
@@ -27,29 +28,63 @@ OutletsAdapter outlets_adapter;
 //
 //   act - activity that instantiated the class
 //
-public Outlets(final MainActivity act)
+public Outlets(final MainActivity act, final DoitCallback cb)
 {
 
 	this.act = act;
+    this.cb_show = cb;
 
-    this.x10 = new X10(act);
+    x10 = new X10(act);
 
-    this.tplink = new Tplink(act);
+    tplink = new Tplink(act);
 
     outlets_adapter = new OutletsAdapter(act);
-    startup();
+
+    //
+    // Enumerate the outlets
+    //
+    enumerate(outlets_adapter);
+
+    //
+    //  Thread to get data from the thermostats
+    //
+
+    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+        @Override
+        public void doit(Object obj) {
+            battery();
+
+            boolean x10_change = x10.get_data(outlets_adapter);
+            boolean tp_change = tplink.get_data(outlets_adapter);
+            cb.doit(x10_change || tp_change);
+        }
+    });
 }
 
-public void startup()
+public void enumerate(final OutletsAdapter adapter)
 {
 
     new Thread(new Runnable() {
         public void run() {
-            outlets_adapter.clear();
+            adapter.clear();
 
-            x10.get_devices(outlets_adapter);
+            x10.get_devices(adapter, new DoitCallback() {
+                @Override
+                public void doit(Object obj) {
 
-            tplink.get_devices(outlets_adapter);
+                    tplink.get_devices(adapter, new DoitCallback() {
+                        @Override
+                        public void doit(Object obj) {
+
+                            act.runOnUiThread(new Runnable() {
+                                public void run() {
+                                    act.outlets.init_view();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         }
     }).start();
 }
@@ -87,8 +122,6 @@ public void init_view()
         v.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 OutletsDevice dev = (OutletsDevice) v.getTag();
-                //dev.set_hold(!dev.get_hold());
-                //dev.set_state(dev.get_state(), act);
                 Popup popup = act.popup;
                 popup.device_dialog(dev);
                 return true;
@@ -114,6 +147,7 @@ private void go_control(OutletsDevice dev, int toggle)
         new_state = (dev.get_state() ? false : true);
     else
         new_state = (toggle == 0 ? false : true);
+
     switch (dev.get_type()) {
 
     case OutletsDevice.TYPE_X10:
@@ -129,6 +163,7 @@ private void go_control(OutletsDevice dev, int toggle)
         break;
 
     }
+    cb_show.doit(null);
 }
 
 public void set_power(String name)
@@ -171,21 +206,22 @@ private void battery()
         go_control(outlets_power, 0);
 }
 
-public void update()
+public void ui_show()
 {
 
-    //
-    //  Get the data
-    //
-    if (period++ >= PERIOD) {
-        x10.update(outlets_adapter);
+    int max = outlets_adapter.getCount();
+    for (int i = 0; i < max; i++)
+        outlets_adapter.getItem(i).show();
+}
 
-        tplink.update(outlets_adapter);
+public void show()
+{
 
-        battery();
-
-        period = 1;
-    }
+    act.runOnUiThread(new Runnable() {
+        public void run() {
+            ui_show();
+        }
+    });
 }
 
 }

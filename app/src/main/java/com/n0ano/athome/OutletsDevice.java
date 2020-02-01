@@ -83,6 +83,7 @@ public boolean get_hold() { return this.hold; }
 public void set_hold(boolean hold) { this.hold = hold; }
 
 public boolean get_state() { return this.state; }
+public void set_state(boolean s) { state = s; }
 
 public String get_dev_code()
 {
@@ -118,21 +119,15 @@ public String get_tname()
     }
 }
 
-public void set_state(final boolean state, MainActivity act)
+public void show()
 {
     final int draw;
 
-    this.state = state;
-//Log.d(name + "(" + code + index + ") set state to " + (state ? "on, " : "off, ") + (hold ? "holding" : "normal"));
     if (hold)
         draw = state ? R.drawable.outlet_on_blue : R.drawable.outlet_off_blue;
     else
         draw = state ? R.drawable.outlet_on_green : R.drawable.outlet_off_red;
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            icon.setImageResource(draw);
-        }
-    });
+    icon.setImageResource(draw);
 }
 
 }

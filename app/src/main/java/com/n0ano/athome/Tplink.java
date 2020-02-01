@@ -50,14 +50,13 @@ private boolean current_state(OutletsDevice dev)
     return false;
 }
 
-public void get_devices(OutletsAdapter outlets_adapter)
+public void get_devices(OutletsAdapter adapter, DoitCallback cb)
 {
     int i;
     String resp;
     String alias;
-    OutletsAdapter adapter;
 
-    adapter = outlets_adapter;
+    adapter = adapter;
 
     resp = act.call_api("POST",
                         TPLINK_URL,
@@ -87,22 +86,18 @@ public void get_devices(OutletsAdapter outlets_adapter)
                                               id,
                                               url,
                                               View.inflate(act, R.layout.outlet, null));
-        dev.set_state(current_state(dev), act);
+        dev.set_state(current_state(dev));
 
         adapter.add_device(dev);
     }
 
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            act.outlets.init_view();
-        }
-    });
+    cb.doit(null);
 }
 
 public void control(final OutletsDevice dev, boolean state)
 {
 
-    dev.set_state(state, act);
+    dev.set_state(state);
     final String onoff = state ? "1" : "0";
     new Thread(new Runnable() {
         public void run() {
@@ -124,18 +119,16 @@ public void control(final OutletsDevice dev, boolean state)
     }).start();
 }
 
-public void update(OutletsAdapter outlets_adapter)
+public boolean get_data(OutletsAdapter adapter)
 {
 
-    int max_devices = outlets_adapter.getCount();
+    int max_devices = adapter.getCount();
     for (int i = 0; i < max_devices; i++) {
-        OutletsDevice dev = outlets_adapter.getItem(i);
-        if (dev.get_type() == OutletsDevice.TYPE_TPLINK) {
-            boolean now = current_state(dev);
-            if (now != dev.get_state())
-                dev.set_state(now, act);
-        }
+        OutletsDevice dev = adapter.getItem(i);
+        if (dev.get_type() == OutletsDevice.TYPE_TPLINK)
+            dev.set_state(current_state(dev));
     }
+    return true;
 }
 
 }

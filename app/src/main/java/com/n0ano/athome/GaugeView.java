@@ -165,7 +165,7 @@ public void set_value(String val)
         set_value(v);
 
     } catch (Exception e) {
-        Log.d("Temp: bad float - " + val);
+        //Log.d("Temp: bad float - " + val);
     } 
 }
 
@@ -184,7 +184,7 @@ public void set_minmax(String min, String max)
         cur_max = Float.valueOf(max);
 
     } catch (Exception e) {
-        Log.d("Temp: bad float for min/max - " + min + "/" + max);
+        //Log.d("Temp: bad float for min/max - " + min + "/" + max);
     } 
 }
 

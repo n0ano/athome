@@ -22,13 +22,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
-            <ImageView
-                android:id="@+id/egauge_timeout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="65dp"
-                android:src="@drawable/timeout_10" />
-
             <!-- grid -->
             <LinearLayout
                 android:id="@+id/egauge_grid"

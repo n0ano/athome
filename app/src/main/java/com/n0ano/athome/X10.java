@@ -20,6 +20,8 @@ final static String X10_STATE_MAP = " \"state\":\"";
 
 MainActivity act;
 
+String cur_state = null;
+
 Map<String, String> onoff_state = new HashMap<String, String>();
 
 // X10: class constructor
@@ -32,7 +34,7 @@ public X10(final MainActivity act)
 	this.act = act;
 }
 
-public void get_devices(OutletsAdapter adapter)
+public void get_devices(OutletsAdapter adapter, DoitCallback cb)
 {
     int i, hi, idx;
     String name, hcode;
@@ -57,17 +59,13 @@ public void get_devices(OutletsAdapter adapter)
         }
     }
 
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            act.outlets.init_view();
-        }
-    });
+    cb.doit(null);
 }
 
 public void control(final OutletsDevice dev, boolean state)
 {
 
-    dev.set_state(state, act);
+    dev.set_state(state);
     final String onoff = state ? "on" : "off";
     new Thread(new Runnable() {
         public void run() {
@@ -92,62 +90,58 @@ private boolean get_state(int idx, String map)
     return ((map.charAt(16 - idx) == '0') ? false : true);
 }
 
-private boolean status_changed(String resp)
-{
-    int i;
-    boolean changed;
-    String code, line;
-
-    i = 0;
-    changed = false;
-    while ((code = act.parse.json_get("code", resp, ++i)) != null) {
-        if ((line = act.parse.json_get("state", resp, i)) == null) {
-            Log.d("X10 bad state data: " + resp);
-            return false;
-        }
-        if (!line.equals(onoff_state.get(code))) {
-            onoff_state.put(code, line);
-            changed = true;
-        }
-    }
-    return changed;
-}
-
 private void on_off(String resp, OutletsAdapter outlets_adapter)
 {
     int i;
     boolean state;
 
-    if (status_changed(resp)) {
-        int max_devices = outlets_adapter.getCount();
-        for (i = 0; i < max_devices; i++) {
-            OutletsDevice dev = outlets_adapter.getItem(i);
-            if (dev.get_type() == OutletsDevice.TYPE_X10) {
-                String code = dev.get_code();
-                int idx = dev.get_index();
-                state = get_state(idx, onoff_state.get(code));
-                if (state != dev.get_state())
-                    dev.set_state(state, act);
-            }
+    int max_devices = outlets_adapter.getCount();
+    for (i = 0; i < max_devices; i++) {
+        OutletsDevice dev = outlets_adapter.getItem(i);
+        if (dev.get_type() == OutletsDevice.TYPE_X10) {
+            String code = dev.get_code();
+            int idx = dev.get_index();
+            state = get_state(idx, onoff_state.get(code));
+Log.d(dev.get_name() + ": set state - " + state);
+            dev.set_state(state);
         }
     }
 }
 
-public void update(OutletsAdapter outlets_adapter)
+private void get_status(String resp)
+{
+    String code, line;
+
+    int i = 0;
+    while ((code = act.parse.json_get("code", resp, ++i)) != null) {
+        if ((line = act.parse.json_get("state", resp, i)) == null) {
+            Log.d("X10 bad state data: " + resp);
+            return;
+        }
+        onoff_state.put(code, line);
+    }
+}
+
+public boolean get_data(OutletsAdapter outlets_adapter)
 {
 
     //
     //  Get the data and display any changes
     //
-    String resp = act.call_api("GET",
+    String old = cur_state;
+    String cur_state = act.call_api("GET",
                                act.x10_url + X10_API,
                                X10_GET,
                                "",
                                null);
-    if (act.parse.json_get("house", resp, 1) == null)
-        Log.d("X10 bad get data: " + resp);
-    else
-        on_off(resp, outlets_adapter);
+    if (act.parse.json_get("house", cur_state, 1) == null) {
+        Log.d("X10 bad get data: " + cur_state);
+        return false;
+    }
+
+    get_status(cur_state);
+    on_off(cur_state, outlets_adapter);
+    return true;
 }
 
 }

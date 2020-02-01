@@ -18,22 +18,13 @@
         <RelativeLayout
             android:id="@+id/weather_out"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content" >
 
-            <ImageView
-                android:id="@+id/weather_timeout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:paddingTop="10dp"
-                android:src="@drawable/timeout_10" />
             <ImageView
                 android:id="@+id/weather_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/weather_timeout"
+                android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:paddingTop="10dp"
                 android:paddingLeft="5dp"
