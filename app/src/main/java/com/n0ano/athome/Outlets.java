@@ -139,23 +139,24 @@ public void init_view()
 
 private void go_control(OutletsDevice dev, int toggle)
 {
-    boolean new_state;
+    boolean new_onoff;
 
-    if (dev.get_hold())
+    if ((dev.get_state() == OutletsDevice.HOLD) || (dev.get_state() == OutletsDevice.OFFLINE))
         return;
+
     if (toggle < 0)
-        new_state = (dev.get_state() ? false : true);
+        new_onoff = (dev.get_onoff() ? false : true);
     else
-        new_state = (toggle == 0 ? false : true);
+        new_onoff = (toggle == 0 ? false : true);
 
     switch (dev.get_type()) {
 
     case OutletsDevice.TYPE_X10:
-        x10.control(dev, new_state);
+        x10.control(dev, new_onoff);
         break;
 
     case OutletsDevice.TYPE_TPLINK:
-        tplink.control(dev, new_state);
+        tplink.control(dev, new_onoff);
         break;
 
     default:
@@ -187,22 +188,24 @@ public void set_power(String name)
 private void battery()
 {
 
-    if (outlets_power == null || outlets_power.get_hold()) {
+    if ((outlets_power == null) ||
+        (outlets_power.get_state() == OutletsDevice.HOLD) ||
+        (outlets_power.get_state() == OutletsDevice.OFFLINE)) {
         Log.s("battery - no control", act);
         return;
     }
 
-    boolean state = outlets_power.get_state();
+    boolean onoff = outlets_power.get_onoff();
     int chg = act.get_battery();
     if (act.debug > 0)
             Log.s("battery: " + outlets_power.get_name() +
-                            (state ? "(on)" : "(off)") + " => " +
+                            (onoff ? "(on)" : "(off)") + " => " +
                             act.outlets_batt_min + " < " +
                             chg + " > " +
                             act.outlets_batt_max, act);
-    if ((chg < act.outlets_batt_min) && !state)
+    if ((chg < act.outlets_batt_min) && !onoff)
         go_control(outlets_power, 1);
-    else if ((chg > act.outlets_batt_max) && state)
+    else if ((chg > act.outlets_batt_max) && onoff)
         go_control(outlets_power, 0);
 }
 

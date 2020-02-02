@@ -11,16 +11,20 @@ import android.widget.TextView;
 //
 public class OutletsDevice {
 
-final static int TYPE_X10 =     0;
-final static int TYPE_TPLINK =  1;
+public final static int TYPE_X10 =      0;
+public final static int TYPE_TPLINK =   1;
+
+public final static int HOLD =          0;
+public final static int ONLINE =        1;
+public final static int OFFLINE =       2;
 
 private String name;
 private int type;
 private int index;
 private String code;
 private String url;
-private boolean state;
-private boolean hold;
+private boolean onoff;
+private int state;
 private View view;
 
 private ImageView icon;
@@ -40,8 +44,8 @@ Log.d("outlet " + name + " = " + code + id);
     tv_name = view.findViewById(R.id.outlet_name);
     tv_name.setText(name);
 
-    this.state = false;
-    this.hold = false;
+    this.onoff = false;
+    this.state = OFFLINE;
 }
 
 public OutletsDevice(String name, String code, String url, View view)
@@ -58,8 +62,8 @@ Log.d("device " + name + " = " + code);
     tv_name = view.findViewById(R.id.outlet_name);
     tv_name.setText(name);
 
-    this.state = false;
-    this.hold = false;
+    this.onoff = false;
+    this.state = OFFLINE;
 }
 
 public String get_name() { return name; }
@@ -78,12 +82,15 @@ public View get_view() { return view; }
 
 public void set_view(View view) { this.view = view; }
 
-public boolean get_hold() { return this.hold; }
+public int get_state() { return state; }
+public void set_state(int s, boolean force)
+{
+    if (force || (state != HOLD))
+        state = s;
+}
 
-public void set_hold(boolean hold) { this.hold = hold; }
-
-public boolean get_state() { return this.state; }
-public void set_state(boolean s) { state = s; }
+public boolean get_onoff() { return this.onoff; }
+public void set_onoff(boolean s) { onoff = s; }
 
 public String get_dev_code()
 {
@@ -123,10 +130,22 @@ public void show()
 {
     final int draw;
 
-    if (hold)
-        draw = state ? R.drawable.outlet_on_blue : R.drawable.outlet_off_blue;
-    else
-        draw = state ? R.drawable.outlet_on_green : R.drawable.outlet_off_red;
+    switch (state) {
+
+    case HOLD:
+        draw = onoff ? R.drawable.outlet_on_blue : R.drawable.outlet_off_blue;
+        break;
+
+    case ONLINE:
+        draw = onoff ? R.drawable.outlet_on_green : R.drawable.outlet_off_red;
+        break;
+
+    default:
+    case OFFLINE:
+        draw = R.drawable.outlet_offline;
+        break;
+
+    }
     icon.setImageResource(draw);
 }
 

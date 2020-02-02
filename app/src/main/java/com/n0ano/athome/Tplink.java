@@ -52,9 +52,11 @@ private boolean current_state(OutletsDevice dev)
     try {
         JSONObject json = C.str2json(resp);
         if (json.getInt("error_code") == TPLINK_OFFLINE) {
+            dev.set_state(OutletsDevice.OFFLINE, false);
             Log.d("TPLink: " + dev.get_name() + " offline");
             return false;
         }
+        dev.set_state(OutletsDevice.ONLINE, false);
         JSONObject result = (JSONObject)json.get("result");
         JSONObject info = C.str2json(result.optString("responseData", ""));
 
@@ -63,6 +65,7 @@ private boolean current_state(OutletsDevice dev)
         String onoff = sysinfo.optString("relay_state", "");
         return onoff.equals("1");
     } catch (Exception e) {
+        dev.set_state(OutletsDevice.OFFLINE, false);
         Log.d("TPLink current state(" + resp + ") json parse error - " + e);
     }
     return false;
@@ -121,18 +124,18 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
                                 info.optString("deviceId", ""),
                                 info.optString("appServerUrl", ""),
                                 View.inflate(act, R.layout.outlet, null));
-        dev.set_state(current_state(dev));
+        dev.set_onoff(current_state(dev));
         adapter.add_device(dev);
     }
 
     cb.doit(null);
 }
 
-public void control(final OutletsDevice dev, boolean state)
+public void control(final OutletsDevice dev, boolean onoff)
 {
 
-    dev.set_state(state);
-    final String onoff = state ? "1" : "0";
+    dev.set_onoff(onoff);
+    final String state = onoff ? "1" : "0";
     new Thread(new Runnable() {
         public void run() {
             String resp = act.call_api("POST",
@@ -145,7 +148,7 @@ public void control(final OutletsDevice dev, boolean state)
                                             "\"deviceId\":\"" + dev.get_code() + "\"," +
                                             "\"requestData\":\"{\\\"system\\\":{" +
                                                 "\\\"set_relay_state\\\":{" +
-                                                    "\\\"state\\\":" + onoff + "}" +
+                                                    "\\\"state\\\":" + state + "}" +
                                                 "}}\"" +
                                             "}}"
                                        );
@@ -160,7 +163,7 @@ public boolean get_data(OutletsAdapter adapter)
     for (int i = 0; i < max_devices; i++) {
         OutletsDevice dev = adapter.getItem(i);
         if (dev.get_type() == OutletsDevice.TYPE_TPLINK)
-            dev.set_state(current_state(dev));
+            dev.set_onoff(current_state(dev));
     }
     return true;
 }

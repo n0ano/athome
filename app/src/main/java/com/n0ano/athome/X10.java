@@ -81,17 +81,17 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
     cb.doit(null);
 }
 
-public void control(final OutletsDevice dev, boolean state)
+public void control(final OutletsDevice dev, boolean onoff)
 {
 
-    dev.set_state(state);
-    final String onoff = state ? "on" : "off";
+    dev.set_onoff(onoff);
+    final String state = onoff ? "on" : "off";
     new Thread(new Runnable() {
         public void run() {
             String resp = act.call_api("GET",
                                        act.x10_url + X10_API,
                                        X10_SET + "&code=" + dev.get_dev_code() +
-                                                 "&state=" + onoff +
+                                                 "&state=" + state +
                                                  "&token=" + act.x10_jwt,
                                        "",
                                        null);
@@ -99,7 +99,7 @@ public void control(final OutletsDevice dev, boolean state)
     }).start();
 }
 
-private boolean get_state(int idx, String map)
+private boolean get_onoff(int idx, String map)
 {
 
     if (map.length() < 16) {
@@ -109,27 +109,36 @@ private boolean get_state(int idx, String map)
     return ((map.charAt(16 - idx) == '0') ? false : true);
 }
 
-private void set_onoff(OutletsAdapter outlets_adapter)
+private void set_onoff(OutletsAdapter adapter)
 {
-    int i;
-    boolean state;
+    boolean onoff;
 
-    int max_devices = outlets_adapter.getCount();
-    for (i = 0; i < max_devices; i++) {
-        OutletsDevice dev = outlets_adapter.getItem(i);
+    int max_devices = adapter.getCount();
+    for (int i = 0; i < max_devices; i++) {
+        OutletsDevice dev = adapter.getItem(i);
         if (dev.get_type() == OutletsDevice.TYPE_X10) {
             String code = dev.get_code();
             int idx = dev.get_index();
-            state = get_state(idx, onoff_state.get(code));
-            dev.set_state(state);
+            onoff = get_onoff(idx, onoff_state.get(code));
+            dev.set_onoff(onoff);
         }
     }
 }
 
-public boolean get_data(OutletsAdapter outlets_adapter)
+private void x10_state(OutletsAdapter adapter, int state)
+{
+
+    int max_devices = adapter.getCount();
+    for (int i = 0; i < max_devices; i++) {
+        OutletsDevice dev = adapter.getItem(i);
+        dev.set_state(state, false);
+    }
+}
+
+public boolean get_data(OutletsAdapter adapter)
 {
     JSONObject json, info;
-    String code, value, state;
+    String code, value, onoff;
 
     //
     //  Get the data and display any changes
@@ -140,8 +149,11 @@ public boolean get_data(OutletsAdapter outlets_adapter)
                                "",
                                null);
 
-    if ((json = C.str2json(resp)) == null)
+    if ((json = C.str2json(resp)) == null) {
+        x10_state(adapter, OutletsDevice.OFFLINE);
         return false;
+    }
+    x10_state(adapter, OutletsDevice.ONLINE);
 
     JSONArray house = json.optJSONArray("house");
     if (house == null) {
@@ -161,7 +173,7 @@ public boolean get_data(OutletsAdapter outlets_adapter)
             onoff_state.put(code, value);
         }
     }
-    set_onoff(outlets_adapter);
+    set_onoff(adapter);
     return ret;
 }
 

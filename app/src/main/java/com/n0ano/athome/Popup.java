@@ -174,6 +174,9 @@ public void device_dialog(final OutletsDevice dev)
     TextView tv = (TextView) dialog.findViewById(R.id.device_name);
     tv.setText(dev.get_name());
 
+    tv = (TextView) dialog.findViewById(R.id.device_status);
+    tv.setText(dev.get_state() == OutletsDevice.OFFLINE ? "offline" : "online");
+
     tv = (TextView) dialog.findViewById(R.id.device_type);
     tv.setText(dev.get_tname());
 
@@ -181,13 +184,18 @@ public void device_dialog(final OutletsDevice dev)
     tv.setText(dev.get_dev_code());
 
     final CheckBox cb = (CheckBox) dialog.findViewById(R.id.device_hold);
-    cb.setChecked(dev.get_hold());
+    if (dev.get_state() == OutletsDevice.OFFLINE)
+        cb.setEnabled(false);
+    else {
+        cb.setEnabled(true);
+        cb.setChecked(dev.get_state() == OutletsDevice.HOLD);
+    }
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            dev.set_hold(cb.isChecked());
+            dev.set_state((cb.isChecked() ? OutletsDevice.HOLD : OutletsDevice.ONLINE), true);
             dev.show();
             end_dialog(dialog, false);
         }
