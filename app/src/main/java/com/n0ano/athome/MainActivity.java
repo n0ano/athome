@@ -1041,28 +1041,6 @@ private void clock()
     });
 }
 
-private void disp_update()
-{
-
-    runOnUiThread(new Runnable() {
-        public void run() {
-            clock();
-
-            if (weather_layout != Popup.LAYOUT_NONE)
-                weather.show();
-
-            if (thermostat_layout != Popup.LAYOUT_NONE)
-                thermostat.show();
-
-            if (egauge_layout != Popup.LAYOUT_NONE)
-                egauge.show();
-
-            if (outlets_layout != Popup.LAYOUT_NONE)
-                outlets.show();
-        }
-    });
-}
-
 private void doit()
 {
 
@@ -1104,7 +1082,7 @@ private void doit()
 
     new Thread(new Runnable() {
         public void run() {
-            while (C.working()) {
+            while (C.working(false)) {
                 if (!paused)
                     clock();
                 SystemClock.sleep(1000);

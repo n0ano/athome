@@ -44,8 +44,6 @@ private final static String DATA_TEMPLATE =
 
 MainActivity act;
 
-private Thread data_thread;
-
 JSONObject w_data;
 
 ArrayList<Double> baro_hist = new ArrayList<Double>();
@@ -74,7 +72,7 @@ public Weather(MainActivity act, final DoitCallback cb)
         return;
     }
 
-    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+    Thread data_thread = C.data_thread(PERIOD, false, new DoitCallback() {
         @Override
         public void doit(Object obj) {
             get_wunder();

@@ -75,18 +75,18 @@ public static Object json_get(JSONArray json, int i)
     }
 }
 
-public static boolean working()
+public static boolean working(boolean constant)
 {
 
-    return running;
+    return constant ? constant : running;
 }
 
-public static Thread data_thread(final int period, final DoitCallback cb)
+public static Thread data_thread(final int period, final boolean constant, final DoitCallback cb)
 {
 
     Thread thread = new Thread(new Runnable() {
         public void run() {
-            while (working()) {
+            while (working(constant)) {
                 //
                 //  Get the data
                 //

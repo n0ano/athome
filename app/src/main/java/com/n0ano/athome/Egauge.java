@@ -34,7 +34,7 @@ public Egauge(MainActivity act, final DoitCallback cb)
 
 	this.act = act;
 
-    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+    Thread data_thread = C.data_thread(PERIOD, false, new DoitCallback() {
         @Override
         public void doit(Object obj) {
             get_data();

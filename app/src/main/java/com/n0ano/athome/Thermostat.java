@@ -52,7 +52,7 @@ public Thermostat(final MainActivity act, final DoitCallback cb)
             //
             //  Thread to get data from the thermostats
             //
-            Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+            Thread data_thread = C.data_thread(PERIOD, false, new DoitCallback() {
                 @Override
                 public void doit(Object obj) {
                     ecobee.get_data(thermostat_adapter);
