@@ -43,25 +43,28 @@ public Outlets(final MainActivity act, final DoitCallback cb)
     //
     // Enumerate the outlets
     //
-    enumerate(outlets_adapter);
-
-    //
-    //  Thread to get data from the thermostats
-    //
-
-    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+    enumerate(outlets_adapter, new DoitCallback() {
         @Override
         public void doit(Object obj) {
-            battery();
+            //
+            //  Thread to get data from the thermostats
+            //
 
-            boolean x10_change = x10.get_data(outlets_adapter);
-            boolean tp_change = tplink.get_data(outlets_adapter);
-            cb.doit(x10_change || tp_change);
+            Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+                @Override
+                public void doit(Object obj) {
+                    battery();
+
+                    boolean x10_change = x10.get_data(outlets_adapter);
+                    boolean tp_change = tplink.get_data(outlets_adapter);
+                    cb.doit(x10_change || tp_change);
+                }
+            });
         }
     });
 }
 
-public void enumerate(final OutletsAdapter adapter)
+public void enumerate(final OutletsAdapter adapter, final DoitCallback cb)
 {
 
     new Thread(new Runnable() {
@@ -79,6 +82,7 @@ public void enumerate(final OutletsAdapter adapter)
                             act.runOnUiThread(new Runnable() {
                                 public void run() {
                                     act.outlets.init_view();
+                                    cb.doit(null);
                                 }
                             });
                         }

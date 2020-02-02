@@ -46,21 +46,24 @@ public Thermostat(final MainActivity act, final DoitCallback cb)
     //
     //  Enumerate thermostats
     //
-    enumerate();
-
-    //
-    //  Thread to get data from the thermostats
-    //
-    Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+    enumerate(new DoitCallback() {
         @Override
         public void doit(Object obj) {
-            ecobee.get_data(thermostat_adapter);
-            cb.doit(null);
+            //
+            //  Thread to get data from the thermostats
+            //
+            Thread data_thread = C.data_thread(PERIOD, new DoitCallback() {
+                @Override
+                public void doit(Object obj) {
+                    ecobee.get_data(thermostat_adapter);
+                    cb.doit(null);
+                }
+            });
         }
     });
 }
 
-public void enumerate()
+public void enumerate(final DoitCallback cb)
 {
 
     new Thread(new Runnable() {
@@ -71,6 +74,7 @@ public void enumerate()
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     act.thermostat.init_view();
+                    cb.doit(null);
                 }
             });
         }

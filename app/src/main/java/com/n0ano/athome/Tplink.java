@@ -66,7 +66,7 @@ private boolean current_state(OutletsDevice dev)
         return onoff.equals("1");
     } catch (Exception e) {
         dev.set_state(OutletsDevice.OFFLINE, false);
-        Log.d("TPLink current state(" + resp + ") json parse error - " + e);
+        Log.d("TPLink: " + dev.get_name() + " offline, json parse(" + resp + ") error - " + e);
     }
     return false;
 }
