@@ -25,7 +25,7 @@ String name;
 int width;
 int height;
 int type;
-int ts;
+long ts;
 boolean checked;
 
 int generation;
@@ -37,7 +37,8 @@ private HashMap<String, String> meta;
 
 public ImageEntry(String name, String list, int gen)
 {
-    int idx, ts;
+    int idx;
+    long ts;
     char t;
 
     this.checked = true;
@@ -47,7 +48,7 @@ public ImageEntry(String name, String list, int gen)
         // name from image server list
         this.type = ((t == 'F') ? C.IMAGE_REMOTE : C.IMAGE_LOCAL);
         idx = name.indexOf(":");
-        this.ts = Integer.parseInt(name.substring(1, idx), 10);
+        this.ts = Long.parseLong(name.substring(1, idx), 10);
     } else {
         this.type = ((t == 'L' || t == 'l') ? C.IMAGE_LOCAL : C.IMAGE_REMOTE);
         if (t == 'l' || t == 'r')
@@ -60,21 +61,21 @@ public ImageEntry(String name, String list, int gen)
     this.height = 0;
     this.bitmap_th = null;
     this.generation = gen;
-if (type == C.IMAGE_LOCAL) {
-    try {
-        ExifInterface exif = new ExifInterface(this.name);
-        //Log.d("DDD-SS", this.name + " => " + exif.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION));
-    } catch (Exception e) {
-        //Log.d("DDD-SS", this.name + " => no Comment attribute");
-    }
-}
+//if (type == C.IMAGE_LOCAL) {
+//    try {
+//        ExifInterface exif = new ExifInterface(this.name);
+//        //Log.d("DDD-SS", this.name + " => " + exif.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION));
+//    } catch (Exception e) {
+//        //Log.d("DDD-SS", this.name + " => no Comment attribute");
+//    }
+//}
 }
 
 public String get_name() { return name; }
 
 public int get_type() { return type; }
 
-public int get_ts() { return ts; }
+public long get_ts() { return ts; }
 
 public int get_width() { return width; }
 public void set_width(int w) { width = w; }
@@ -265,7 +266,15 @@ private InputStream open_image(ScreenInfo ss_info, int r, int width, int height)
 public int compareTo(ImageEntry e)
 {
 
-        return e.ts - ts;
+        if (e == null) {
+            Log.d("DDD-TS", "null compare object");
+            return 1;
+        }
+        if (e.ts > ts)
+            return 1;
+        else if (e.ts < ts)
+            return -1;
+        return 0;
 }
 
 }

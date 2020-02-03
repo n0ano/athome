@@ -71,6 +71,7 @@ public void find_remote(String list, boolean thumb)
     int gen = 0;
     char type;
     String url;
+    String str = "";
 	InputStream in_rdr = null;
 
     HashMap<String, String> meta = new HashMap<String, String>();
@@ -84,47 +85,46 @@ public void find_remote(String list, boolean thumb)
         Log.d("DDD-SS", "get names from " + url);
         Authenticator.setDefault(new CustomAuthenticator(info.user, info.pwd));
         in_rdr = new URL(url).openStream();
-        for (;;) {
-            final String str = C.meta_line(in_rdr);
-            type = str.charAt(0);
-            switch (type) {
-
-            case 'E':
-                return;
-
-            case 'G':
-                gen = Integer.parseInt(str.substring(1), 10);
-                break;
-
-            case 'F':
-                final String name = str.substring(str.indexOf(":"));
-                if (C.loading_name != null)
-                    act.runOnUiThread(new Runnable() {
-                        public void run() {
-                            C.loading_name.setText(name);
-                        }
-                    });
-                ImageEntry img = null;
-                if (image_vm != null)
-                    img = image_vm.get(name, gen, C.THUMB_X, C.THUMB_Y);
-                if (img == null) {
-                    img = new ImageEntry(str, list, gen);
-                    if (image_vm != null)
-                        image_vm.put(name, img);
-                }
-                images.add(img);
-                break;
-
-            default:
-                Log.d("DDD-SS", "Unexpected meta data - " + str);
-                break;
-
-            }
-        }
     } catch (Exception e) {
-        Log.d("DDD-SS", "image name execption - " + e);
+        Log.d("DDD-SS", "image name(" + str + ") exception - " + e);
     }
-    return;
+    for (;;) {
+        str = C.meta_line(in_rdr);
+        type = str.charAt(0);
+        switch (type) {
+
+        case 'E':
+            return;
+
+        case 'G':
+            gen = Integer.parseInt(str.substring(1), 10);
+            break;
+
+        case 'F':
+            final String name = str.substring(str.indexOf(":"));
+            if (C.loading_name != null)
+                act.runOnUiThread(new Runnable() {
+                    public void run() {
+                        C.loading_name.setText(name);
+                    }
+                });
+            ImageEntry img = null;
+            if (image_vm != null)
+                img = image_vm.get(name, gen, C.THUMB_X, C.THUMB_Y);
+            if (img == null) {
+                img = new ImageEntry(str, list, gen);
+                if (image_vm != null)
+                    image_vm.put(name, img);
+            }
+            images.add(img);
+            break;
+
+        default:
+            Log.d("DDD-SS", "Unexpected meta data - " + str);
+            return;
+
+        }
+    }
 }
 
 }
