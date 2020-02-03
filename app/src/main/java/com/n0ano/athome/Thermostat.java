@@ -34,7 +34,7 @@ ThermostatAdapter thermostat_adapter;
 //
 //   act - activity that instantiated the class
 //
-public Thermostat(final MainActivity act, final DoitCallback cb)
+public Thermostat(final MainActivity act, View v, final DoitCallback cb)
 {
 
 	this.act = act;
@@ -46,7 +46,7 @@ public Thermostat(final MainActivity act, final DoitCallback cb)
     //
     //  Enumerate thermostats
     //
-    enumerate(new DoitCallback() {
+    enumerate(v, new DoitCallback() {
         @Override
         public void doit(Object obj) {
             //
@@ -63,7 +63,7 @@ public Thermostat(final MainActivity act, final DoitCallback cb)
     });
 }
 
-public void enumerate(final DoitCallback cb)
+public void enumerate(final View v, final DoitCallback cb)
 {
 
     new Thread(new Runnable() {
@@ -73,7 +73,7 @@ public void enumerate(final DoitCallback cb)
 
             act.runOnUiThread(new Runnable() {
                 public void run() {
-                    act.thermostat.init_view();
+                    init_view(v);
                     cb.doit(null);
                 }
             });
@@ -172,11 +172,11 @@ private void hold_dialog(final ThermostatDevice dev)
     dialog.show();
 }
 
-public void init_view()
+public void init_view(View main)
 {
     int i;
 
-    TableLayout tl = (TableLayout) act.findViewById(R.id.thermostats_table);
+    TableLayout tl = (TableLayout) main.findViewById(R.id.thermostats_table);
     if (tl == null)
         return;
     tl.removeAllViews();
@@ -219,7 +219,7 @@ public void go_hold(View v)
     hold_dialog((ThermostatDevice) v.getTag());
 }
 
-public void ui_show()
+public void show(View v)
 {
 
     //
@@ -228,23 +228,13 @@ public void ui_show()
     int max_devices = thermostat_adapter.getCount();
     for (int i = 0; i < max_devices; i++) {
         ThermostatDevice dev = thermostat_adapter.getItem(i);
-        View v = dev.get_view();
-        GaugeView gv = (GaugeView) v.findViewById(R.id.thermostat_temp);
+        View dv = dev.get_view();
+        GaugeView gv = (GaugeView) dv.findViewById(R.id.thermostat_temp);
         gv.set_value(dev.get_temp());
 //      tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ?
 //                                            act.getResources().getColor(R.color.fore) :
 //                                            act.getResources().getColor(R.color.hold));
     }
-}
-
-public void show()
-{
-
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            ui_show();
-        }
-    });
 }
 
 }

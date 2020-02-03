@@ -212,7 +212,7 @@ public void go_temp_detail(View v)
     detail_dialog();
 }
 
-public void ui_show()
+public void show(View v)
 {
 
     //
@@ -222,35 +222,25 @@ public void ui_show()
     ImageView iv;
     GaugeView gv;
 
-    if ((gv = (GaugeView) act.findViewById(R.id.weather_temp)) != null) {
+    if ((gv = (GaugeView) v.findViewById(R.id.weather_temp)) != null) {
         gv.set_minmax(min_temp, max_temp);
         gv.set_value((float)w_data.optDouble("temp", 0.0));
     }
 
-    if ((iv = (ImageView) act.findViewById(R.id.weather_dir)) != null)
+    if ((iv = (ImageView) v.findViewById(R.id.weather_dir)) != null)
         iv.setRotation(Integer.valueOf(w_data.optInt("winddir", 0)));
 
-    if ((tv = (TextView) act.findViewById(R.id.weather_speed)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.weather_speed)) != null)
         tv.setText(String.format("%.1f", (float)w_data.optDouble("windSpeed", 0.0)));
 
-    if ((tv = (TextView) act.findViewById(R.id.weather_rain)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.weather_rain)) != null)
         tv.setText(String.format("%.1f", (float)w_data.optDouble("precipTotal", 0.0)));
 
-    if ((iv = (ImageView) act.findViewById(R.id.weather_bar_dir)) != null)
+    if ((iv = (ImageView) v.findViewById(R.id.weather_bar_dir)) != null)
         iv.setImageResource(baro_icon);
 
-    if ((tv = (TextView) act.findViewById(R.id.weather_barometer)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.weather_barometer)) != null)
         tv.setText(String.format("%.1f", w_data.optDouble("pressure", 0.0)));
-}
-
-public void show()
-{
-
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            ui_show();
-        }
-    });
 }
 
 }

@@ -1,6 +1,7 @@
 package com.n0ano.athome;
 
 import android.content.res.Resources;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -124,7 +125,7 @@ private int gen_icon(int watts)
     return R.drawable.panel_red;
 }
 
-public void ui_show()
+public void show(View v)
 {
 
     //
@@ -137,16 +138,16 @@ public void ui_show()
     int disp_y = Resources.getSystem().getDisplayMetrics().heightPixels;
     //Log.d("display = " + disp_x + "x" + disp_y);
 
-    LinearLayout ll = (LinearLayout)act.findViewById(R.id.egauge);
+    LinearLayout ll = (LinearLayout)v.findViewById(R.id.egauge);
     //Logandroid and.d("layout = " + ll.getWidth() + "x" + ll.getHeight() + " => " + disp_x + "x" + disp_y);
 
-    //ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
+    //ClockView vv = (ClockView)v.findViewById(R.id.clock_view);
     //ViewGroup.LayoutParams vp = vv.getLayoutParams();
     //Log.d("clock = " + vp.width + "x" + vp.height);
 
     if (width == 0 && disp_x < 1000) {
         width = 180;
-        ClockView vv = (ClockView)act.findViewById(R.id.clock_view);
+        ClockView vv = (ClockView)v.findViewById(R.id.clock_view);
         if (vv != null) {
             ViewGroup.LayoutParams vp = vv.getLayoutParams();
             vp.width = width;
@@ -157,31 +158,21 @@ public void ui_show()
 
     int grid_watt = gen_watt - use_watt;
 
-    if ((tv = (TextView) act.findViewById(R.id.grid_watt)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.grid_watt)) != null)
         tv.setText(k_watts(grid_watt));
 
-    if ((tv = (TextView) act.findViewById(R.id.house_watt)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.house_watt)) != null)
         tv.setText(k_watts(use_watt));
 
-    if ((tv = (TextView) act.findViewById(R.id.panel_watt)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.panel_watt)) != null)
         tv.setText(k_watts(gen_watt));
-    if ((iv = (ImageView) act.findViewById(R.id.panel_image)) != null)
+    if ((iv = (ImageView) v.findViewById(R.id.panel_image)) != null)
         iv.setImageResource(gen_icon(gen_watt));
-    if ((iv = (ImageView) act.findViewById(R.id.panel_arrow)) != null)
+    if ((iv = (ImageView) v.findViewById(R.id.panel_arrow)) != null)
         iv.setImageResource(gen_arrow(gen_watt));
 
-    if ((iv = (ImageView) act.findViewById(R.id.grid_arrow)) != null)
+    if ((iv = (ImageView) v.findViewById(R.id.grid_arrow)) != null)
         set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
-}
-
-public void show()
-{
-
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            ui_show();
-        }
-    });
 }
 
 }

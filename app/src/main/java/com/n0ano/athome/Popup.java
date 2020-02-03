@@ -336,7 +336,6 @@ private void egauge_dialog()
             act.egauge_url = et.getText().toString();
             pref.put("egauge_url", act.egauge_url);
 
-            act.show_views();
             end_dialog(dialog, true);
         }
     });
@@ -486,7 +485,6 @@ private void weather_dialog()
             act.weather_key = et_key.getText().toString();
             pref.put("wunder_key", act.weather_key);
 
-            act.show_views();
             end_dialog(dialog, true);
         }
     });

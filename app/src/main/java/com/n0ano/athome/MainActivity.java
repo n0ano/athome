@@ -135,6 +135,8 @@ protected void onCreate(Bundle state)
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
 
+    restore_state();
+
     ss_info = new ScreenInfo(this, pref);
 
     start_home(state);
@@ -180,7 +182,7 @@ protected void onResume()
 
 //test_parse();
 
-    restore_state();
+    ss_control(C.SS_OP_INIT);
 
     ss_gesture = new GestureDetectorCompat(this, new MyGesture(ss_saver));
 
@@ -308,7 +310,8 @@ private void menu_icons(boolean vis)
 private void start_home(Bundle state)
 {
 
-    setContentView(R.layout.activity_main);
+    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                             R.layout.activity_ph);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     toolbar.setTitle("AtHome");
     toolbar.setTitleTextColor(Color.WHITE);
@@ -394,40 +397,15 @@ public void screen_mgmt(View v)
     startActivityForResult(intent, ImageMgmt.IMAGES_UPDATE);
 }
 
-public void view_show(int view_id, int[] ids, int main)
-{
-    int id;
-
-    if (view_id > ids.length)
-        view_id = 0;
-    id = ids[view_id];
-    View v = findViewById(main);
-    if (v == null)
-        return;
-    ViewGroup parent = (ViewGroup) v.getParent();
-    int index = parent.indexOfChild(v);
-    parent.removeView(v);
-    v = getLayoutInflater().inflate(id, parent, false);
-    parent.addView(v, index);
-}
-
-public void show_views()
+public View view_show(int layout, int view_id)
 {
 
-    view_show(egauge_layout, Popup.layout_egauge, R.id.egauge_main);
-    final ClockView cv = (ClockView)findViewById(R.id.clock_view);
-    if (cv != null) {
-        ImageView h_img = (ImageView)findViewById(R.id.house_image);
-        h_img.setVisibility(egauge_clock ? View.GONE :    View.VISIBLE);
-        cv.setVisibility(egauge_clock    ? View.VISIBLE : View.GONE);
-    }
-
-    view_show(weather_layout, Popup.layout_weather, R.id.weather_main);
-
-    view_show(thermostat_layout, Popup.layout_thermostat, R.id.thermostat_main);
-
-Log.d("outlets - " + outlets_layout + "(" + Popup.LAYOUT_TABLET +")");
-    view_show(outlets_layout, Popup.layout_outlets, R.id.outlets_main);
+    View v = (View)findViewById(view_id);
+    if (layout == Popup.LAYOUT_NONE)
+        v.setVisibility(View.GONE);
+    else
+        v.setVisibility(View.VISIBLE);
+    return v;
 }
 
 public String encode_time(int t)
@@ -615,8 +593,6 @@ private void restore_state()
 
     debug = pref.get("debug", 0);
     Log.cfg(debug, log_uri, log_params);
-
-    ss_control(C.SS_OP_INIT);
 }
 
 public void stream_log(String line)
@@ -1044,41 +1020,65 @@ private void clock()
 private void doit()
 {
 
-    if (weather_layout != Popup.LAYOUT_NONE)
-        weather = new Weather(this, new DoitCallback() {
-            @Override
-            public void doit(Object obj) {
-                weather.show();
-            }
-        });
-
-    if (thermostat_layout != Popup.LAYOUT_NONE)
-        thermostat = new Thermostat(this, new DoitCallback() {
-            @Override
-            public void doit(Object obj) {
-                thermostat.show();
-            }
-        });
-
-    if (egauge_layout != Popup.LAYOUT_NONE)
+    final View egauge_view = view_show(egauge_layout, R.id.egauge_main);
+    ClockView cv = (ClockView)findViewById(R.id.clock_view);
+    if (cv != null) {
+        ImageView h_img = (ImageView)findViewById(R.id.house_image);
+        h_img.setVisibility(egauge_clock ? View.GONE :    View.VISIBLE);
+        cv.setVisibility(egauge_clock    ? View.VISIBLE : View.GONE);
+    }
+    if (egauge_view != null)
         egauge = new Egauge(this, new DoitCallback() {
             @Override
             public void doit(Object obj) {
-                egauge.show();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        egauge.show(egauge_view);
+                    }
+                });
             }
         });
 
-    if (outlets_layout != Popup.LAYOUT_NONE)
-        outlets = new Outlets(this, new DoitCallback() {
+    final View weather_view = view_show(egauge_layout, R.id.weather_main);
+    if (weather_view != null)
+        weather = new Weather(this, new DoitCallback() {
             @Override
             public void doit(Object obj) {
-                outlets.show();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        weather.show(weather_view);
+                    }
+                });
+            }
+        });
+
+    final View thermostat_view = view_show(thermostat_layout, R.id.thermostats_table);
+    if (thermostat_view != null)
+        thermostat = new Thermostat(this, thermostat_view, new DoitCallback() {
+            @Override
+            public void doit(Object obj) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        thermostat.show(thermostat_view);
+                    }
+                });
+            }
+        });
+
+    final View outlets_view = view_show(outlets_layout, R.id.outlets_table);
+    if (outlets_view != null)
+        outlets = new Outlets(this, outlets_view, new DoitCallback() {
+            @Override
+            public void doit(Object obj) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        outlets.show(outlets_view);
+                    }
+                });
             }
         });
 
     C.running = true;
-
-    show_views();
 
     new Thread(new Runnable() {
         public void run() {

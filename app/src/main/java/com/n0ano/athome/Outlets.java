@@ -28,7 +28,7 @@ OutletsAdapter outlets_adapter;
 //
 //   act - activity that instantiated the class
 //
-public Outlets(final MainActivity act, final DoitCallback cb)
+public Outlets(final MainActivity act, View v, final DoitCallback cb)
 {
 
 	this.act = act;
@@ -43,7 +43,7 @@ public Outlets(final MainActivity act, final DoitCallback cb)
     //
     // Enumerate the outlets
     //
-    enumerate(outlets_adapter, new DoitCallback() {
+    enumerate(outlets_adapter, v, new DoitCallback() {
         @Override
         public void doit(Object obj) {
             //
@@ -64,7 +64,7 @@ public Outlets(final MainActivity act, final DoitCallback cb)
     });
 }
 
-public void enumerate(final OutletsAdapter adapter, final DoitCallback cb)
+public void enumerate(final OutletsAdapter adapter, final View main, final DoitCallback cb)
 {
 
     new Thread(new Runnable() {
@@ -81,7 +81,7 @@ public void enumerate(final OutletsAdapter adapter, final DoitCallback cb)
 
                             act.runOnUiThread(new Runnable() {
                                 public void run() {
-                                    act.outlets.init_view();
+                                    init_view(main);
                                     cb.doit(null);
                                 }
                             });
@@ -93,12 +93,12 @@ public void enumerate(final OutletsAdapter adapter, final DoitCallback cb)
     }).start();
 }
 
-public void init_view()
+public void init_view(View main)
 {
     int i;
 
     set_power(act.outlets_battery);
-    TableLayout tl = (TableLayout) act.findViewById(R.id.outlets_table);
+    TableLayout tl = (TableLayout) main.findViewById(R.id.outlets_table);
     if (tl == null)
         return;
     tl.removeAllViews();
@@ -213,22 +213,12 @@ private void battery()
         go_control(outlets_power, 0);
 }
 
-public void ui_show()
+public void show(View v)
 {
 
     int max = outlets_adapter.getCount();
     for (int i = 0; i < max; i++)
         outlets_adapter.getItem(i).show();
-}
-
-public void show()
-{
-
-    act.runOnUiThread(new Runnable() {
-        public void run() {
-            ui_show();
-        }
-    });
 }
 
 }
