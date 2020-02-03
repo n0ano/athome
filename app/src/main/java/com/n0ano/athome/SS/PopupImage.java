@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.n0ano.athome.Preferences;
 import com.n0ano.athome.R;
 import com.n0ano.athome.Log;
 
@@ -15,13 +14,11 @@ public class PopupImage extends ImageMgmt
 {
 
 ImageMgmt act;
-Preferences pref;
 
-public PopupImage(ImageMgmt act, Preferences pref)
+public PopupImage(ImageMgmt act)
 {
 
     this.act = act;
-    this.pref = pref;
 }
 
 public boolean menu_click(int item)

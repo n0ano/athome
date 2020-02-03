@@ -58,13 +58,10 @@ private int type_pos;
 public final static int SS_START = 30;
 public final static int SS_DELAY = 30;
 
-Preferences pref;
-
-public Popup(MainActivity act, Preferences pref)
+public Popup(MainActivity act)
 {
 
     this.act = act;
-    this.pref = pref;
 }
 
 private int index_id(int index, int[] ids)
@@ -278,24 +275,24 @@ private void general_dialog()
             act.general_layout = (rg.getCheckedRadioButtonId() == R.id.general_tablet) ?
                                             LAYOUT_TABLET :
                                             LAYOUT_PHONE;
-            pref.put("general_layout", act.general_layout);
+            P.put("general_layout", act.general_layout);
 
             act.egauge_layout = (bt_egauge.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put("egauge_layout", act.egauge_layout);
+            P.put("egauge_layout", act.egauge_layout);
 
             act.weather_layout = (bt_weather.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put("weather_layout", act.weather_layout);
+            P.put("weather_layout", act.weather_layout);
 
             act.thermostat_layout = (bt_thermostat.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put("thermostat_layout", act.thermostat_layout);
+            P.put("thermostat_layout", act.thermostat_layout);
 
             act.outlets_layout = (bt_outlets.isChecked() ? act.general_layout : LAYOUT_NONE);
-            pref.put("outlets_layout", act.outlets_layout);
+            P.put("outlets_layout", act.outlets_layout);
 
             act.on_time = act.decode_time(et_on.getText().toString());
-            pref.put("general_on", act.on_time);
+            P.put("general_on", act.on_time);
             act.off_time = act.decode_time(et_off.getText().toString());
-            pref.put("general_off", act.off_time);
+            P.put("general_off", act.off_time);
 
             end_dialog(dialog, true);
         }
@@ -328,13 +325,13 @@ private void egauge_dialog()
         @Override
         public void onClick(View v) {
             act.egauge_progress = (cb.isChecked() ? 1 : 0);
-            pref.put("egauge_progress", act.egauge_progress);
+            P.put("egauge_progress", act.egauge_progress);
 
             act.egauge_clock = ((rg.getCheckedRadioButtonId() == R.id.egauge_clock) ?  true : false);
-            pref.put("egauge_clock", act.egauge_clock);
+            P.put("egauge_clock", act.egauge_clock);
 
             act.egauge_url = et.getText().toString();
-            pref.put("egauge_url", act.egauge_url);
+            P.put("egauge_url", act.egauge_url);
 
             end_dialog(dialog, true);
         }
@@ -391,7 +388,7 @@ private void ecobee_doauth(final String api, final String pin)
         @Override
         public void onClick(View v) {
             act.ecobee_api = api;
-            pref.put("ecobee_api", act.ecobee_api);
+            P.put("ecobee_api", act.ecobee_api);
             new Thread(new Runnable() {
                 public void run() {
                     act.thermostat.ecobee.ecobee_authorize(act.ecobee_api);
@@ -442,9 +439,9 @@ private void ecobee_dialog()
             act.ecobee_api = api_tv.getText().toString();
             act.ecobee_access = access_tv.getText().toString();
             act.ecobee_refresh = refresh_tv.getText().toString();
-            pref.put("ecobee_api", act.ecobee_api);
-            pref.put("ecobee_access", act.ecobee_access);
-            pref.put("ecobee_refresh", act.ecobee_refresh);
+            P.put("ecobee_api", act.ecobee_api);
+            P.put("ecobee_access", act.ecobee_access);
+            P.put("ecobee_refresh", act.ecobee_refresh);
             end_dialog(dialog, false);
         }
     });
@@ -477,13 +474,13 @@ private void weather_dialog()
         @Override
         public void onClick(View v) {
             act.weather_progress = (cb.isChecked() ? 1 : 0);
-            pref.put("weather_progress", act.weather_progress);
+            P.put("weather_progress", act.weather_progress);
 
             act.weather_id = et_id.getText().toString();
-            pref.put("wunder_id", act.weather_id);
+            P.put("wunder_id", act.weather_id);
 
             act.weather_key = et_key.getText().toString();
-            pref.put("wunder_key", act.weather_key);
+            P.put("wunder_key", act.weather_key);
 
             end_dialog(dialog, true);
         }
@@ -596,13 +593,13 @@ private void outlets_dialog()
             else
                 act.outlets_battery = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
             act.outlets.set_power(outlets_battery);
-            pref.put("outlets_battery", act.outlets_battery);
+            P.put("outlets_battery", act.outlets_battery);
             act.outlets_cols = C.a2i(cols.getText().toString());
-            pref.put("outlets_cols", act.outlets_cols);
+            P.put("outlets_cols", act.outlets_cols);
             act.outlets_batt_min = C.a2i(min.getText().toString());
-            pref.put("outlets_batt_min", act.outlets_batt_min);
+            P.put("outlets_batt_min", act.outlets_batt_min);
             act.outlets_batt_max = C.a2i(max.getText().toString());
-            pref.put("outlets_batt_max", act.outlets_batt_max);
+            P.put("outlets_batt_max", act.outlets_batt_max);
             end_dialog(dialog, true);
         }
     });
@@ -625,9 +622,9 @@ private void x10_dialog()
         @Override
         public void onClick(View v) {
             act.x10_url = et.getText().toString();
-            pref.put("x10_url", act.x10_url);
+            P.put("x10_url", act.x10_url);
             act.x10_jwt = jt.getText().toString();
-            pref.put("x10_jwt", act.x10_jwt);
+            P.put("x10_jwt", act.x10_jwt);
             end_dialog(dialog, true);
         }
     });
@@ -650,9 +647,9 @@ private void tplink_dialog()
         @Override
         public void onClick(View v) {
             act.tplink_user = ut.getText().toString();
-            pref.put("tplink_user", act.tplink_user);
+            P.put("tplink_user", act.tplink_user);
             act.tplink_pwd = pt.getText().toString();
-            pref.put("tplink_pwd", act.tplink_pwd);
+            P.put("tplink_pwd", act.tplink_pwd);
             end_dialog(dialog, true);
         }
     });
@@ -720,33 +717,33 @@ private void screen_dialog()
         @Override
         public void onClick(View v) {
             act.ss_info.enable = cb_enable.isChecked();
-            pref.put("ss_enable", act.ss_info.enable);
+            P.put("ss_enable", act.ss_info.enable);
             act.ss_info.host = et_host.getText().toString();
-            pref.put("ss_host", act.ss_info.host);
+            P.put("ss_host", act.ss_info.host);
             act.ss_info.list = C.suffix(act.ss_info.host);
             act.ss_info.server = et_server.getText().toString();
-            pref.put("ss_server", act.ss_info.server);
+            P.put("ss_server", act.ss_info.server);
             act.ss_info.user = et_user.getText().toString();
-            pref.put("ss_user", act.ss_info.user);
+            P.put("ss_user", act.ss_info.user);
             act.ss_info.pwd = et_pwd.getText().toString();
-            pref.put("ss_pwd", act.ss_info.pwd);
+            P.put("ss_pwd", act.ss_info.pwd);
 
             try {
                 act.ss_info.start = C.a2i(ss_start.getText().toString());
             } catch (Exception e) {
                 act.ss_info.start = 0;
             }
-            pref.put("ss_start", act.ss_info.start);
+            P.put("ss_start", act.ss_info.start);
 
             try {
                 act.ss_info.delay = C.a2i(ss_delay.getText().toString());
             } catch (Exception e) {
                 act.ss_info.delay = SS_DELAY;
             }
-            pref.put("ss_delay", act.ss_info.delay);
+            P.put("ss_delay", act.ss_info.delay);
 
             act.ss_info.fade = type_pos;
-            pref.put("ss_fade", act.ss_info.fade);
+            P.put("ss_fade", act.ss_info.fade);
 
             if (cb.isChecked())
                 act.ss_saver.ss_reset();
@@ -780,15 +777,15 @@ private void developer_dialog()
         @Override
         public void onClick(View v) {
             act.outlets_batt_level = C.a2i(level.getText().toString());
-            pref.put("outlets_batt_level", act.outlets_batt_level);
+            P.put("outlets_batt_level", act.outlets_batt_level);
 
             act.log_uri = uri.getText().toString();
-            pref.put("log_uri", act.log_uri);
+            P.put("log_uri", act.log_uri);
             act.log_params = params.getText().toString();
-            pref.put("log_params", act.log_params);
+            P.put("log_params", act.log_params);
 
             act.debug = (cb.isChecked() ? 1 : 0);
-            pref.put("debug", act.debug);
+            P.put("debug", act.debug);
             Log.cfg(act.debug, act.log_uri, act.log_params);
 
             end_dialog(dialog, true);
@@ -805,7 +802,7 @@ public void remote_server(final String type, final String cfg)
     tv.setText("Remote server - " + type);
 
     final EditText et = (EditText)dialog.findViewById(R.id.remote_url);
-    et.setText(pref.get("remote_server", ""));
+    et.setText(P.get("remote_server", ""));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {

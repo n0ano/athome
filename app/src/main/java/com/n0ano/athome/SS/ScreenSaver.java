@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import com.n0ano.athome.R;
-import com.n0ano.athome.Preferences;
 import com.n0ano.athome.Log;
 
 public class ScreenSaver
@@ -47,7 +46,6 @@ public final static int INTR_NEXT =      2;  // next image
 
 Activity act;
 SS_Callbacks callbacks;
-Preferences pref;
 Thread main_thread = null;
 
 ImageLists img_lists;
@@ -78,13 +76,13 @@ public ScreenSaver(View first, View v1, View v2, Activity act, SS_Callbacks call
     this.act = act;
     this.callbacks = callbacks;
 
-    pref = new Preferences(act);
+    P.init(act.getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
 
-    ss_info = new ScreenInfo(act, pref);
+    ss_info = new ScreenInfo(act);
 
     finder = new ImageFind(act, null);
 
-    img_lists = new ImageLists(ss_info.list, "", pref, finder);
+    img_lists = new ImageLists(ss_info.list, "", finder);
 
     this.first = first;
     ss_views[0] = v1;
@@ -218,10 +216,10 @@ public void intr(int type)
 public void ss_reset()
 {
 
-    pref.rm_key("images:" + "");
-    pref.rm_key("image_last:" + "");
-    pref.rm_key("images:" + ss_info.list);
-    pref.rm_key("image_last:" + ss_info.list);
+    P.rm_key("images:" + "");
+    P.rm_key("image_last:" + "");
+    P.rm_key("images:" + ss_info.list);
+    P.rm_key("image_last:" + ss_info.list);
     redo_lists();
 }
 
@@ -240,7 +238,7 @@ private void init_list(int listno)
 {
 
     img_lists.set_listno(listno);
-    String saved = pref.get("images:" + img_lists.get_name(), "");
+    String saved = P.get("images:" + img_lists.get_name(), "");
     img_lists.parse(saved);
     Log.d("DDD-SS", "init_list: " + img_lists.get_name() + ", size - " + img_lists.get_size() + " => " + saved);
     int gen = C.parse_gen(saved);
@@ -347,7 +345,7 @@ public void upd_list(final int gen)
     int count = img_lists.get_size();
     do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(img_lists.get_generation()));
 
-    HashMap<String, String> map = C.parse_names(pref.get("images:" + img_lists.get_name(), ""));
+    HashMap<String, String> map = C.parse_names(P.get("images:" + img_lists.get_name(), ""));
     img_lists.scan(map, ss_info, false);
 
     if (img_lists.get_size() > count) {
@@ -364,8 +362,8 @@ public void upd_list(final int gen)
 
     img_lists.set_generation((img_lists.get_size() > 0) ? img_lists.get_image(0).get_generation() : gen);
     String image_list = img_lists.list2str();
-    pref.put("images:" + img_lists.get_name(), image_list);
-    pref.put("image_last:" + img_lists.get_name(), img_lists.get_size());
+    P.put("images:" + img_lists.get_name(), image_list);
+    P.put("image_last:" + img_lists.get_name(), img_lists.get_size());
 }
 
 //

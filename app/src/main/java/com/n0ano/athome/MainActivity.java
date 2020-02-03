@@ -2,6 +2,7 @@ package com.n0ano.athome;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -58,8 +59,6 @@ public final static int OUTLETS_COLS = 3;
 private final static String CONFIG_URI = "/cgi-bin/athome/config";
 private final static String CONFIG_LOAD =  "load";
 private final static String CONFIG_SAVE =  "save";
-
-public Preferences pref;
 
 public Menu menu_bar;
 
@@ -129,17 +128,15 @@ protected void onCreate(Bundle state)
 
     super.onCreate(state);
 
-    pref = new Preferences(this);
-    debug = pref.get("debug", 0);
+    P.init(getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
+    debug = P.get("debug", 0);
         Log.cfg(debug, "", "");
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
 
     restore_state();
 
-    ss_info = new ScreenInfo(this, pref);
-
-    start_home(state);
+    ss_info = new ScreenInfo(this);
 }
 
 @Override
@@ -180,7 +177,7 @@ protected void onResume()
     super.onResume();
     Log.d("MainActivity: onResume");
 
-//test_parse();
+    start_home();
 
     ss_control(C.SS_OP_INIT);
 
@@ -274,7 +271,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Log.d("image update worked");
         }
-Log.d("DDD-SS", "activity result - " + pref.get("images:" + ss_info.list, ""));
+Log.d("DDD-SS", "activity result - " + P.get("images:" + ss_info.list, ""));
         runOnUiThread(new Runnable() {
             public void run() {
                 Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
@@ -307,7 +304,7 @@ private void menu_icons(boolean vis)
     icon.setVisible(vis);
 }
 
-private void start_home(Bundle state)
+private void start_home()
 {
 
     setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
@@ -338,7 +335,7 @@ private void start_home(Bundle state)
 
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-    popup = new Popup(this, pref);
+    popup = new Popup(this);
 
     display(true);
 }
@@ -555,43 +552,43 @@ public void ss_control(int op)
 private void restore_state()
 {
 
-    general_layout = pref.get("general_layout", Popup.LAYOUT_TABLET);
-    on_time = pref.get("general_on", -1);
-    off_time = pref.get("general_off", -1);
+    general_layout = P.get("general_layout", Popup.LAYOUT_TABLET);
+    on_time = P.get("general_on", -1);
+    off_time = P.get("general_off", -1);
 
-    egauge_layout = pref.get("egauge_layout", Popup.LAYOUT_TABLET);
-    egauge_progress = pref.get("egauge_progress", 1);
-    egauge_url = pref.get("egauge_url", "");
-    egauge_clock = pref.get("egauge_clock", false);
+    egauge_layout = P.get("egauge_layout", Popup.LAYOUT_TABLET);
+    egauge_progress = P.get("egauge_progress", 1);
+    egauge_url = P.get("egauge_url", "");
+    egauge_clock = P.get("egauge_clock", false);
 
-    weather_layout = pref.get("weather_layout", Popup.LAYOUT_TABLET);
-    weather_progress = pref.get("weather_progress", 1);
+    weather_layout = P.get("weather_layout", Popup.LAYOUT_TABLET);
+    weather_progress = P.get("weather_progress", 1);
 
-    weather_id = pref.get("wunder_id", "");
-    weather_key = pref.get("wunder_key", "");
+    weather_id = P.get("wunder_id", "");
+    weather_key = P.get("wunder_key", "");
 
-    thermostat_layout = pref.get("thermostat_layout", Popup.LAYOUT_TABLET);
-    ecobee_api = pref.get("ecobee_api", "");
-    ecobee_access = pref.get("ecobee_access", "");
-    ecobee_refresh = pref.get("ecobee_refresh", "");
+    thermostat_layout = P.get("thermostat_layout", Popup.LAYOUT_TABLET);
+    ecobee_api = P.get("ecobee_api", "");
+    ecobee_access = P.get("ecobee_access", "");
+    ecobee_refresh = P.get("ecobee_refresh", "");
 
-    outlets_layout = pref.get("outlets_layout", Popup.LAYOUT_TABLET);
-    outlets_battery = pref.get("outlets_battery", "");
-    outlets_cols = pref.get("outlets_cols", OUTLETS_COLS);
-    outlets_batt_min = pref.get("outlets_batt_min", BATTERY_LOW);
-    outlets_batt_max = pref.get("outlets_batt_max", BATTERY_HIGH);
-    outlets_batt_level = pref.get("outlets_batt_level", 0);
+    outlets_layout = P.get("outlets_layout", Popup.LAYOUT_TABLET);
+    outlets_battery = P.get("outlets_battery", "");
+    outlets_cols = P.get("outlets_cols", OUTLETS_COLS);
+    outlets_batt_min = P.get("outlets_batt_min", BATTERY_LOW);
+    outlets_batt_max = P.get("outlets_batt_max", BATTERY_HIGH);
+    outlets_batt_level = P.get("outlets_batt_level", 0);
 
-    x10_url = pref.get("x10_url", "");
-    x10_jwt = pref.get("x10_jwt", "none");
+    x10_url = P.get("x10_url", "");
+    x10_jwt = P.get("x10_jwt", "none");
 
-    tplink_user = pref.get("tplink_user", "");
-    tplink_pwd = pref.get("tplink_pwd", "");
+    tplink_user = P.get("tplink_user", "");
+    tplink_pwd = P.get("tplink_pwd", "");
 
-    log_uri = pref.get("log_uri", "");
-    log_params = pref.get("log_params", "");
+    log_uri = P.get("log_uri", "");
+    log_params = P.get("log_params", "");
 
-    debug = pref.get("debug", 0);
+    debug = P.get("debug", 0);
     Log.cfg(debug, log_uri, log_params);
 }
 
@@ -772,7 +769,7 @@ public void show_log()
 private String cfg_param(String key)
 {
 
-    return key + ": " + pref.get(key, "") + "\n";
+    return key + ": " + P.get(key, "") + "\n";
 }
 
 private void set_cfg(String cfg)
@@ -785,7 +782,7 @@ private void set_cfg(String cfg)
         for (Iterator itr = json.keys(); itr.hasNext();) {
             key = (String)itr.next();
             value = json.getString(key);
-            pref.put(key, value);
+            P.put(key, value);
         }
     } catch (Exception e) {
         Log.d("JSON format error " + e);
@@ -796,7 +793,7 @@ private void set_cfg(String cfg)
 public void remote_doit(String type, String url, String cfg)
 {
 
-    pref.put("remote_server", url);
+    P.put("remote_server", url);
     if (type.equals(CONFIG_SAVE)) {
         call_api("POST", url + CONFIG_URI, type, "", cfg);
     } else {
@@ -868,40 +865,40 @@ public void show_cfg()
 
     JSONObject cfg = new JSONObject();
     try {
-        cfg.put("debug", pref.get("debug", ""));
-        cfg.put("egauge_clock", pref.get("egauge_clock", ""));
-        cfg.put("egauge_layout", pref.get("egauge_layout", ""));
-        cfg.put("egauge_progress", pref.get("egauge_progress", ""));
-        cfg.put("general_layout", pref.get("general_layout", ""));
-        cfg.put("ss_enable", pref.get("ss_start", ""));
-        cfg.put("ss_start", pref.get("ss_start", ""));
-        cfg.put("ss_delay", pref.get("ss_delay", ""));
-        cfg.put("ss_fade", pref.get("ss_fade", ""));
-        cfg.put("ss_host", pref.get("ss_host", ""));
-        cfg.put("ss_list", pref.get("ss_list", ""));
-        cfg.put("ss_server", pref.get("ss_server", ""));
-        cfg.put("ss_user", pref.get("ss_user", ""));
-        cfg.put("ss_pwd", pref.get("ss_pwd", ""));
-        cfg.put("outlets_cols", pref.get("outlets_cols", ""));
-        cfg.put("outlets_batt_level", pref.get("outlets_batt_level", ""));
-        cfg.put("outlets_batt_max", pref.get("outlets_batt_max", ""));
-        cfg.put("outlets_batt_min", pref.get("outlets_batt_min", ""));
-        cfg.put("thermostat_layout", pref.get("thermostat_layout", ""));
-        cfg.put("weather_layout", pref.get("weather_layout", ""));
-        cfg.put("weather_progress", pref.get("weather_progress", ""));
-        cfg.put("ecobee_api", pref.get("ecobee_api", ""));
-        cfg.put("egauge_url", pref.get("egauge_url", ""));
-        cfg.put("log_params", pref.get("log_params", ""));
-        cfg.put("log_uri", pref.get("log_uri", ""));
-        cfg.put("outlets_battery", pref.get("outlets_battery", ""));
-        cfg.put("pref_version", pref.get("pref_version", ""));
-        cfg.put("remote_server", pref.get("remote_server", ""));
-        cfg.put("tplink_pwd", pref.get("tplink_pwd", ""));
-        cfg.put("tplink_user", pref.get("tplink_user", ""));
-        cfg.put("wunder_id", pref.get("wunder_id", ""));
-        cfg.put("wunder_key", pref.get("wunder_key", ""));
-        cfg.put("x10_jwt", pref.get("x10_jwt", ""));
-        cfg.put("x10_url", pref.get("x10_url", ""));
+        cfg.put("debug", P.get("debug", ""));
+        cfg.put("egauge_clock", P.get("egauge_clock", ""));
+        cfg.put("egauge_layout", P.get("egauge_layout", ""));
+        cfg.put("egauge_progress", P.get("egauge_progress", ""));
+        cfg.put("general_layout", P.get("general_layout", ""));
+        cfg.put("ss_enable", P.get("ss_start", ""));
+        cfg.put("ss_start", P.get("ss_start", ""));
+        cfg.put("ss_delay", P.get("ss_delay", ""));
+        cfg.put("ss_fade", P.get("ss_fade", ""));
+        cfg.put("ss_host", P.get("ss_host", ""));
+        cfg.put("ss_list", P.get("ss_list", ""));
+        cfg.put("ss_server", P.get("ss_server", ""));
+        cfg.put("ss_user", P.get("ss_user", ""));
+        cfg.put("ss_pwd", P.get("ss_pwd", ""));
+        cfg.put("outlets_cols", P.get("outlets_cols", ""));
+        cfg.put("outlets_batt_level", P.get("outlets_batt_level", ""));
+        cfg.put("outlets_batt_max", P.get("outlets_batt_max", ""));
+        cfg.put("outlets_batt_min", P.get("outlets_batt_min", ""));
+        cfg.put("thermostat_layout", P.get("thermostat_layout", ""));
+        cfg.put("weather_layout", P.get("weather_layout", ""));
+        cfg.put("weather_progress", P.get("weather_progress", ""));
+        cfg.put("ecobee_api", P.get("ecobee_api", ""));
+        cfg.put("egauge_url", P.get("egauge_url", ""));
+        cfg.put("log_params", P.get("log_params", ""));
+        cfg.put("log_uri", P.get("log_uri", ""));
+        cfg.put("outlets_battery", P.get("outlets_battery", ""));
+        cfg.put("pref_version", P.get("pref_version", ""));
+        cfg.put("remote_server", P.get("remote_server", ""));
+        cfg.put("tplink_pwd", P.get("tplink_pwd", ""));
+        cfg.put("tplink_user", P.get("tplink_user", ""));
+        cfg.put("wunder_id", P.get("wunder_id", ""));
+        cfg.put("wunder_key", P.get("wunder_key", ""));
+        cfg.put("x10_jwt", P.get("x10_jwt", ""));
+        cfg.put("x10_url", P.get("x10_url", ""));
         et.setText(cfg.toString(2));
     } catch (Exception e) {
         Log.d("JSON error " + e);

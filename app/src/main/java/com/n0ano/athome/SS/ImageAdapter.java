@@ -104,7 +104,7 @@ public View getView(final int position, View view, ViewGroup parent)
                 image.set_check(!image.get_check());
                 notifyDataSetChanged();
             }
-            act.pref.put("image_last:" + act.ss_info.list, images.indexOf(image) - 1);
+            P.put("image_last:" + act.ss_info.list, images.indexOf(image) - 1);
         }
     });
 

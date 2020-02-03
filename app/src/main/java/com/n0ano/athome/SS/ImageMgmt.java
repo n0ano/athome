@@ -3,6 +3,7 @@ package com.n0ano.athome.SS;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -33,7 +34,6 @@ import java.util.Map;
 
 import com.n0ano.athome.R;
 import com.n0ano.athome.Log;
-import com.n0ano.athome.Preferences;
 
 public class ImageMgmt extends AppCompatActivity
 {
@@ -43,7 +43,6 @@ public static int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1001;
 
 public static int IMAGES_UPDATE =       2001;
 
-Preferences pref;
 int debug = 0;
 int show_idx;
 
@@ -76,11 +75,11 @@ public void onCreate(Bundle state)
     v.setVisibility(View.VISIBLE);
     C.loading_name = (TextView) findViewById(R.id.mgmt_name);
 
-    pref = new Preferences(this);
-    debug = pref.get("debug", 0);
+    P.init(getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
+    debug = P.get("debug", 0);
         Log.cfg(debug, "", "");
 
-    popup = new PopupImage(this, pref);
+    popup = new PopupImage(this);
 
     setTitle("Image mgmt");
 
@@ -94,7 +93,7 @@ public void onCreate(Bundle state)
 //        return;
 //    }
 
-    ss_info = new ScreenInfo(this, pref);
+    ss_info = new ScreenInfo(this);
     if (ss_info.host.isEmpty()) {
         Intent intent = new Intent();
         setResult(Activity.RESULT_CANCELED, intent);
@@ -102,17 +101,17 @@ public void onCreate(Bundle state)
         return;
     }
 
-    generation = C.parse_gen(pref.get("images:" + ss_info.list, ""));
+    generation = C.parse_gen(P.get("images:" + ss_info.list, ""));
 
     image_vm = ViewModelProviders.of(this).get(ImageVM.class);
     Log.d("DDD-SS", "view model - " + image_vm.size());
 
-    saved_images = C.parse_names(pref.get("images:" + ss_info.list, ""));
+    saved_images = C.parse_names(P.get("images:" + ss_info.list, ""));
 
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
     gv.setAdapter(image_adapt);
-    gv.setSelection(pref.get("image_last:" + ss_info.list, 0));
+    gv.setSelection(P.get("image_last:" + ss_info.list, 0));
 }
 
 @Override
@@ -483,7 +482,7 @@ private void save_list(String list)
         image_vm.put(entry.get_name(), entry);
     }
     image_adapt.notifyDataSetChanged();
-    pref.put("images:" + list, inf.toString());
+    P.put("images:" + list, inf.toString());
 }
 
 public void show_files()
@@ -498,11 +497,11 @@ public void show_files()
     ListView lv = (ListView) findViewById(R.id.mgmt_files);
     FilesAdapter file_adapt = new FilesAdapter(this);
     lv.setAdapter(file_adapt);
-    lv.setSelection(pref.get("image_last:" + ss_info.list, 0));
+    lv.setSelection(P.get("image_last:" + ss_info.list, 0));
     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-            pref.put("image_last:" + ss_info.list, position);
+            P.put("image_last:" + ss_info.list, position);
        }
     });
 }

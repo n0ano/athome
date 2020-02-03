@@ -1,10 +1,10 @@
 package com.n0ano.athome.SS;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.view.Display;
 
-import com.n0ano.athome.Preferences;
 import com.n0ano.athome.Log;
 
 import java.util.ArrayList;
@@ -33,19 +33,20 @@ public int offset = 0;
 public int width = 0;
 public int height = 0;
 
-public ScreenInfo(Activity act, Preferences pref)
+public ScreenInfo(Activity act)
 {
 
     this.act = act;
-    this.host = pref.get("ss_host", "");
+    P.init(act.getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
+    this.host = P.get("ss_host", "");
     this.list = C.suffix(host);
-    this.server = pref.get("ss_server", "");
-    this.user = pref.get("ss_user", "");
-    this.pwd = pref.get("ss_pwd", "");
-    this.enable = pref.get("ss_enable", true);
-    this.start = pref.get("ss_start", 0);
-    this.delay = pref.get("ss_delay", 0);
-    this.fade = pref.get("ss_fade", 0);
+    this.server = P.get("ss_server", "");
+    this.user = P.get("ss_user", "");
+    this.pwd = P.get("ss_pwd", "");
+    this.enable = P.get("ss_enable", true);
+    this.start = P.get("ss_start", 0);
+    this.delay = P.get("ss_delay", 0);
+    this.fade = P.get("ss_fade", 0);
 
     Display d = act.getWindowManager().getDefaultDisplay();
     Point point = new Point();

@@ -121,8 +121,7 @@ public String ecobee_get_pin(String api)
         return "";
 
     act.ecobee_access = json.optString("code", "");
-    Preferences pref = act.pref;
-    pref.put("ecobee_access", act.ecobee_access);
+    P.put("ecobee_access", act.ecobee_access);
     String pin = json.optString("ecobeePin", "");
     return pin;
 }
@@ -148,9 +147,8 @@ private void ecobee_token(String type, String code, String api)
         return;
     act.ecobee_access = token;
     act.ecobee_refresh = json.optString("refresh_token", "");
-    Preferences pref = act.pref;
-    pref.put("ecobee_access", act.ecobee_access);
-    pref.put("ecobee_refresh", act.ecobee_refresh);
+    P.put("ecobee_access", act.ecobee_access);
+    P.put("ecobee_refresh", act.ecobee_refresh);
     return;
 }
 

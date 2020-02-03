@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.n0ano.athome.Log;
-import com.n0ano.athome.Preferences;
 
 public class ImageLists
 {
@@ -28,10 +27,9 @@ String name_2nd;
 int generation_2nd;
 ArrayList<ImageEntry> images_2nd;
 
-Preferences pref;
 ImageFind finder;
 
-public ImageLists(String name1, String name2, Preferences pref, ImageFind finder)
+public ImageLists(String name1, String name2, ImageFind finder)
 {
 
     this.name_1st = name1;
@@ -43,7 +41,6 @@ public ImageLists(String name1, String name2, Preferences pref, ImageFind finder
     this.images_2nd = new ArrayList<ImageEntry>();
 
     this.listno = 0;
-    this.pref = pref;
     this.finder = finder;
 }
 
@@ -101,11 +98,11 @@ public ImageEntry next_image(int delta)
     if (get_size() < 2)
         return get_image(0);
 
-    int next = pref.get("image_last:" + get_name(), get_size());
+    int next = P.get("image_last:" + get_name(), get_size());
     if (delta == 0) {
         if (next >= get_size()) {
             next = get_size() - 1;
-            pref.put("image_last:" + get_name(), next);
+            P.put("image_last:" + get_name(), next);
         }
         return get_image(next);
     }
@@ -118,7 +115,7 @@ public ImageEntry next_image(int delta)
             next = get_size() - 1;
         img = get_image(next);
         if (img.get_check()) {
-            pref.put("image_last:" + get_name(), next);
+            P.put("image_last:" + get_name(), next);
             return img;
         }
     }
