@@ -21,6 +21,10 @@ final static String X10_LIST = "list";
 
 final static String X10_STATE_MAP = " \"state\":\"";
 
+final static int OFFLINE_MAX =  4;
+
+int offline_count = 0;
+
 MainActivity act;
 
 Map<String, String> onoff_state = new HashMap<String, String>();
@@ -150,10 +154,12 @@ public boolean get_data(OutletsAdapter adapter)
                                null);
 
     if ((json = C.str2json(resp)) == null) {
-        x10_state(adapter, OutletsDevice.OFFLINE);
+        if (++offline_count > OFFLINE_MAX)
+            x10_state(adapter, OutletsDevice.OFFLINE);
         return false;
     }
     x10_state(adapter, OutletsDevice.ONLINE);
+    offline_count = 0;
 
     JSONArray house = json.optJSONArray("house");
     if (house == null) {
