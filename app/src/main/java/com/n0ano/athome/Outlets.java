@@ -111,7 +111,7 @@ public void init_view(View main)
 {
     int i;
 
-    set_power(P.get_string("outlets_battery"));
+    set_power(P.get_string("outlets:battery"));
     TableLayout tl = (TableLayout) main.findViewById(R.id.outlets_table);
     if (tl == null)
         return;
@@ -119,11 +119,11 @@ public void init_view(View main)
     TableRow tr = null;
     TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
     params.setMargins(0, 40, 0, 0); /* left, top, right, bottom */
-    int row = P.get_int("outlets_cols");
+    int row = P.get_int("outlets:cols");
     int max_devices = outlets_adapter.getCount();
     for (i = 0; i < max_devices; i++) {
         OutletsDevice dev = outlets_adapter.getItem(i);
-        if (++row > P.get_int("outlets_cols")) {
+        if (++row > P.get_int("outlets:cols")) {
             row = 1;
             if (tr != null)
                 tl.addView(tr, params);
@@ -218,12 +218,12 @@ private void battery()
     if (P.get_int("debug") > 0)
             Log.s("battery: " + outlets_power.get_name() +
                             (onoff ? "(on)" : "(off)") + " => " +
-                            P.get_int("outlets_batt_min") + " < " +
+                            P.get_int("outlets:batt_min") + " < " +
                             chg + " > " +
-                            P.get_int("outlets_batt_max"), act);
-    if ((chg < P.get_int("outlets_batt_min")) && !onoff)
+                            P.get_int("outlets:batt_max"), act);
+    if ((chg < P.get_int("outlets:batt_min")) && !onoff)
         go_control(outlets_power, 1);
-    else if ((chg > P.get_int("outlets_batt_max")) && onoff)
+    else if ((chg > P.get_int("outlets:batt_max")) && onoff)
         go_control(outlets_power, 0);
 }
 

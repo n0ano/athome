@@ -113,7 +113,7 @@ public void onCreate(Bundle state)
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
     gv.setAdapter(image_adapt);
-    gv.setSelection(Integer.parseInt(P.get("image_last:" + ss_info.list, "0"), 10));
+    gv.setSelection(P.get("image_last:" + ss_info.list, 0));
 }
 
 @Override
@@ -499,7 +499,7 @@ public void show_files()
     ListView lv = (ListView) findViewById(R.id.mgmt_files);
     FilesAdapter file_adapt = new FilesAdapter(this);
     lv.setAdapter(file_adapt);
-    lv.setSelection(Integer.parseInt(P.get("image_last:" + ss_info.list, "0")));
+    lv.setSelection(P.get("image_last:" + ss_info.list, 0));
     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {

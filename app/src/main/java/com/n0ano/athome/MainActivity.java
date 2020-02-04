@@ -88,11 +88,12 @@ protected void onCreate(Bundle state)
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
 
-    setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+    setContentView((P.get_int("general:layout") == Popup.LAYOUT_TABLET) ?
                                                         R.layout.activity_tab :
                                                         R.layout.activity_ph);
 
-    Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
+    Log.cfg(P.get_int("debug"), P.get_string("log:uri"), P.get_string("log:params"));
+Log.cfg(1, "", "");
 
     ss_info = new ScreenInfo(this);
 }
@@ -504,9 +505,9 @@ public void ss_control(int op)
 public void stream_log(String line)
 {
 
-    if (P.get_string("log_uri").equals(""))
+    if (P.get_string("general:log_uri").equals(""))
         return;
-    call_api_nolog("GET", P.get_string("log_uri"), P.get_string("log_params") + URLEncoder.encode(line), "", null);
+    call_api_nolog("GET", P.get_string("general:log_uri"), P.get_string("general:log_params") + URLEncoder.encode(line), "", null);
 }
 
 /*
@@ -629,7 +630,7 @@ public void show_log()
     bt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+            setContentView((P.get_int("general:layout") == Popup.LAYOUT_TABLET) ?
                                                                 R.layout.activity_tab :
                                                                 R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -643,7 +644,7 @@ public void show_log()
         @Override
         public void onClick(View v) {
             Log.clear();
-            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+            setContentView((P.get_int("general:layout") == Popup.LAYOUT_TABLET) ?
                                                                 R.layout.activity_tab :
                                                                 R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -693,7 +694,7 @@ private void set_cfg(String cfg)
     } catch (Exception e) {
         Log.d("JSON format error " + e);
     }
-    Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
+    Log.cfg(P.get_int("debug"), P.get_string("general:log_uri"), P.get_string("general:log_params"));
 }
 
 public void remote_doit(final String type, final String cfg)
@@ -702,9 +703,9 @@ public void remote_doit(final String type, final String cfg)
     new Thread(new Runnable() {
         public void run() {
             if (type.equals(C.CONFIG_SAVE))
-                call_api("POST", P.get_string("config_url") + C.CONFIG_URI, type, "", cfg);
+                call_api("POST", P.get_string("general:config_url") + C.CONFIG_URI, type, "", cfg);
             else {
-                String resp = call_api("GET", P.get_string("config_url") + C.CONFIG_URI, type, "", null);
+                String resp = call_api("GET", P.get_string("general:config_url") + C.CONFIG_URI, type, "", null);
                 final boolean ok = (resp.length() > 1);
                 if (ok) {
                     C.new_cfg(resp.substring(1));
@@ -774,8 +775,8 @@ public int get_battery()
 {
     String chg;
 
-    if (P.get_int("outlets_batt_level") != 0)
-        return P.get_int("outlets_batt_level");
+    if (P.get_int("outlets:batt_level") != 0)
+        return P.get_int("outlets:batt_level");
 
     IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     Intent bs = this.registerReceiver(null, ifilter);
@@ -802,9 +803,9 @@ private void clock()
 
     Calendar cal = Calendar.getInstance();
     int time = (cal.get(Calendar.HOUR_OF_DAY) * 100) + cal.get(Calendar.MINUTE);
-    if (P.get_int("general_off") >= 0 && time == P.get_int("general_off") && screen)
+    if (P.get_int("general:off") >= 0 && time == P.get_int("general:off") && screen)
         display(false);
-    else if (P.get_int("general_on") >= 0 && time == P.get_int("general_on") && !screen)
+    else if (P.get_int("general:on") >= 0 && time == P.get_int("general:on") && !screen)
         display(true);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
@@ -847,8 +848,8 @@ private void doit()
     ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv != null) {
         ImageView h_img = (ImageView)findViewById(R.id.house_image);
-        h_img.setVisibility(P.get_boolean("egauge_clock") ? View.GONE :    View.VISIBLE);
-        cv.setVisibility(P.get_boolean("egauge_clock")    ? View.VISIBLE : View.GONE);
+        h_img.setVisibility(P.get_boolean("egauge:clock") ? View.GONE :    View.VISIBLE);
+        cv.setVisibility(P.get_boolean("egauge:clock")    ? View.VISIBLE : View.GONE);
     }
     if (egauge_view != null)
         egauge = new Egauge(this, new DoitCallback() {

@@ -67,7 +67,7 @@ private void get_data()
     // Get the data
     //
     String resp = act.call_api("GET",
-                               P.get_string("egauge_url") + EGAUGE_API,
+                               P.get_string("egauge:url") + EGAUGE_API,
                                EGAUGE_QUERY,
                                "",
                                null);

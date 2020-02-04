@@ -109,10 +109,10 @@ public static int decode_time(String t)
 public static String get_cfg(int indent)
 {
 
-    P.put("ss_enable", P_SS.get("ss_enable", false));
-    P.put("ss_start", P_SS.get("ss_start", 0));
-    P.put("ss_delay", P_SS.get("ss_delay", 0));
-    P.put("ss_fade", P_SS.get("ss_fade", 0));
+    P.put("ss:enable", P_SS.get("ss_enable", false));
+    P.put("ss:start", P_SS.get("ss_start", 0));
+    P.put("ss:delay", P_SS.get("ss_delay", 0));
+    P.put("ss:fade", P_SS.get("ss_fade", 0));
     return P.get_cfg(indent);
 }
 
@@ -120,10 +120,10 @@ public static void new_cfg(String cfg)
 {
 
     P.new_cfg(cfg);
-    P_SS.put("ss_enable", P.get_boolean("ss_enable"));
-    P_SS.put("ss_start", P.get_int("ss_start"));
-    P_SS.put("ss_delay", P.get_int("ss_delay"));
-    P_SS.put("ss_fade", P.get_int("ss_fade"));
+    P_SS.put("ss_enable", P.get_boolean("ss:enable"));
+    P_SS.put("ss_start", P.get_int("ss:start"));
+    P_SS.put("ss_delay", P.get_int("ss:delay"));
+    P_SS.put("ss_fade", P.get_int("ss:fade"));
 }
 
 }

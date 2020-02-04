@@ -120,7 +120,7 @@ public String ecobee_get_pin(String api)
     if ((json = C.str2json(resp)) == null)
         return "";
 
-    P.put("ecobee_access", json.optString("code", ""));
+    P.put("thermostat:ecobee_access", json.optString("code", ""));
     String pin = json.optString("ecobeePin", "");
     return pin;
 }
@@ -144,8 +144,8 @@ private void ecobee_token(String type, String code, String api)
     token = json.optString("access_token", "");
     if (token.isEmpty())
         return;
-    P.put("ecobee_access", token);
-    P.put("ecobee_refresh", json.optString("refresh_token", ""));
+    P.put("thermostat:ecobee_access", token);
+    P.put("thermostat:ecobee_refresh", json.optString("refresh_token", ""));
     return;
 }
 
@@ -159,13 +159,13 @@ private void ecobee_token(String type, String code, String api)
 public void ecobee_authorize(String api)
 {
 
-    ecobee_token("ecobeePin", P.get_string("ecobee_access"), api);
+    ecobee_token("ecobeePin", P.get_string("thermostat:ecobee_access"), api);
 }
 
 private void ecobee_refresh()
 {
 
-    ecobee_token("refresh_token", P.get_string("ecobee_refresh"), P.get_string("ecobee_api"));
+    ecobee_token("refresh_token", P.get_string("thermostat:ecobee_refresh"), P.get_string("thermostat:ecobee_api"));
 }
 
 private JSONObject ecobee_query(String info, String id)
@@ -176,7 +176,7 @@ private JSONObject ecobee_query(String info, String id)
     String resp = act.call_api("GET",
                                ECO_URL + ECO_DATA,
                                ecobee_param(info, id),
-                               "Bearer " + P.get_string("ecobee_access"),
+                               "Bearer " + P.get_string("thermostat:ecobee_access"),
                                null);
     try {
         json = C.str2json(resp);
@@ -211,7 +211,7 @@ public void ecobee_resume(ThermostatDevice dev)
     String resp = act.call_api("POST",
                                ECO_URL + ECO_DATA,
                                "format=json",
-                               "Bearer " + P.get_string("ecobee_access"),
+                               "Bearer " + P.get_string("thermostat:ecobee_access"),
                                body);
 }
 
@@ -245,7 +245,7 @@ public void ecobee_hold(int heat, ThermostatDevice dev)
     String resp = act.call_api("POST",
                                ECO_URL + ECO_DATA,
                                "format=json",
-                               "Bearer " + P.get_string("ecobee_access"),
+                               "Bearer " + P.get_string("thermostat:ecobee_access"),
                                body);
 }
 
