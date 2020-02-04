@@ -1,6 +1,7 @@
 package com.n0ano.athome;
 
 import android.app.Dialog;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -44,6 +45,9 @@ private final static String DATA_TEMPLATE =
 
 MainActivity act;
 
+boolean running = true;
+boolean paused = false;
+
 JSONObject w_data;
 
 ArrayList<Double> baro_hist = new ArrayList<Double>();
@@ -72,14 +76,25 @@ public Weather(MainActivity act, final DoitCallback cb)
         return;
     }
 
-    Thread data_thread = C.data_thread(PERIOD, false, new DoitCallback() {
-        @Override
-        public void doit(Object obj) {
-            get_wunder();
-            cb.doit(null);
+    new Thread(new Runnable() {
+        public void run() {
+            while (running) {
+                //
+                //  Get the data
+                //
+                if (!paused) {
+                    get_wunder();
+                    cb.doit(null);
+                }
+
+                SystemClock.sleep(PERIOD);
+            }
         }
-    });
+    }).start();
 }
+
+public void stop() { running = false; }
+public void pause(boolean p) { paused = p; }
 
 private JSONObject find_station(String id, JSONObject json)
 {

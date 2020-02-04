@@ -60,6 +60,8 @@ private final static String CONFIG_URI = "/cgi-bin/athome/config";
 private final static String CONFIG_LOAD =  "load";
 private final static String CONFIG_SAVE =  "save";
 
+private boolean paused = false;
+
 public Menu menu_bar;
 
 public int general_layout;
@@ -106,8 +108,6 @@ Thermostat thermostat;
 Egauge egauge;
 Outlets outlets;
 
-boolean paused;
-
 public Popup popup;
 
 public boolean screen = true;
@@ -133,6 +133,10 @@ protected void onCreate(Bundle state)
         Log.cfg(debug, "", "");
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
+
+    general_layout = P.get("general_layout", Popup.LAYOUT_TABLET);
+    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                             R.layout.activity_ph);
 
     restore_state();
 
@@ -191,13 +195,21 @@ protected void onPause()
 {
 
     super.onPause();
-    C.running = false;
     Log.d("MainActivity: onPause");
 }
 
 @Override
 protected void onStop()
 {
+
+    if (egauge != null)
+        egauge.stop();
+    if (weather != null)
+        weather.stop();
+    if (thermostat != null)
+        thermostat.stop();
+    if (outlets != null)
+        outlets.stop();
 
     super.onStop();
     Log.d("MainActivity: onStop");
@@ -282,6 +294,15 @@ Log.d("DDD-SS", "activity result - " + P.get("images:" + ss_info.list, ""));
     }
 }
 
+public void restart()
+{
+
+    Log.d("DDD-SS", "MainActivity: restarting");
+    Intent intent = getIntent();
+    finish();
+    startActivity(intent);
+}
+
 private void menu_icons(boolean vis)
 {
     MenuItem icon = menu_bar.findItem(R.id.action_saver);
@@ -307,8 +328,6 @@ private void menu_icons(boolean vis)
 private void start_home()
 {
 
-    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                             R.layout.activity_ph);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     toolbar.setTitle("AtHome");
     toolbar.setTitleTextColor(Color.WHITE);
@@ -456,13 +475,13 @@ public void ss_control(int op)
         if (ss_saver == null) {
             ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
             pb.setVisibility(View.VISIBLE);
-            paused = true;
+            pause_threads(true);
             ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
                 @Override
                 public ScreenInfo ss_start()
                 {
                     Log.d("DDD-SS", "screen saver start");
-                    paused = true;
+                    pause_threads(true);
 
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -484,7 +503,7 @@ public void ss_control(int op)
                 public void ss_stop()
                 {
                     Log.d("DDD-SS", "screen saver stop");
-                    paused = false;
+                    pause_threads(false);
                     runOnUiThread(new Runnable() {
                         public void run() {
                             Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
@@ -525,7 +544,7 @@ public void ss_control(int op)
                             pb.setVisibility(View.GONE);
                         }
                     });
-                    paused = false;
+                    pause_threads(false);
                 }
             });
         }
@@ -714,14 +733,14 @@ public void show_log()
     TextView tv;
 
     Log.d("Show log");
-    C.running = false;
     setContentView(R.layout.log);
 
     Button bt = findViewById(R.id.log_return);
     bt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            setContentView(R.layout.activity_main);
+            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                                     R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -733,7 +752,8 @@ public void show_log()
         @Override
         public void onClick(View v) {
             Log.clear();
-            setContentView(R.layout.activity_main);
+            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                                     R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -803,7 +823,8 @@ public void remote_doit(String type, String url, String cfg)
             set_cfg(resp.substring(1));
         runOnUiThread(new Runnable() {
             public void run() {
-                setContentView(R.layout.activity_main);
+                setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                                         R.layout.activity_ph);
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 if (!ok)
@@ -820,14 +841,15 @@ public void show_cfg()
     TextView tv;
 
     Log.d("Show cfg");
-    C.running = false;
-    setContentView(R.layout.config);
+    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                             R.layout.activity_ph);
 
     Button bt = findViewById(R.id.cfg_return);
     bt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            setContentView(R.layout.activity_main);
+            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                                     R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -840,7 +862,8 @@ public void show_cfg()
         @Override
         public void onClick(View v) {
             set_cfg(et.getText().toString());
-            setContentView(R.layout.activity_main);
+            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                                     R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -909,7 +932,8 @@ public void go_log_return()
 {
 
     Log.d("Log return");
-    setContentView(R.layout.activity_main);
+    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
+                                                             R.layout.activity_ph);
 }
 
 public void set_timeout(ImageView v, int p, int maxp)
@@ -1014,6 +1038,29 @@ private void clock()
     });
 }
 
+private void sh_rain()
+{
+
+Log.d("DDD-SS", "set rain to --");
+    TextView tv = (TextView)findViewById(R.id.weather_rain);
+    tv.setText("--");
+tv.invalidate();
+}
+
+private void pause_threads(boolean p)
+{
+
+    paused = p;
+    if (egauge != null)
+        egauge.pause(p);
+    if (weather != null)
+        weather.pause(p);
+    if (thermostat != null)
+        thermostat.pause(p);
+    if (outlets != null)
+        outlets.pause(p);
+}
+
 private void doit()
 {
 
@@ -1043,6 +1090,7 @@ private void doit()
             public void doit(Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
+sh_rain();
                         weather.show(weather_view);
                     }
                 });
@@ -1075,11 +1123,11 @@ private void doit()
             }
         });
 
-    C.running = true;
+    pause_threads(false);
 
     new Thread(new Runnable() {
         public void run() {
-            while (C.working(false)) {
+            for (;;) {
                 if (!paused)
                     clock();
                 SystemClock.sleep(1000);

@@ -151,10 +151,8 @@ public void end_dialog(Dialog dialog, boolean restart)
 
     act.ss_control(C.SS_OP_RESET);
     dialog.dismiss();
-    if (restart) {
-        act.finish();
-        act.startActivity(act.getIntent());
-    }
+    if (restart)
+        act.restart();
 }
 
 public void display_dialog()

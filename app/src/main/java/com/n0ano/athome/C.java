@@ -20,7 +20,7 @@ public static final int SS_OP_RESET =   1;
 public static final int SS_OP_BLOCK =   2;
 public static final int SS_OP_UPDATE =  3;
 
-public static boolean running = true;
+public static boolean paused = true;
 
 public static int a2i(String num)
 {
@@ -78,7 +78,7 @@ public static Object json_get(JSONArray json, int i)
 public static boolean working(boolean constant)
 {
 
-    return constant ? constant : running;
+    return constant ? constant : !paused;
 }
 
 public static Thread data_thread(final int period, final boolean constant, final DoitCallback cb)
@@ -86,11 +86,12 @@ public static Thread data_thread(final int period, final boolean constant, final
 
     Thread thread = new Thread(new Runnable() {
         public void run() {
-            while (working(constant)) {
+            for (;;) {
                 //
                 //  Get the data
                 //
-                cb.doit(null);
+                if (working(constant))
+                    cb.doit(null);
 
                 SystemClock.sleep(period);
             }

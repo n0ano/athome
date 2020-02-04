@@ -1,5 +1,6 @@
 package com.n0ano.athome;
 
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
@@ -16,6 +17,9 @@ private final static int PERIOD = (10 * 1000);   // check outlets every 10 secon
 
 MainActivity act;
 DoitCallback cb_show;
+
+boolean running = true;
+boolean paused = false;
 
 X10 x10;
 Tplink tplink;
@@ -47,22 +51,32 @@ public Outlets(final MainActivity act, View v, final DoitCallback cb)
         @Override
         public void doit(Object obj) {
             //
-            //  Thread to get data from the thermostats
+            //  Thread to get data from the outlets
             //
+            new Thread(new Runnable() {
+                public void run() {
+                    while (running) {
+                        //
+                        //  Get the data
+                        //
+                        if (!paused) {
+                            battery();
 
-            Thread data_thread = C.data_thread(PERIOD, true, new DoitCallback() {
-                @Override
-                public void doit(Object obj) {
-                    battery();
+                            boolean x10_change = x10.get_data(outlets_adapter);
+                            boolean tp_change = tplink.get_data(outlets_adapter);
+                            cb.doit(x10_change || tp_change);
+                        }
 
-                    boolean x10_change = x10.get_data(outlets_adapter);
-                    boolean tp_change = tplink.get_data(outlets_adapter);
-                    cb.doit(x10_change || tp_change);
+                        SystemClock.sleep(PERIOD);
+                    }
                 }
-            });
+            }).start();
         }
     });
 }
+
+public void stop() { running = false; }
+public void pause(boolean p) { paused = p; }
 
 public void enumerate(final OutletsAdapter adapter, final View main, final DoitCallback cb)
 {

@@ -1,6 +1,7 @@
 package com.n0ano.athome;
 
 import android.app.Dialog;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -28,6 +29,9 @@ private final static int PERIOD = (10 * 1000);   // check outlets every 10 secon
 MainActivity act;
 Ecobee ecobee;
 
+boolean running = true;
+boolean paused = false;
+
 ThermostatAdapter thermostat_adapter;
 
 // Thermostat: class constructor
@@ -52,16 +56,27 @@ public Thermostat(final MainActivity act, View v, final DoitCallback cb)
             //
             //  Thread to get data from the thermostats
             //
-            Thread data_thread = C.data_thread(PERIOD, false, new DoitCallback() {
-                @Override
-                public void doit(Object obj) {
-                    ecobee.get_data(thermostat_adapter);
-                    cb.doit(null);
+            new Thread(new Runnable() {
+                public void run() {
+                    while (running) {
+                        //
+                        //  Get the data
+                        //
+                        if (!paused) {
+                            ecobee.get_data(thermostat_adapter);
+                            cb.doit(null);
+                        }
+
+                        SystemClock.sleep(PERIOD);
+                    }
                 }
-            });
+            }).start();
         }
     });
 }
+
+public void stop() { running = false; }
+public void pause(boolean p) { paused = p; }
 
 public void enumerate(final View v, final DoitCallback cb)
 {

@@ -1,6 +1,7 @@
 package com.n0ano.athome;
 
 import android.content.res.Resources;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,6 +22,9 @@ public final static String EGAUGE_QUERY = "tot&inst";
 
 MainActivity act;
 
+boolean running = true;
+boolean paused = false;
+
 int use_watt = 0;
 int gen_watt = 0;
 
@@ -35,14 +39,25 @@ public Egauge(MainActivity act, final DoitCallback cb)
 
 	this.act = act;
 
-    Thread data_thread = C.data_thread(PERIOD, false, new DoitCallback() {
-        @Override
-        public void doit(Object obj) {
-            get_data();
-            cb.doit(null);
+    new Thread(new Runnable() {
+        public void run() {
+            while (running) {
+                //
+                //  Get the data
+                //
+                if (!paused) {
+                    get_data();
+                    cb.doit(null);
+                }
+
+                SystemClock.sleep(PERIOD);
+            }
         }
-    });
+    }).start();
 }
+
+public void stop() { running = false; }
+public void pause(boolean p) { paused = p; }
 
 private void get_data()
 {
