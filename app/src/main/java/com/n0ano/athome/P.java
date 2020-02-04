@@ -20,7 +20,7 @@ public static final int MAX_RECENT = 10;
 
 public static final String PREF_NAME = "AtHome_Preferences";
 
-public static final int PREF_VERSION = 2;
+public static final int PREF_VERSION = 3;
 
 private static final int PREF_INT =     0;
 private static final int PREF_STRING =  1;
@@ -42,55 +42,6 @@ public static void init(SharedPreferences pref)
 	P.pref = pref;
     init_defaults();
     json_cfg = C.str2json(pref.getString("config", "{\"pref_version\":0}"));
-
-    switch (get_int("pref_version")) {
-
-    default:
-    case 0:
-        cfg_v0_v2();
-        break;
-
-    case P.PREF_VERSION:
-        break;
-
-    }
-}
-
-private static void cfg_v0_v2()
-{
-
-    Log.d("Convert preferences to version " + P.PREF_VERSION);
-
-	put("general_layout", get_old("general_layout", Popup.LAYOUT_TABLET));
-	put("general_on", get_old("general_on", -1));
-	put("general_off", get_old("general_off", -1));
-	put("egauge_layout", get_old("egauge_layout", Popup.LAYOUT_TABLET));
-	put("egauge_progress", get_old("egauge_progress", 1));
-	put("egauge_url", get_old("egauge_url", ""));
-	put("egauge_clock", get_old("egauge_clock", false));
-	put("weather_layout", get_old("weather_layout", Popup.LAYOUT_TABLET));
-	put("weather_progress", get_old("weather_progress", 1));
-	put("wunder_id", get_old("wunder_id", ""));
-	put("wunder_key", get_old("wunder_key", ""));
-	put("thermostat_layout", get_old("thermostat_layout", Popup.LAYOUT_TABLET));
-	put("ecobee_api", get_old("ecobee_api", ""));
-	put("ecobee_access", get_old("ecobee_access", ""));
-	put("ecobee_refresh", get_old("ecobee_refresh", ""));
-	put("outlets_layout", get_old("outlets_layout", Popup.LAYOUT_TABLET));
-	put("outlets_battery", get_old("outlets_battery", ""));
-	put("outlets_cols", get_old("outlets_cols", C.OUTLETS_COLS));
-	put("outlets_batt_min", get_old("outlets_batt_min", C.BATTERY_LOW));
-	put("outlets_batt_max", get_old("outlets_batt_max", C.BATTERY_HIGH));
-	put("outlets_batt_level", get_old("outlets_batt_level", 0));
-	put("x10_url", get_old("x10_url", ""));
-	put("x10_jwt", get_old("x10_jwt", "none"));
-	put("tplink_user", get_old("tplink_user", ""));
-	put("tplink_pwd", get_old("tplink_pwd", ""));
-	put("log_uri", get_old("log_uri", ""));
-	put("log_params", get_old("log_params", ""));
-	put("debug", get_old("debug", 0));
-
-    put("pref_version", P.PREF_VERSION);
 }
 
 private static void init_defaults()
@@ -157,63 +108,145 @@ public static void new_cfg(String cfg)
 {
 
     try {
-        JSONObject json = new JSONObject(cfg);
-        json_cfg = json;
+        json_cfg = new JSONObject(cfg);
     } catch (Exception e) {
         Log.d("bad config string(" + cfg + ") - " + e);
+        return;
     }
+    Log.d("new config loaded");
+	SharedPreferences.Editor editor = pref.edit();
+	editor.putString("config", C.json2str(json_cfg));
+	editor.commit();
+}
+
+private static String get_json(String key)
+{
+
+    int idx = key.indexOf(":");
+    if (idx < 0)
+        return null;
+    return key.substring(0, idx);
+}
+
+private static String get_key(String key)
+{
+
+    int idx = key.indexOf(":");
+    if (idx < 0)
+        return key;
+    return key.substring(idx + 1);
+}
+
+private static JSONObject get_obj(String name)
+{
+
+    String obj_name = get_json(name);
+    if (obj_name == null)
+        return json_cfg;
+    JSONObject obj = (JSONObject)json_cfg.opt(obj_name);
+    if (obj == null)
+        return new JSONObject();
+    return obj;
 }
 
 public static void rm_key(String key)
 {
 
-    json_cfg.remove(key);
+    try {
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.remove(get_key(key));
+        else {
+            JSONObject obj = get_obj(key);
+            obj.remove(get_key(key));
+            json_cfg.put(json, obj);
+        }
+    } catch (Exception e) {
+        Log.d("JSON put error(" + key + ") - " + e);
+        return;
+    }
+    
 	SharedPreferences.Editor editor = pref.edit();
-	editor.remove(key);
+	editor.putString("config", C.json2str(json_cfg));
 	editor.commit();
 }
 
 public static int get_int(String key)
 {
     
+    JSONObject obj = get_obj(key);
     Integer def = def_int.get(key);
-    return json_cfg.optInt(key, def == null ? 0 : def.intValue());
+    return obj.optInt(get_key(key), def == null ? 0 : def.intValue());
 }
 public static void put(String key, int value)
 {
 
     try {
-        json_cfg.put(key, value);
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.put(get_key(key), value);
+        else {
+            JSONObject obj = get_obj(key);
+            obj.put(get_key(key), value);
+            json_cfg.put(json, obj);
+        }
     } catch (Exception e) {
-        Log.d("Preferences JSON put error on int - " + e);
+        Log.d("Preferences JSON put error:" + key + "=" + value + " - " + e);
+        return;
     }
 	SharedPreferences.Editor editor = pref.edit();
 	editor.putString("config", C.json2str(json_cfg));
 	editor.commit();
 }
 
-public static boolean get_boolean(String key) { return json_cfg.optBoolean(key, false); }
+public static boolean get_boolean(String key)
+{
+    
+    JSONObject obj = get_obj(key);
+    return obj.optBoolean(get_key(key), false);
+}
 public static void put(String key, boolean value)
 {
 
     try {
-        json_cfg.put(key, value);
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.put(get_key(key), value);
+        else {
+            JSONObject obj = get_obj(key);
+            obj.put(get_key(key), value);
+            json_cfg.put(json, obj);
+        }
     } catch (Exception e) {
-        Log.d("Preferences JSON put error on int - " + e);
+        Log.d("Preferences JSON put error:" + key + "=" + value + " - " + e);
+        return;
     }
 	SharedPreferences.Editor editor = pref.edit();
 	editor.putString("config", C.json2str(json_cfg));
 	editor.commit();
 }
 
-public static String get_string(String key) { return json_cfg.optString(key, ""); }
+public static String get_string(String key)
+{
+    
+    JSONObject obj = get_obj(key);
+    return obj.optString(get_key(key), "");
+}
 public static void put(String key, String value)
 {
 
     try {
-        json_cfg.put(key, value);
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.put(get_key(key), value);
+        else {
+            JSONObject obj = get_obj(key);
+            obj.put(get_key(key), value);
+            json_cfg.put(json, obj);
+        }
     } catch (Exception e) {
-        Log.d("Preferences JSON put error on int - " + e);
+        Log.d("Preferences JSON put error:" + key + "=" + value + " - " + e);
+        return;
     }
 	SharedPreferences.Editor editor = pref.edit();
 	editor.putString("config", C.json2str(json_cfg));

@@ -219,11 +219,16 @@ private void config_dialog()
     final TextView tv = (TextView) dialog.findViewById(R.id.config_table);
     tv.setText(C.get_cfg(2));
 
+    final TextView cfg_url = (TextView) dialog.findViewById(R.id.config_url);
+    cfg_url.setText(P.get_string("general:config_url"));
+
     Button b_save = (Button) dialog.findViewById(R.id.save);
     b_save.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.remote_doit(C.CONFIG_SAVE, C.get_cfg(2));
+            String host = cfg_url.getText().toString();
+            P.put("general:config_url", cfg_url.getText().toString());
+            act.remote_doit(host, C.CONFIG_SAVE, C.get_cfg(2));
             end_dialog(dialog, false);
         }
     });
@@ -232,7 +237,9 @@ private void config_dialog()
     b_load.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.remote_doit(C.CONFIG_LOAD, null);
+            String host = cfg_url.getText().toString();
+            P.put("general:config_url", cfg_url.getText().toString());
+            act.remote_doit(host, C.CONFIG_LOAD, null);
             end_dialog(dialog, false);
         }
     });
@@ -254,27 +261,27 @@ private void general_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_general);
 
     final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.general_layout);
-    rg.check((P.get_int("general_layout") == LAYOUT_TABLET) ?
+    rg.check((P.get_int("general:layout") == LAYOUT_TABLET) ?
                                                 R.id.general_tablet :
                                                 R.id.general_phone);
 
     final CheckBox bt_egauge = (CheckBox) dialog.findViewById(R.id.general_egauge);
-    bt_egauge.setChecked(P.get_int("egauge_layout") != LAYOUT_NONE);
+    bt_egauge.setChecked(P.get_int("egauge:layout") != LAYOUT_NONE);
 
     final CheckBox bt_weather = (CheckBox) dialog.findViewById(R.id.general_weather);
-    bt_weather.setChecked(P.get_int("weather_layout") != LAYOUT_NONE);
+    bt_weather.setChecked(P.get_int("weather:layout") != LAYOUT_NONE);
 
     final CheckBox bt_thermostat = (CheckBox) dialog.findViewById(R.id.general_thermostat);
-    bt_thermostat.setChecked(P.get_int("thermostat_layout") != LAYOUT_NONE);
+    bt_thermostat.setChecked(P.get_int("thermostat:layout") != LAYOUT_NONE);
 
     final CheckBox bt_outlets = (CheckBox) dialog.findViewById(R.id.general_outlets);
-    bt_outlets.setChecked(P.get_int("outlets_layout") != LAYOUT_NONE);
+    bt_outlets.setChecked(P.get_int("outlets:layout") != LAYOUT_NONE);
 
     final EditText et_on = (EditText) dialog.findViewById(R.id.general_on);
-    et_on.setText(C.encode_time(P.get_int("general_on")));
+    et_on.setText(C.encode_time(P.get_int("general:on")));
 
     final EditText et_off = (EditText) dialog.findViewById(R.id.general_off);
-    et_off.setText(C.encode_time(P.get_int("general_off")));
+    et_off.setText(C.encode_time(P.get_int("general:off")));
 
     Button db = (Button) dialog.findViewById(R.id.general_developer);
     db.setOnClickListener(new OnClickListener() {
@@ -309,18 +316,18 @@ private void general_dialog()
             int layout = (rg.getCheckedRadioButtonId() == R.id.general_tablet) ?
                                                             LAYOUT_TABLET :
                                                             LAYOUT_PHONE;
-            P.put("general_layout", layout);
+            P.put("general:layout", layout);
 
-            P.put("egauge_layout", bt_egauge.isChecked() ? layout : LAYOUT_NONE);
+            P.put("egauge:layout", bt_egauge.isChecked() ? layout : LAYOUT_NONE);
 
-            P.put("weather_layout", bt_weather.isChecked() ? layout : LAYOUT_NONE);
+            P.put("weather:layout", bt_weather.isChecked() ? layout : LAYOUT_NONE);
 
-            P.put("thermostat_layout", bt_thermostat.isChecked() ? layout : LAYOUT_NONE);
+            P.put("thermostat:layout", bt_thermostat.isChecked() ? layout : LAYOUT_NONE);
 
-            P.put("outlets_layout", bt_outlets.isChecked() ? layout : LAYOUT_NONE);
+            P.put("outlets:layout", bt_outlets.isChecked() ? layout : LAYOUT_NONE);
 
-            P.put("general_on", C.decode_time(et_on.getText().toString()));
-            P.put("general_off", C.decode_time(et_off.getText().toString()));
+            P.put("general:on", C.decode_time(et_on.getText().toString()));
+            P.put("general:off", C.decode_time(et_off.getText().toString()));
 
             end_dialog(dialog, true);
         }
@@ -332,26 +339,26 @@ private void egauge_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_egauge);
 
-    if (P.get_int("egauge_layout") == LAYOUT_NONE) {
+    if (P.get_int("egauge:layout") == LAYOUT_NONE) {
         end_dialog(dialog, false);
         act.toast("eGauge disabled");
         return;
     }
 
     final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.general_house);
-    rg.check(P.get_boolean("egauge_clock") ? R.id.egauge_clock :
+    rg.check(P.get_boolean("egauge:clock") ? R.id.egauge_clock :
                                              R.id.egauge_icon);
 
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
-    et.setText(P.get_string("egauge_url"));
+    et.setText(P.get_string("egauge:url"));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("egauge_clock", ((rg.getCheckedRadioButtonId() == R.id.egauge_clock) ?  true : false));
+            P.put("egauge:clock", ((rg.getCheckedRadioButtonId() == R.id.egauge_clock) ?  true : false));
 
-            P.put("egauge_url", et.getText().toString());
+            P.put("egauge:url", et.getText().toString());
 
             end_dialog(dialog, true);
         }
@@ -407,10 +414,10 @@ private void ecobee_doauth(final String api, final String pin)
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("ecobee_api", api);
+            P.put("thermostat:ecobee_api", api);
             new Thread(new Runnable() {
                 public void run() {
-                    act.thermostat.ecobee.ecobee_authorize(P.get_string("ecobee_api"));
+                    act.thermostat.ecobee.ecobee_authorize(P.get_string("thermostat:ecobee_api"));
                 }
             }).start();
             end_dialog(dialog, false);
@@ -425,13 +432,13 @@ private void ecobee_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_ecobee);
 
     final EditText api_tv = (EditText) dialog.findViewById(R.id.ecobee_api);
-    api_tv.setText(P.get_string("ecobee_api"));
+    api_tv.setText(P.get_string("thermostat:ecobee_api"));
 
     final EditText access_tv = (EditText) dialog.findViewById(R.id.ecobee_access);
-    access_tv.setText(P.get_string("ecobee_access"));
+    access_tv.setText(P.get_string("thermostat:ecobee_access"));
 
     final EditText refresh_tv = (EditText) dialog.findViewById(R.id.ecobee_refresh);
-    refresh_tv.setText(P.get_string("ecobee_refresh"));
+    refresh_tv.setText(P.get_string("thermostat:ecobee_refresh"));
 
     Button bv_how = (Button) dialog.findViewById(R.id.ecobee_how);
     bv_how.setOnClickListener(new OnClickListener() {
@@ -455,9 +462,9 @@ private void ecobee_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("ecobee_api", api_tv.getText().toString());
-            P.put("ecobee_access", access_tv.getText().toString());
-            P.put("ecobee_refresh", refresh_tv.getText().toString());
+            P.put("thermostat:ecobee_api", api_tv.getText().toString());
+            P.put("thermostat:ecobee_access", access_tv.getText().toString());
+            P.put("thermostat:ecobee_refresh", refresh_tv.getText().toString());
             end_dialog(dialog, false);
         }
     });
@@ -470,25 +477,25 @@ private void weather_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_weather);
 
-    if (P.get_int("weather_layout") == LAYOUT_NONE) {
+    if (P.get_int("weather:layout") == LAYOUT_NONE) {
         end_dialog(dialog, false);
         act.toast("Weather disabled");
         return;
     }
 
     final EditText et_id = (EditText) dialog.findViewById(R.id.weather_id);
-    et_id.setText(P.get_string("wunder_id"));
+    et_id.setText(P.get_string("weather:wunder_id"));
 
     final EditText et_key = (EditText) dialog.findViewById(R.id.weather_key);
-    et_key.setText(P.get_string("wunder_key"));
+    et_key.setText(P.get_string("weather:wunder_key"));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("wunder_id", et_id.getText().toString());
+            P.put("weather:wunder_id", et_id.getText().toString());
 
-            P.put("wunder_key", et_key.getText().toString());
+            P.put("weather:wunder_key", et_key.getText().toString());
 
             end_dialog(dialog, true);
         }
@@ -502,7 +509,7 @@ private void thermostat_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_thermostat);
 
-    if (P.get_int("thermostat_layout") == LAYOUT_NONE) {
+    if (P.get_int("thermostat:layout") == LAYOUT_NONE) {
         end_dialog(dialog, false);
         act.toast("Thermostats disabled");
         return;
@@ -533,7 +540,7 @@ private void outlets_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_outlets);
 
-    if (P.get_int("outlets_layout") == LAYOUT_NONE) {
+    if (P.get_int("outlets:layout") == LAYOUT_NONE) {
         end_dialog(dialog, false);
         act.toast("Outlets disabled");
         return;
@@ -542,7 +549,7 @@ private void outlets_dialog()
     String[] names = new String[max_dev + 1];
     names[0] = "- none -";
     batt_pos = 0;
-    pname = P.get_string("outlets_battery");
+    pname = P.get_string("outlets:battery");
     for (i = 0; i < max_dev; i++) {
         name = act.outlets.outlets_adapter.getItem(i).get_name();
         names[i + 1] = name;
@@ -568,13 +575,13 @@ private void outlets_dialog()
     });
 
     final TextView cols = (TextView) dialog.findViewById(R.id.outlets_cols);
-    cols.setText(C.i2a(P.get_int("outlets_cols")));
+    cols.setText(C.i2a(P.get_int("outlets:cols")));
 
     final TextView min = (TextView) dialog.findViewById(R.id.outlets_batt_min);
-    min.setText(C.i2a(P.get_int("outlets_batt_min")));
+    min.setText(C.i2a(P.get_int("outlets:batt_min")));
 
     final TextView max = (TextView) dialog.findViewById(R.id.outlets_batt_max);
-    max.setText(C.i2a(P.get_int("outlets_batt_max")));
+    max.setText(C.i2a(P.get_int("outlets:batt_max")));
 
     Button bv_how = (Button) dialog.findViewById(R.id.outlets_x10);
     bv_how.setOnClickListener(new OnClickListener() {
@@ -601,10 +608,10 @@ private void outlets_dialog()
                 str = "";
             else
                 str = act.outlets.outlets_adapter.getItem(batt_pos - 1).get_name();
-            P.put("outlets_battery", str);
-            P.put("outlets_cols", C.a2i(cols.getText().toString()));
-            P.put("outlets_batt_min", C.a2i(min.getText().toString()));
-            P.put("outlets_batt_max", C.a2i(max.getText().toString()));
+            P.put("outlets:battery", str);
+            P.put("outlets:cols", C.a2i(cols.getText().toString()));
+            P.put("outlets:batt_min", C.a2i(min.getText().toString()));
+            P.put("outlets:batt_max", C.a2i(max.getText().toString()));
             end_dialog(dialog, true);
         }
     });
@@ -617,17 +624,17 @@ private void x10_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_x10);
 
     final EditText et = (EditText) dialog.findViewById(R.id.x10_url);
-    et.setText(P.get_string("x10_url"));
+    et.setText(P.get_string("outlets:x10_url"));
 
     final EditText jt = (EditText) dialog.findViewById(R.id.x10_jwt);
-    jt.setText(P.get_string("x10_jwt"));
+    jt.setText(P.get_string("outlets:x10_jwt"));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("x10_url", et.getText().toString());
-            P.put("x10_jwt", jt.getText().toString());
+            P.put("outlets:x10_url", et.getText().toString());
+            P.put("outlets:x10_jwt", jt.getText().toString());
             end_dialog(dialog, true);
         }
     });
@@ -640,17 +647,17 @@ private void tplink_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_tplink);
 
     final EditText ut = (EditText) dialog.findViewById(R.id.tplink_user);
-    ut.setText(P.get_string("tplink_user"));
+    ut.setText(P.get_string("outlets:tplink_user"));
 
     final EditText pt = (EditText) dialog.findViewById(R.id.tplink_pwd);
-    pt.setText(P.get_string("tplink_pwd"));
+    pt.setText(P.get_string("outlets:tplink_pwd"));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("tplink_user", ut.getText().toString());
-            P.put("tplink_pwd", pt.getText().toString());
+            P.put("outlets:tplink_user", ut.getText().toString());
+            P.put("outlets:tplink_pwd", pt.getText().toString());
             end_dialog(dialog, true);
         }
     });
@@ -734,19 +741,19 @@ private void screen_dialog()
             } catch (Exception e) {
                 act.ss_info.start = 0;
             }
-            P.put("ss_start", act.ss_info.start);
+            P_SS.put("ss_start", act.ss_info.start);
 
             try {
                 act.ss_info.delay = C.a2i(ss_delay.getText().toString());
             } catch (Exception e) {
                 act.ss_info.delay = SS_DELAY;
             }
-            P.put("ss_delay", act.ss_info.delay);
+            P_SS.put("ss_delay", act.ss_info.delay);
 
             act.ss_info.fade = type_pos;
-            P.put("ss_fade", act.ss_info.fade);
+            P_SS.put("ss_fade", act.ss_info.fade);
 
-            if (cb.isChecked())
+            if (cb.isChecked() && act.ss_saver != null)
                 act.ss_saver.ss_reset();
 
             act.ss_control(C.SS_OP_INIT);
@@ -765,30 +772,25 @@ private void developer_dialog()
     cb.setChecked(P.get_int("debug") != 0);
 
     final TextView level = (TextView) dialog.findViewById(R.id.outlets_batt_level);
-    level.setText(C.i2a(P.get_int("outlets_batt_level")));
+    level.setText(C.i2a(P.get_int("outlets:batt_level")));
 
     final TextView uri = (TextView) dialog.findViewById(R.id.log_uri);
-    uri.setText(P.get_string("log_uri"));
+    uri.setText(P.get_string("general:log_uri"));
 
     final TextView params = (TextView) dialog.findViewById(R.id.log_params);
-    params.setText(P.get_string("log_params"));
-
-    final TextView cfg_url = (TextView) dialog.findViewById(R.id.config_url);
-    cfg_url.setText(P.get_string("config_url"));
+    params.setText(P.get_string("general:log_params"));
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("outlets_batt_level", C.a2i(level.getText().toString()));
+            P.put("outlets:batt_level", C.a2i(level.getText().toString()));
 
-            P.put("log_uri", uri.getText().toString());
-            P.put("log_params", params.getText().toString());
-
-            P.put("config_url", cfg_url.getText().toString());
+            P.put("general:log_uri", uri.getText().toString());
+            P.put("general:log_params", params.getText().toString());
 
             P.put("debug", (cb.isChecked() ? 1 : 0));
-            Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
+            Log.cfg(P.get_int("debug"), P.get_string("general:log_uri"), P.get_string("general:log_params"));
 
             end_dialog(dialog, true);
         }
