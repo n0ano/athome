@@ -52,10 +52,6 @@ import com.n0ano.athome.SS.SS_Callbacks;
 public class MainActivity extends AppCompatActivity
 {
 
-public final static int BATTERY_LOW  = 20;
-public final static int BATTERY_HIGH = 90;
-public final static int OUTLETS_COLS = 3;
-
 private final static String CONFIG_URI = "/cgi-bin/athome/config";
 private final static String CONFIG_LOAD =  "load";
 private final static String CONFIG_SAVE =  "save";
@@ -64,44 +60,9 @@ private boolean paused = false;
 
 public Menu menu_bar;
 
-public int general_layout;
-
-public int egauge_layout;
-public int egauge_progress;
-public boolean egauge_clock;
-public String egauge_url;
-
-public int weather_layout;
-public int weather_progress;
-
-public String weather_id;
-public String weather_key;
-
-public int thermostat_layout;
-public String ecobee_api;
-public String ecobee_refresh;
-public String ecobee_access;
-
 private String url;
 
 int degree = 0;
-int debug = 0;
-
-String log_uri = "";
-String log_params = "";
-
-String x10_url;
-String x10_jwt;
-
-String tplink_user;
-String tplink_pwd;
-
-public int outlets_layout;
-String outlets_battery = "";
-int outlets_cols;
-int outlets_batt_min;
-int outlets_batt_max;
-int outlets_batt_level;
 
 Weather weather;
 Thermostat thermostat;
@@ -119,9 +80,6 @@ private GestureDetectorCompat ss_gesture;
 public ScreenInfo ss_info;
 private int ss_offset = 0;
 
-public int on_time = -1;        // (hour * 100) + minute, -1 = none
-public int off_time = -1;       // (hour * 100) + minute, -1 = none
-
 @Override
 protected void onCreate(Bundle state)
 {
@@ -129,16 +87,15 @@ protected void onCreate(Bundle state)
     super.onCreate(state);
 
     P.init(getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
-    debug = P.get("debug", 0);
-        Log.cfg(debug, "", "");
+    Log.cfg(P.get_int("debug"), "", "");
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
 
-    general_layout = P.get("general_layout", Popup.LAYOUT_TABLET);
-    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                             R.layout.activity_ph);
+    setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                        R.layout.activity_tab :
+                                                        R.layout.activity_ph);
 
-    restore_state();
+    Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
 
     ss_info = new ScreenInfo(this);
 }
@@ -424,27 +381,6 @@ public View view_show(int layout, int view_id)
     return v;
 }
 
-public String encode_time(int t)
-{
-
-    if (t < 0)
-        return "";
-    int hr = t / 100;
-    t -= hr * 100;
-    return String.valueOf(hr) + ":" + String.format("%02d", t);
-}
-public int decode_time(String t)
-{
-
-    if (t.isEmpty())
-        return -1;
-    int idx = t.indexOf(":");
-    if (idx < 0)
-        return Integer.parseInt(t);
-    else
-        return (Integer.parseInt(t.substring(0, idx)) * 100) + Integer.parseInt(t.substring(idx + 1));
-}
-
 public void saver_click()
 {
 
@@ -568,55 +504,12 @@ public void ss_control(int op)
     }
 }
 
-private void restore_state()
-{
-
-    general_layout = P.get("general_layout", Popup.LAYOUT_TABLET);
-    on_time = P.get("general_on", -1);
-    off_time = P.get("general_off", -1);
-
-    egauge_layout = P.get("egauge_layout", Popup.LAYOUT_TABLET);
-    egauge_progress = P.get("egauge_progress", 1);
-    egauge_url = P.get("egauge_url", "");
-    egauge_clock = P.get("egauge_clock", false);
-
-    weather_layout = P.get("weather_layout", Popup.LAYOUT_TABLET);
-    weather_progress = P.get("weather_progress", 1);
-
-    weather_id = P.get("wunder_id", "");
-    weather_key = P.get("wunder_key", "");
-
-    thermostat_layout = P.get("thermostat_layout", Popup.LAYOUT_TABLET);
-    ecobee_api = P.get("ecobee_api", "");
-    ecobee_access = P.get("ecobee_access", "");
-    ecobee_refresh = P.get("ecobee_refresh", "");
-
-    outlets_layout = P.get("outlets_layout", Popup.LAYOUT_TABLET);
-    outlets_battery = P.get("outlets_battery", "");
-    outlets_cols = P.get("outlets_cols", OUTLETS_COLS);
-    outlets_batt_min = P.get("outlets_batt_min", BATTERY_LOW);
-    outlets_batt_max = P.get("outlets_batt_max", BATTERY_HIGH);
-    outlets_batt_level = P.get("outlets_batt_level", 0);
-
-    x10_url = P.get("x10_url", "");
-    x10_jwt = P.get("x10_jwt", "none");
-
-    tplink_user = P.get("tplink_user", "");
-    tplink_pwd = P.get("tplink_pwd", "");
-
-    log_uri = P.get("log_uri", "");
-    log_params = P.get("log_params", "");
-
-    debug = P.get("debug", 0);
-    Log.cfg(debug, log_uri, log_params);
-}
-
 public void stream_log(String line)
 {
 
-    if (log_uri.equals(""))
+    if (P.get_string("log_uri").equals(""))
         return;
-    call_api_nolog("GET", log_uri, log_params + URLEncoder.encode(line), "", null);
+    call_api_nolog("GET", P.get_string("log_uri"), P.get_string("log_params") + URLEncoder.encode(line), "", null);
 }
 
 /*
@@ -739,8 +632,9 @@ public void show_log()
     bt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                                     R.layout.activity_ph);
+            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                                R.layout.activity_tab :
+                                                                R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -752,8 +646,9 @@ public void show_log()
         @Override
         public void onClick(View v) {
             Log.clear();
-            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                                     R.layout.activity_ph);
+            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                                R.layout.activity_tab :
+                                                                R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -807,7 +702,7 @@ private void set_cfg(String cfg)
     } catch (Exception e) {
         Log.d("JSON format error " + e);
     }
-    restore_state();
+    Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
 }
 
 public void remote_doit(String type, String url, String cfg)
@@ -823,8 +718,9 @@ public void remote_doit(String type, String url, String cfg)
             set_cfg(resp.substring(1));
         runOnUiThread(new Runnable() {
             public void run() {
-                setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                                         R.layout.activity_ph);
+                setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                                    R.layout.activity_tab :
+                                                                    R.layout.activity_ph);
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 if (!ok)
@@ -841,15 +737,17 @@ public void show_cfg()
     TextView tv;
 
     Log.d("Show cfg");
-    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                             R.layout.activity_ph);
+    setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                            R.layout.activity_tab :
+                                                            R.layout.activity_ph);
 
     Button bt = findViewById(R.id.cfg_return);
     bt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                                     R.layout.activity_ph);
+            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                                R.layout.activity_tab :
+                                                                R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -862,8 +760,9 @@ public void show_cfg()
         @Override
         public void onClick(View v) {
             set_cfg(et.getText().toString());
-            setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                                     R.layout.activity_ph);
+            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                                R.layout.activity_tab :
+                                                                R.layout.activity_ph);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             doit();
@@ -891,7 +790,6 @@ public void show_cfg()
         cfg.put("debug", P.get("debug", ""));
         cfg.put("egauge_clock", P.get("egauge_clock", ""));
         cfg.put("egauge_layout", P.get("egauge_layout", ""));
-        cfg.put("egauge_progress", P.get("egauge_progress", ""));
         cfg.put("general_layout", P.get("general_layout", ""));
         cfg.put("ss_enable", P.get("ss_start", ""));
         cfg.put("ss_start", P.get("ss_start", ""));
@@ -908,7 +806,6 @@ public void show_cfg()
         cfg.put("outlets_batt_min", P.get("outlets_batt_min", ""));
         cfg.put("thermostat_layout", P.get("thermostat_layout", ""));
         cfg.put("weather_layout", P.get("weather_layout", ""));
-        cfg.put("weather_progress", P.get("weather_progress", ""));
         cfg.put("ecobee_api", P.get("ecobee_api", ""));
         cfg.put("egauge_url", P.get("egauge_url", ""));
         cfg.put("log_params", P.get("log_params", ""));
@@ -932,8 +829,9 @@ public void go_log_return()
 {
 
     Log.d("Log return");
-    setContentView((general_layout == Popup.LAYOUT_TABLET) ? R.layout.activity_tab :
-                                                             R.layout.activity_ph);
+    setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
+                                                        R.layout.activity_tab :
+                                                        R.layout.activity_ph);
 }
 
 public void set_timeout(ImageView v, int p, int maxp)
@@ -995,8 +893,8 @@ public int get_battery()
 {
     String chg;
 
-    if (outlets_batt_level != 0)
-        return outlets_batt_level;
+    if (P.get_int("outlets_batt_level") != 0)
+        return P.get_int("outlets_batt_level");
 
     IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     Intent bs = this.registerReceiver(null, ifilter);
@@ -1023,9 +921,9 @@ private void clock()
 
     Calendar cal = Calendar.getInstance();
     int time = (cal.get(Calendar.HOUR_OF_DAY) * 100) + cal.get(Calendar.MINUTE);
-    if (off_time >= 0 && time == off_time && screen)
+    if (P.get_int("general_off") >= 0 && time == P.get_int("general_off") && screen)
         display(false);
-    else if (on_time >= 0 && time == on_time && !screen)
+    else if (P.get_int("general_on") >= 0 && time == P.get_int("general_on") && !screen)
         display(true);
 
     final ClockView cv = (ClockView)findViewById(R.id.clock_view);
@@ -1064,12 +962,12 @@ private void pause_threads(boolean p)
 private void doit()
 {
 
-    final View egauge_view = view_show(egauge_layout, R.id.egauge_main);
+    final View egauge_view = view_show(P.get_int("egauge_layout"), R.id.egauge_main);
     ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv != null) {
         ImageView h_img = (ImageView)findViewById(R.id.house_image);
-        h_img.setVisibility(egauge_clock ? View.GONE :    View.VISIBLE);
-        cv.setVisibility(egauge_clock    ? View.VISIBLE : View.GONE);
+        h_img.setVisibility(P.get_boolean("egauge_clock") ? View.GONE :    View.VISIBLE);
+        cv.setVisibility(P.get_boolean("egauge_clock")    ? View.VISIBLE : View.GONE);
     }
     if (egauge_view != null)
         egauge = new Egauge(this, new DoitCallback() {
@@ -1083,7 +981,7 @@ private void doit()
             }
         });
 
-    final View weather_view = view_show(egauge_layout, R.id.weather_main);
+    final View weather_view = view_show(P.get_int("weather_layout"), R.id.weather_main);
     if (weather_view != null)
         weather = new Weather(this, new DoitCallback() {
             @Override
@@ -1097,7 +995,7 @@ sh_rain();
             }
         });
 
-    final View thermostat_view = view_show(thermostat_layout, R.id.thermostats_table);
+    final View thermostat_view = view_show(P.get_int("thermostat_layout"), R.id.thermostats_table);
     if (thermostat_view != null)
         thermostat = new Thermostat(this, thermostat_view, new DoitCallback() {
             @Override
@@ -1110,7 +1008,7 @@ sh_rain();
             }
         });
 
-    final View outlets_view = view_show(outlets_layout, R.id.outlets_table);
+    final View outlets_view = view_show(P.get_int("outlets_layout"), R.id.outlets_table);
     if (outlets_view != null)
         outlets = new Outlets(this, outlets_view, new DoitCallback() {
             @Override

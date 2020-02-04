@@ -1,6 +1,5 @@
 - Screen Saver
-	. weather/egauge update after onPause
-	. update on `large` list takes too long, show circle while updatin
+	. update on `large` list takes too long, show circle while updating
 	. refactor http calls
 	. touch to quit saver overrides main display, sometimes
 	. button to start thumbnail download?

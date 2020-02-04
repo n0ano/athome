@@ -86,8 +86,8 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
                             "\"method\":\"login\"," +
                             "\"params\":{" +
                             "\"appType\":\"Kasa_Android\"," +
-                            "\"cloudUserName\":\"" + act.tplink_user + "\"," +
-                            "\"cloudPassword\":\"" + act.tplink_pwd + "\"," +
+                            "\"cloudUserName\":\"" + P.get_string("tplink_user") + "\"," +
+                            "\"cloudPassword\":\"" + P.get_string("tplink_pwd") + "\"," +
                             "\"terminalUUID\":\"" + TPLINK_UUID + "\"" +
                             "}}"
                        );

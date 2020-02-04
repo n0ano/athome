@@ -46,8 +46,8 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
     String code, name;
 
     final String resp = act.call_api("GET",
-                               act.x10_url + X10_API,
-                               X10_LIST + "&token=" + act.x10_jwt,
+                               P.get_string("x10_url") + X10_API,
+                               X10_LIST + "&token=" + P.get_string("x10_jwt"),
                                "",
                                null);
 
@@ -93,10 +93,10 @@ public void control(final OutletsDevice dev, boolean onoff)
     new Thread(new Runnable() {
         public void run() {
             String resp = act.call_api("GET",
-                                       act.x10_url + X10_API,
+                                       P.get_string("x10_url") + X10_API,
                                        X10_SET + "&code=" + dev.get_dev_code() +
                                                  "&state=" + state +
-                                                 "&token=" + act.x10_jwt,
+                                                 "&token=" + P.get_string("x10_jwt"),
                                        "",
                                        null);
         }
@@ -148,7 +148,7 @@ public boolean get_data(OutletsAdapter adapter)
     //  Get the data and display any changes
     //
     String resp = act.call_api("GET",
-                               act.x10_url + X10_API,
+                               P.get_string("x10_url") + X10_API,
                                X10_GET,
                                "",
                                null);

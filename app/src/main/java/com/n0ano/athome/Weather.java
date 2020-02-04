@@ -117,7 +117,7 @@ private boolean get_info_wunder(JSONObject json)
     String key;
     String val;
 
-    JSONObject station = find_station(act.weather_id, json);
+    JSONObject station = find_station(P.get_string("wunder_id"), json);
     if (station == null)
         return false;
     JSONObject units = (JSONObject)station.opt("imperial");
@@ -176,8 +176,8 @@ private void get_wunder()
 
     String resp = act.call_api("GET",
                                WUNDER_URL + WUNDER_API,
-                               WUNDER_ID + act.weather_id +
-                               WUNDER_KEY + act.weather_key +
+                               WUNDER_ID + P.get_string("wunder_id") +
+                               WUNDER_KEY + P.get_string("wunder_key") +
                                WUNDER_QUERY,
                                "",
                                null);
@@ -186,7 +186,7 @@ Log.d("wunder:" + resp);
         JSONObject json = new JSONObject(resp);
         get_info_wunder(json);
     } catch (Exception e) {
-        Log.d("get_wunder: no data for station " + act.weather_id);
+        Log.d("get_wunder: no data for station " + P.get_string("wunder_id"));
     }
 }
 

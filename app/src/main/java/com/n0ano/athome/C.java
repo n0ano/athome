@@ -20,6 +20,11 @@ public static final int SS_OP_RESET =   1;
 public static final int SS_OP_BLOCK =   2;
 public static final int SS_OP_UPDATE =  3;
 
+public final static int BATTERY_LOW  = 20;
+public final static int BATTERY_HIGH = 90;
+
+public final static int OUTLETS_COLS = 3;
+
 public static boolean paused = true;
 
 public static int a2i(String num)
@@ -49,7 +54,7 @@ public static JSONObject str2json(String str)
         json = new JSONObject(str);
     } catch (Exception e) {
         Log.d("JSON parse error(" + str + ") - " + e);
-        return null;
+        json = new JSONObject();
     }
     return json;
 }
@@ -73,6 +78,28 @@ public static Object json_get(JSONArray json, int i)
         Log.d("JSON get error - " + e);
         return null;
     }
+}
+
+public static String encode_time(int t)
+{
+
+    if (t < 0)
+        return "";
+    int hr = t / 100;
+    t -= hr * 100;
+    return String.valueOf(hr) + ":" + String.format("%02d", t);
+}
+
+public static int decode_time(String t)
+{
+
+    if (t.isEmpty())
+        return -1;
+    int idx = t.indexOf(":");
+    if (idx < 0)
+        return Integer.parseInt(t);
+    else
+        return (Integer.parseInt(t.substring(0, idx)) * 100) + Integer.parseInt(t.substring(idx + 1));
 }
 
 public static boolean working(boolean constant)
