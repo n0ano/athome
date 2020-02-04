@@ -43,7 +43,7 @@ public static void init(SharedPreferences pref)
     init_defaults();
     json_cfg = C.str2json(get_old("config", "{\"pref_version\":0}"));
 
-    switch (get("pref_version", 0)) {
+    switch (get_int("pref_version")) {
 
     default:
     case 0:
@@ -137,6 +137,20 @@ private static void init_defaults()
 	//def_string.put("tplink_pwd", "");
 	//def_string.put("log_uri", "");
 	//def_string.put("log_params", "");
+	//def_string.put("config_uri", "");
+}
+
+public static String get_cfg(int indent)
+{
+
+    if (indent == 0)
+        return C.json2str(json_cfg);
+    try {
+        return json_cfg.toString(indent);
+    } catch (Exception e) {
+        Log.d("get_cfg JSON to string error - " + e);
+        return "";
+    }
 }
 
 public static void new_cfg(String cfg)
@@ -153,6 +167,7 @@ public static void new_cfg(String cfg)
 public static void rm_key(String key)
 {
 
+    json_cfg.remove(key);
 	SharedPreferences.Editor editor = pref.edit();
 	editor.remove(key);
 	editor.commit();
@@ -164,7 +179,6 @@ public static int get_int(String key)
     Integer def = def_int.get(key);
     return json_cfg.optInt(key, def == null ? 0 : def.intValue());
 }
-public static int get(String key, int def) { return json_cfg.optInt(key, def); }
 public static void put(String key, int value)
 {
 
@@ -179,7 +193,6 @@ public static void put(String key, int value)
 }
 
 public static boolean get_boolean(String key) { return json_cfg.optBoolean(key, false); }
-public static boolean get(String key, boolean def) { return json_cfg.optBoolean(key, def); }
 public static void put(String key, boolean value)
 {
 
@@ -194,7 +207,6 @@ public static void put(String key, boolean value)
 }
 
 public static String get_string(String key) { return json_cfg.optString(key, ""); }
-public static String get(String key, String def) { return json_cfg.optString(key, def); }
 public static void put(String key, String value)
 {
 

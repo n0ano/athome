@@ -25,6 +25,10 @@ public final static int BATTERY_HIGH = 90;
 
 public final static int OUTLETS_COLS = 3;
 
+public final static String CONFIG_URI = "/cgi-bin/athome/config";
+public final static String CONFIG_LOAD =  "load";                
+public final static String CONFIG_SAVE =  "save";
+
 public static boolean paused = true;
 
 public static int a2i(String num)

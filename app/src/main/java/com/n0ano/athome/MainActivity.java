@@ -52,10 +52,6 @@ import com.n0ano.athome.SS.SS_Callbacks;
 public class MainActivity extends AppCompatActivity
 {
 
-private final static String CONFIG_URI = "/cgi-bin/athome/config";
-private final static String CONFIG_LOAD =  "load";
-private final static String CONFIG_SAVE =  "save";
-
 private boolean paused = false;
 
 public Menu menu_bar;
@@ -240,7 +236,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Log.d("image update worked");
         }
-Log.d("DDD-SS", "activity result - " + P.get("images:" + ss_info.list, ""));
+Log.d("DDD-SS", "activity result - " + P.get_string("images:" + ss_info.list, ""));
         runOnUiThread(new Runnable() {
             public void run() {
                 Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
@@ -681,12 +677,6 @@ public void show_log()
     }
 }
 
-private String cfg_param(String key)
-{
-
-    return key + ": " + P.get(key, "") + "\n";
-}
-
 private void set_cfg(String cfg)
 {
     String key, value;
@@ -705,133 +695,22 @@ private void set_cfg(String cfg)
     Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
 }
 
-public void remote_doit(String type, String url, String cfg)
+public void remote_doit(final String type, final String cfg)
 {
 
-    P.put("remote_server", url);
-    if (type.equals(CONFIG_SAVE)) {
-        call_api("POST", url + CONFIG_URI, type, "", cfg);
-    } else {
-        String resp = call_api("GET", url + CONFIG_URI, type, "", null);
-        final boolean ok = (resp.length() > 1);
-        if (ok)
-            set_cfg(resp.substring(1));
-        runOnUiThread(new Runnable() {
-            public void run() {
-                setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
-                                                                    R.layout.activity_tab :
-                                                                    R.layout.activity_ph);
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
-                if (!ok)
-                    toast("No config - bad host name?");
-                doit();
+    new Thread(new Runnable() {
+        public void run() {
+            if (type.equals(C.CONFIG_SAVE))
+                call_api("POST", P.get_string("config_url") + C.CONFIG_URI, type, "", cfg);
+            else {
+                String resp = call_api("GET", P.get_string("config_url") + C.CONFIG_URI, type, "", null);
+                final boolean ok = (resp.length() > 1);
+                if (ok)
+                    P.new_cfg(resp.substring(1));
+                    restart();
             }
-        });
-    }
-}
-
-public void show_cfg()
-{
-    String line;
-    TextView tv;
-
-    Log.d("Show cfg");
-    setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
-                                                            R.layout.activity_tab :
-                                                            R.layout.activity_ph);
-
-    Button bt = findViewById(R.id.cfg_return);
-    bt.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
-                                                                R.layout.activity_tab :
-                                                                R.layout.activity_ph);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            doit();
         }
-    });
-
-    final EditText et = (EditText) findViewById(R.id.cfg_table);
-    bt = findViewById(R.id.cfg_set);
-    bt.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            set_cfg(et.getText().toString());
-            setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
-                                                                R.layout.activity_tab :
-                                                                R.layout.activity_ph);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            doit();
-        }
-    });
-
-    bt = findViewById(R.id.cfg_save);
-    bt.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            popup.remote_server(CONFIG_SAVE, et.getText().toString());
-        }
-    });
-
-    bt = findViewById(R.id.cfg_load);
-    bt.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            popup.remote_server(CONFIG_LOAD, "");
-        }
-    });
-
-    JSONObject cfg = new JSONObject();
-    try {
-        cfg.put("debug", P.get("debug", ""));
-        cfg.put("egauge_clock", P.get("egauge_clock", ""));
-        cfg.put("egauge_layout", P.get("egauge_layout", ""));
-        cfg.put("general_layout", P.get("general_layout", ""));
-        cfg.put("ss_enable", P.get("ss_start", ""));
-        cfg.put("ss_start", P.get("ss_start", ""));
-        cfg.put("ss_delay", P.get("ss_delay", ""));
-        cfg.put("ss_fade", P.get("ss_fade", ""));
-        cfg.put("ss_host", P.get("ss_host", ""));
-        cfg.put("ss_list", P.get("ss_list", ""));
-        cfg.put("ss_server", P.get("ss_server", ""));
-        cfg.put("ss_user", P.get("ss_user", ""));
-        cfg.put("ss_pwd", P.get("ss_pwd", ""));
-        cfg.put("outlets_cols", P.get("outlets_cols", ""));
-        cfg.put("outlets_batt_level", P.get("outlets_batt_level", ""));
-        cfg.put("outlets_batt_max", P.get("outlets_batt_max", ""));
-        cfg.put("outlets_batt_min", P.get("outlets_batt_min", ""));
-        cfg.put("thermostat_layout", P.get("thermostat_layout", ""));
-        cfg.put("weather_layout", P.get("weather_layout", ""));
-        cfg.put("ecobee_api", P.get("ecobee_api", ""));
-        cfg.put("egauge_url", P.get("egauge_url", ""));
-        cfg.put("log_params", P.get("log_params", ""));
-        cfg.put("log_uri", P.get("log_uri", ""));
-        cfg.put("outlets_battery", P.get("outlets_battery", ""));
-        cfg.put("pref_version", P.get("pref_version", ""));
-        cfg.put("remote_server", P.get("remote_server", ""));
-        cfg.put("tplink_pwd", P.get("tplink_pwd", ""));
-        cfg.put("tplink_user", P.get("tplink_user", ""));
-        cfg.put("wunder_id", P.get("wunder_id", ""));
-        cfg.put("wunder_key", P.get("wunder_key", ""));
-        cfg.put("x10_jwt", P.get("x10_jwt", ""));
-        cfg.put("x10_url", P.get("x10_url", ""));
-        et.setText(cfg.toString(2));
-    } catch (Exception e) {
-        Log.d("JSON error " + e);
-    }
-}
-
-public void go_log_return()
-{
-
-    Log.d("Log return");
-    setContentView((P.get_int("general_layout") == Popup.LAYOUT_TABLET) ?
-                                                        R.layout.activity_tab :
-                                                        R.layout.activity_ph);
+    }).start();
 }
 
 public void set_timeout(ImageView v, int p, int maxp)

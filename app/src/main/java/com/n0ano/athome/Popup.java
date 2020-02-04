@@ -210,6 +210,42 @@ public void log_detail_dialog(int i, String l)
     tv.setText(l);
 }
 
+private void config_dialog()
+{
+    int nt;
+
+    final Dialog dialog = start_dialog(R.layout.bar_config);
+
+    final TextView tv = (TextView) dialog.findViewById(R.id.config_table);
+    tv.setText(P.get_cfg(2));
+
+    Button b_save = (Button) dialog.findViewById(R.id.save);
+    b_save.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.remote_doit(C.CONFIG_SAVE, P.get_cfg(2));
+            end_dialog(dialog, false);
+        }
+    });
+
+    Button b_load = (Button) dialog.findViewById(R.id.load);
+    b_load.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            act.remote_doit(C.CONFIG_LOAD, null);
+            end_dialog(dialog, false);
+        }
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            end_dialog(dialog, false);
+        }
+    });
+}
+
 private void general_dialog()
 {
     int i;
@@ -235,10 +271,10 @@ private void general_dialog()
     bt_outlets.setChecked(P.get_int("outlets_layout") != LAYOUT_NONE);
 
     final EditText et_on = (EditText) dialog.findViewById(R.id.general_on);
-    et_on.setText(C.encode_time(P.get("general_on", -1)));
+    et_on.setText(C.encode_time(P.get_int("general_on")));
 
     final EditText et_off = (EditText) dialog.findViewById(R.id.general_off);
-    et_off.setText(C.encode_time(P.get("general_off", -1)));
+    et_off.setText(C.encode_time(P.get_int("general_off")));
 
     Button db = (Button) dialog.findViewById(R.id.general_developer);
     db.setOnClickListener(new OnClickListener() {
@@ -261,7 +297,7 @@ private void general_dialog()
     cfg.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.show_cfg();
+            config_dialog();
             end_dialog(dialog, false);
         }
     });
@@ -737,6 +773,9 @@ private void developer_dialog()
     final TextView params = (TextView) dialog.findViewById(R.id.log_params);
     params.setText(P.get_string("log_params"));
 
+    final TextView cfg_url = (TextView) dialog.findViewById(R.id.config_url);
+    cfg_url.setText(P.get_string("config_url"));
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
@@ -746,35 +785,12 @@ private void developer_dialog()
             P.put("log_uri", uri.getText().toString());
             P.put("log_params", params.getText().toString());
 
+            P.put("config_url", cfg_url.getText().toString());
+
             P.put("debug", (cb.isChecked() ? 1 : 0));
             Log.cfg(P.get_int("debug"), P.get_string("log_uri"), P.get_string("log_params"));
 
             end_dialog(dialog, true);
-        }
-    });
-}
-
-public void remote_server(final String type, final String cfg)
-{
-
-    final Dialog dialog = start_dialog(R.layout.bar_remote);
-
-    TextView tv = (TextView)dialog.findViewById(R.id.remote_title);
-    tv.setText("Remote server - " + type);
-
-    final EditText et = (EditText)dialog.findViewById(R.id.remote_url);
-    et.setText(P.get("remote_server", ""));
-
-    Button ok = (Button) dialog.findViewById(R.id.ok);
-    ok.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            end_dialog(dialog, false);
-            new Thread(new Runnable() {
-                public void run() {
-                    act.remote_doit(type, et.getText().toString(), cfg);
-                }
-            }).start();
         }
     });
 }
