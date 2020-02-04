@@ -98,11 +98,12 @@ public ImageEntry next_image(int delta)
     if (get_size() < 2)
         return get_image(0);
 
-    int next = P.get("image_last:" + get_name(), get_size());
+    String max = P.get("image_last:" + get_name(), Integer.toString(get_size()));
+    int next = Integer.parseInt(max, 10);
     if (delta == 0) {
         if (next >= get_size()) {
             next = get_size() - 1;
-            P.put("image_last:" + get_name(), next);
+            P.put("image_last:" + get_name(), Integer.toString(next));
         }
         return get_image(next);
     }
@@ -115,7 +116,7 @@ public ImageEntry next_image(int delta)
             next = get_size() - 1;
         img = get_image(next);
         if (img.get_check()) {
-            P.put("image_last:" + get_name(), next);
+            P.put("image_last:" + get_name(), Integer.toString(next));
             return img;
         }
     }

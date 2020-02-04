@@ -106,30 +106,24 @@ public static int decode_time(String t)
         return (Integer.parseInt(t.substring(0, idx)) * 100) + Integer.parseInt(t.substring(idx + 1));
 }
 
-public static boolean working(boolean constant)
+public static String get_cfg(int indent)
 {
 
-    return constant ? constant : !paused;
+    P.put("ss_enable", P_SS.get("ss_enable", false));
+    P.put("ss_start", P_SS.get("ss_start", 0));
+    P.put("ss_delay", P_SS.get("ss_delay", 0));
+    P.put("ss_fade", P_SS.get("ss_fade", 0));
+    return P.get_cfg(indent);
 }
 
-public static Thread data_thread(final int period, final boolean constant, final DoitCallback cb)
+public static void new_cfg(String cfg)
 {
 
-    Thread thread = new Thread(new Runnable() {
-        public void run() {
-            for (;;) {
-                //
-                //  Get the data
-                //
-                if (working(constant))
-                    cb.doit(null);
-
-                SystemClock.sleep(period);
-            }
-        }
-    });
-    thread.start();
-    return thread;
+    P.new_cfg(cfg);
+    P_SS.put("ss_enable", P.get_boolean("ss_enable"));
+    P_SS.put("ss_start", P.get_int("ss_start"));
+    P_SS.put("ss_delay", P.get_int("ss_delay"));
+    P_SS.put("ss_fade", P.get_int("ss_fade"));
 }
 
 }

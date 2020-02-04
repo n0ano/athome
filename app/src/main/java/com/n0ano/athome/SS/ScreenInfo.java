@@ -43,7 +43,7 @@ public ScreenInfo(Activity act)
     this.server = P.get("ss_server", "");
     this.user = P.get("ss_user", "");
     this.pwd = P.get("ss_pwd", "");
-    this.enable = P.get("ss_enable", true);
+    this.enable = P.get("ss_enable", false);
     this.start = P.get("ss_start", 0);
     this.delay = P.get("ss_delay", 0);
     this.fade = P.get("ss_fade", 0);

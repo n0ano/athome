@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.n0ano.athome.BuildConfig;
 import com.n0ano.athome.R;
 import com.n0ano.athome.Log;
 
@@ -76,8 +77,9 @@ public void onCreate(Bundle state)
     C.loading_name = (TextView) findViewById(R.id.mgmt_name);
 
     P.init(getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
-    debug = P.get("debug", 0);
-        Log.cfg(debug, "", "");
+    debug = (BuildConfig.DEBUG ? 1 : 0);
+
+    Log.cfg(debug, "", "");
 
     popup = new PopupImage(this);
 
@@ -111,7 +113,7 @@ public void onCreate(Bundle state)
     GridView gv = (GridView) findViewById(R.id.mgmt_grid);
     image_adapt = new ImageAdapter(this, image_vm);
     gv.setAdapter(image_adapt);
-    gv.setSelection(P.get("image_last:" + ss_info.list, 0));
+    gv.setSelection(Integer.parseInt(P.get("image_last:" + ss_info.list, "0"), 10));
 }
 
 @Override
@@ -497,7 +499,7 @@ public void show_files()
     ListView lv = (ListView) findViewById(R.id.mgmt_files);
     FilesAdapter file_adapt = new FilesAdapter(this);
     lv.setAdapter(file_adapt);
-    lv.setSelection(P.get("image_last:" + ss_info.list, 0));
+    lv.setSelection(Integer.parseInt(P.get("image_last:" + ss_info.list, "0")));
     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {

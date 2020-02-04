@@ -1,4 +1,4 @@
-package com.n0ano.athome.SS;
+package com.n0ano.athome;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 //
 // Class to handle application preferences
 //
-public class P {
+public class P_SS {
 
 public static final String PREF_NAME = "SS_Preferences";
 
@@ -23,9 +23,9 @@ private static SharedPreferences pref = null;
 public static void init(SharedPreferences pref)
 {
 
-    if (P.pref != null)
+    if (P_SS.pref != null)
         return;
-	P.pref = pref;
+	P_SS.pref = pref;
 }
 
 public static void rm_key(String key)

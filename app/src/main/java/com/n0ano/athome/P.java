@@ -41,7 +41,7 @@ public static void init(SharedPreferences pref)
         return;
 	P.pref = pref;
     init_defaults();
-    json_cfg = C.str2json(get_old("config", "{\"pref_version\":0}"));
+    json_cfg = C.str2json(pref.getString("config", "{\"pref_version\":0}"));
 
     switch (get_int("pref_version")) {
 

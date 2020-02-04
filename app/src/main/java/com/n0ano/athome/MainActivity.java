@@ -83,6 +83,7 @@ protected void onCreate(Bundle state)
     super.onCreate(state);
 
     P.init(getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
+    P_SS.init(getSharedPreferences(P_SS.PREF_NAME, Context.MODE_PRIVATE));
     Log.cfg(P.get_int("debug"), "", "");
 Log.cfg(1, "", "");
     Log.d("MainActivity: onCreate");
@@ -705,9 +706,10 @@ public void remote_doit(final String type, final String cfg)
             else {
                 String resp = call_api("GET", P.get_string("config_url") + C.CONFIG_URI, type, "", null);
                 final boolean ok = (resp.length() > 1);
-                if (ok)
-                    P.new_cfg(resp.substring(1));
+                if (ok) {
+                    C.new_cfg(resp.substring(1));
                     restart();
+                }
             }
         }
     }).start();

@@ -217,13 +217,13 @@ private void config_dialog()
     final Dialog dialog = start_dialog(R.layout.bar_config);
 
     final TextView tv = (TextView) dialog.findViewById(R.id.config_table);
-    tv.setText(P.get_cfg(2));
+    tv.setText(C.get_cfg(2));
 
     Button b_save = (Button) dialog.findViewById(R.id.save);
     b_save.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.remote_doit(C.CONFIG_SAVE, P.get_cfg(2));
+            act.remote_doit(C.CONFIG_SAVE, C.get_cfg(2));
             end_dialog(dialog, false);
         }
     });
@@ -718,16 +718,16 @@ private void screen_dialog()
         @Override
         public void onClick(View v) {
             act.ss_info.enable = cb_enable.isChecked();
-            P.put("ss_enable", act.ss_info.enable);
+            P_SS.put("ss_enable", act.ss_info.enable);
             act.ss_info.host = et_host.getText().toString();
-            P.put("ss_host", act.ss_info.host);
+            P_SS.put("ss_host", act.ss_info.host);
             act.ss_info.list = C.suffix(act.ss_info.host);
             act.ss_info.server = et_server.getText().toString();
-            P.put("ss_server", act.ss_info.server);
+            P_SS.put("ss_server", act.ss_info.server);
             act.ss_info.user = et_user.getText().toString();
-            P.put("ss_user", act.ss_info.user);
+            P_SS.put("ss_user", act.ss_info.user);
             act.ss_info.pwd = et_pwd.getText().toString();
-            P.put("ss_pwd", act.ss_info.pwd);
+            P_SS.put("ss_pwd", act.ss_info.pwd);
 
             try {
                 act.ss_info.start = C.a2i(ss_start.getText().toString());
