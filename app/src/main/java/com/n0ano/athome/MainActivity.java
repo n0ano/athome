@@ -697,15 +697,15 @@ private void set_cfg(String cfg)
     Log.cfg(P.get_int("debug"), P.get_string("general:log_uri"), P.get_string("general:log_params"));
 }
 
-public void remote_doit(final String type, final String cfg)
+public void remote_doit(final String host, final String type, final String cfg)
 {
 
     new Thread(new Runnable() {
         public void run() {
             if (type.equals(C.CONFIG_SAVE))
-                call_api("POST", P.get_string("general:config_url") + C.CONFIG_URI, type, "", cfg);
+                call_api("POST", host + C.CONFIG_URI, type, "", cfg);
             else {
-                String resp = call_api("GET", P.get_string("general:config_url") + C.CONFIG_URI, type, "", null);
+                String resp = call_api("GET", host + C.CONFIG_URI, type, "", null);
                 final boolean ok = (resp.length() > 1);
                 if (ok) {
                     C.new_cfg(resp.substring(1));

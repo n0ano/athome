@@ -219,11 +219,16 @@ private void config_dialog()
     final TextView tv = (TextView) dialog.findViewById(R.id.config_table);
     tv.setText(C.get_cfg(2));
 
+    final TextView cfg_url = (TextView) dialog.findViewById(R.id.config_url);
+    cfg_url.setText(P.get_string("general:config_url"));
+
     Button b_save = (Button) dialog.findViewById(R.id.save);
     b_save.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.remote_doit(C.CONFIG_SAVE, C.get_cfg(2));
+            String host = cfg_url.getText().toString();
+            P.put("general:config_url", cfg_url.getText().toString());
+            act.remote_doit(host, C.CONFIG_SAVE, C.get_cfg(2));
             end_dialog(dialog, false);
         }
     });
@@ -232,7 +237,9 @@ private void config_dialog()
     b_load.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            act.remote_doit(C.CONFIG_LOAD, null);
+            String host = cfg_url.getText().toString();
+            P.put("general:config_url", cfg_url.getText().toString());
+            act.remote_doit(host, C.CONFIG_LOAD, null);
             end_dialog(dialog, false);
         }
     });
@@ -746,7 +753,7 @@ private void screen_dialog()
             act.ss_info.fade = type_pos;
             P_SS.put("ss_fade", act.ss_info.fade);
 
-            if (cb.isChecked())
+            if (cb.isChecked() && act.ss_saver != null)
                 act.ss_saver.ss_reset();
 
             act.ss_control(C.SS_OP_INIT);
@@ -773,9 +780,6 @@ private void developer_dialog()
     final TextView params = (TextView) dialog.findViewById(R.id.log_params);
     params.setText(P.get_string("general:log_params"));
 
-    final TextView cfg_url = (TextView) dialog.findViewById(R.id.config_url);
-    cfg_url.setText(P.get_string("general:config_url"));
-
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
@@ -784,8 +788,6 @@ private void developer_dialog()
 
             P.put("general:log_uri", uri.getText().toString());
             P.put("general:log_params", params.getText().toString());
-
-            P.put("general:config_url", cfg_url.getText().toString());
 
             P.put("debug", (cb.isChecked() ? 1 : 0));
             Log.cfg(P.get_int("debug"), P.get_string("general:log_uri"), P.get_string("general:log_params"));

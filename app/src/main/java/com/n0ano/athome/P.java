@@ -42,58 +42,6 @@ public static void init(SharedPreferences pref)
 	P.pref = pref;
     init_defaults();
     json_cfg = C.str2json(pref.getString("config", "{\"pref_version\":0}"));
-
-    switch (get_int("pref_version")) {
-
-    default:
-    case 0:
-        cfg_v0_v2();
-        break;
-
-    case 2:
-        cfg_v2_v3();
-
-    case P.PREF_VERSION:
-        break;
-
-    }
-}
-
-private static void cfg_v0_v2()
-{
-
-    Log.d("Convert preferences to version 2");
-
-	put("general_layout", get_old("general_layout", Popup.LAYOUT_TABLET));
-	put("general_on", get_old("general_on", -1));
-	put("general_off", get_old("general_off", -1));
-	put("egauge_layout", get_old("egauge_layout", Popup.LAYOUT_TABLET));
-	put("egauge_progress", get_old("egauge_progress", 1));
-	put("egauge_url", get_old("egauge_url", ""));
-	put("egauge_clock", get_old("egauge_clock", false));
-	put("weather_layout", get_old("weather_layout", Popup.LAYOUT_TABLET));
-	put("weather_progress", get_old("weather_progress", 1));
-	put("wunder_id", get_old("wunder_id", ""));
-	put("wunder_key", get_old("wunder_key", ""));
-	put("thermostat_layout", get_old("thermostat_layout", Popup.LAYOUT_TABLET));
-	put("ecobee_api", get_old("ecobee_api", ""));
-	put("ecobee_access", get_old("ecobee_access", ""));
-	put("ecobee_refresh", get_old("ecobee_refresh", ""));
-	put("outlets_layout", get_old("outlets_layout", Popup.LAYOUT_TABLET));
-	put("outlets_battery", get_old("outlets_battery", ""));
-	put("outlets_cols", get_old("outlets_cols", C.OUTLETS_COLS));
-	put("outlets_batt_min", get_old("outlets_batt_min", C.BATTERY_LOW));
-	put("outlets_batt_max", get_old("outlets_batt_max", C.BATTERY_HIGH));
-	put("outlets_batt_level", get_old("outlets_batt_level", 0));
-	put("x10_url", get_old("x10_url", ""));
-	put("x10_jwt", get_old("x10_jwt", "none"));
-	put("tplink_user", get_old("tplink_user", ""));
-	put("tplink_pwd", get_old("tplink_pwd", ""));
-	put("log_uri", get_old("log_uri", ""));
-	put("log_params", get_old("log_params", ""));
-	put("debug", get_old("debug", 0));
-
-    put("pref_version", P.PREF_VERSION);
 }
 
 private static void cfg_v2_v3()

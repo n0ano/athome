@@ -60,7 +60,7 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
         return;
     }
 
-    int max = house.length();
+    int max = (house == null) ? 0 : house.length();
     for (int i = 0; i < max; i++) {
         if ((info = (JSONObject)C.json_get(house, i)) == null)
             continue;
