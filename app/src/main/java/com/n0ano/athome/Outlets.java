@@ -59,13 +59,11 @@ public Outlets(final MainActivity act, View v, final DoitCallback cb)
                         //
                         //  Get the data
                         //
-                        if (!paused) {
-                            battery();
+                        battery();
 
-                            boolean x10_change = x10.get_data(outlets_adapter);
-                            boolean tp_change = tplink.get_data(outlets_adapter);
-                            cb.doit(x10_change || tp_change);
-                        }
+                        boolean x10_change = x10.get_data(outlets_adapter);
+                        boolean tp_change = tplink.get_data(outlets_adapter);
+                        cb.doit(x10_change || tp_change);
 
                         SystemClock.sleep(PERIOD);
                     }
