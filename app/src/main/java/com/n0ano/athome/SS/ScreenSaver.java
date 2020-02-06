@@ -56,6 +56,7 @@ String menu_title = null;
 private ScreenInfo ss_info;
 private ImageFind finder;
 
+private boolean fling_ok = false;
 private boolean running = true;
 private int idle_counter;
 private int disp_counter;
@@ -86,12 +87,15 @@ public ScreenSaver(View first, View v1, View v2, Activity act, final SS_Callback
 
     img_lists = new ImageLists(ss_info.list, "", finder);
 
+    //
+    // this must be initialized before the first call to hide_views
+    //
+    faders = new Faders(this);
+
     this.first = first;
     ss_views[0] = v1;
     ss_views[1] = v2;
     hide_views();
-
-    faders = new Faders(this);
 
     main_thread = new Thread(new Runnable() {
         public void run() {
@@ -106,12 +110,12 @@ public ScreenSaver(View first, View v1, View v2, Activity act, final SS_Callback
 
 public void hide_views()
 {
+
+    faders.stop();
     ss_views[0].setVisibility(View.GONE);
     ss_views[0].setAlpha(0.0f);
     ss_views[1].setVisibility(View.GONE);
     ss_views[1].setAlpha(0.0f);
-    first.setVisibility(View.VISIBLE);
-    first.setAlpha(1.0f);
 }
 
 public void do_fade(View start, View end)
@@ -209,6 +213,7 @@ private void init_list(int listno)
 public void saver_start(int listno)
 {
 
+    fling_ok = false;
     ss_info = callbacks.ss_start();
     menu_title = null;
 
@@ -239,7 +244,7 @@ Log.d("DDD-SS", "screen_saver command - " + cmd);
 
     case SAVER_BLOCK:
         idle_counter = -1;
-        disp_counter = -1;
+        disp_counter = -100;
         break;
 
     case SAVER_STOP:
@@ -270,14 +275,9 @@ public boolean touch()
         return true;
     }
 
-    if (disp_counter <= 0) {
-        do_toast("Wait for fade to comlete");
-        return false;
-    }
-
     callbacks.ss_stop();
     hide_views();
-    disp_counter = 0;
+    disp_counter = -100;
     disp_list = 1;
     idle_counter = ss_info.start;
     return false;
@@ -326,7 +326,7 @@ public void upd_list(final int gen)
 public void saver_fling(int dir)
 {
 
-    if (disp_counter <= -100)
+    if (fling_ok)
         saver_fade(dir);
 }
 
@@ -348,12 +348,14 @@ public void saver_click()
     //        100 seconds
     //
     if (disp_counter <= -100) {
+        fling_ok = false;
         callbacks.ss_toolbar(null, R.drawable.ss_play);
         ss_info.fade = fade_type;
         disp_counter = 1;
         return;
     }
 
+    fling_ok = true;
     callbacks.ss_toolbar(null, R.drawable.ss_pause);
     fade_type = ss_info.fade;
     ss_info.fade = 5;
@@ -370,7 +372,7 @@ private void main_loop()
     int d, i;
 
 Log.d("DDD-SS", "Screen saver main loop started");
-    disp_counter = 0;
+    disp_counter = -100;
     idle_counter = ss_info.start;
     while (running) {
 //Log.d("DDD-SS", "idle - " + idle_counter + ", " + disp_counter);

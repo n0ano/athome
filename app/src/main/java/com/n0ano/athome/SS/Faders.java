@@ -8,6 +8,7 @@ import android.widget.TextView;
 import java.util.Random;
 
 import com.n0ano.athome.R;
+import com.n0ano.athome.Log;
 
 public class Faders
 {
@@ -33,7 +34,7 @@ private int duration = 2000;
 
 private int active;
 private DoneCallback callback;
-public boolean end_fade = true;
+private boolean stop_fade = false;
 
 public Faders(ScreenSaver ctx)
 {
@@ -51,6 +52,7 @@ public void fade(int type, View start, View end, int w, int h, DoneCallback call
         type = rand.nextInt(5);
 
     active = 2;
+    stop_fade = false;
 
     switch (type) {
 
@@ -79,6 +81,12 @@ public void fade(int type, View start, View end, int w, int h, DoneCallback call
         return;
 
     }
+}
+
+public void stop()
+{
+
+    stop_fade = true;
 }
 
 public boolean fading()
@@ -233,13 +241,14 @@ private void fade_done(View view, int which)
     switch (which) {
 
     case FADE_START:
-        view.setVisibility(View.GONE);
         view.setTranslationX(0);
         view.setTranslationY(0);
         view.setAlpha(1.0f);
         TextView tv = (TextView)view.findViewById(R.id.title);
         if (tv != null)
             tv.setText("");
+        if (!stop_fade)
+            view.setVisibility(View.GONE);
         break;
 
     case FADE_END:

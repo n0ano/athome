@@ -438,7 +438,6 @@ public void ss_control(int op)
                 @Override
                 public void ss_stop()
                 {
-                    Log.d("DDD-SS", "screen saver stop");
                     pause_threads(false);
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -448,6 +447,10 @@ public void ss_control(int op)
                             icon.setIcon(R.drawable.ss_monitor);
                             menu_icons(true);
 
+                            View v = (View)findViewById(R.id.scroll_view);
+                            v.setScaleX(1.0f);
+                            v.setScaleY(1.0f);
+                            v.setAlpha(1.0f);
                             display(screen);
                         }
                     });
@@ -828,7 +831,6 @@ private void clock()
 private void sh_rain()
 {
 
-Log.d("DDD-SS", "set rain to --");
     TextView tv = (TextView)findViewById(R.id.weather_rain);
     tv.setText("--");
 tv.invalidate();
