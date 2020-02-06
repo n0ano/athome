@@ -166,6 +166,8 @@ protected void onStop()
     if (outlets != null)
         outlets.stop();
 
+    ss_control(C.SS_OP_STOP);
+
     super.onStop();
     Log.d("MainActivity: onStop");
 }
@@ -486,12 +488,17 @@ public void ss_control(int op)
 
     case C.SS_OP_RESET:
         if (ss_saver != null)
-            ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
+            ss_saver.touch();
         break;
 
     case C.SS_OP_BLOCK:
         if (ss_saver != null)
             ss_saver.screen_saver(ScreenSaver.SAVER_BLOCK);
+        break;
+
+    case C.SS_OP_STOP:
+        if (ss_saver != null)
+            ss_saver.screen_saver(ScreenSaver.SAVER_STOP);
         break;
 
     case C.SS_OP_UPDATE:

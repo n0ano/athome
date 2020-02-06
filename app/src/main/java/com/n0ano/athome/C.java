@@ -19,6 +19,7 @@ public static final int SS_OP_INIT =    0;
 public static final int SS_OP_RESET =   1;
 public static final int SS_OP_BLOCK =   2;
 public static final int SS_OP_UPDATE =  3;
+public static final int SS_OP_STOP =    4;
 
 public final static int BATTERY_LOW  = 20;
 public final static int BATTERY_HIGH = 90;

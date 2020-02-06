@@ -33,6 +33,7 @@ private int duration = 2000;
 
 private int active;
 private DoneCallback callback;
+public boolean end_fade = true;
 
 public Faders(ScreenSaver ctx)
 {
@@ -242,7 +243,6 @@ private void fade_done(View view, int which)
         break;
 
     case FADE_END:
-        view.setVisibility(View.VISIBLE);
         break;
 
     }
