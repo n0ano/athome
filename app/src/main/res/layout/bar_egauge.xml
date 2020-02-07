@@ -81,6 +81,18 @@
 
 		</LinearLayout>
 
+    <Button
+        android:id="@+id/egauge_alerts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Show alerts"
+        android:textColor="@color/dialog_fore"
+        android:background="@color/buttonBack" />
+
 	<LinearLayout
 		android:gravity="right"
 		android:orientation="horizontal"

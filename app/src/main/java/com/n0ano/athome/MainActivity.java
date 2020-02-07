@@ -208,8 +208,12 @@ public boolean onCreateOptionsMenu(Menu menu)
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_main, menu);
     menu_bar = menu;
+
     MenuItem icon = menu_bar.findItem(R.id.action_saver);
     icon.setVisible(ss_info.enable);
+
+    menu_bar.findItem(R.id.action_alerts).setVisible(false);
+
     return true;
 }
 
@@ -262,7 +266,7 @@ public void restart()
 
 private void menu_icons(boolean vis)
 {
-    MenuItem icon = menu_bar.findItem(R.id.action_saver);
+    MenuItem icon;
 
 	icon = menu_bar.findItem(R.id.action_display);
     icon.setVisible(vis);
@@ -381,11 +385,11 @@ public View view_show(int layout, int view_id)
     return v;
 }
 
-public void saver_click()
+public void action_click()
 {
 
     if (ss_saver != null)
-        ss_saver.saver_click();
+        ss_saver.action_click();
 }
 
 public void ss_control(int op)
@@ -850,6 +854,50 @@ private void pause_threads(boolean p)
         outlets.pause(p);
 }
 
+public void alerts_ack()
+{
+
+    if (egauge != null)
+        P.put("egauge:ts", egauge.alerts_ack());
+    sh_alerts();
+}
+
+public String alerts_str()
+{
+    int pri;
+    Alert alert;
+
+    if (egauge == null || egauge.alerts_count() <= 0)
+        return "";
+
+    pri = egauge.alerts_item(0).pri;
+    String str = "";
+    int max = egauge.alerts_count();
+    for (int i = 0; i < max; ++i) {
+        alert = egauge.alerts_item(i);
+        if (alert.pri != pri) {
+            str += "\n";
+            pri = alert.pri;
+        }
+        str += alert.pri + ":";
+        str += C.epoch_str(alert.ts);
+        str += " - " + alert.name;
+        if (alert.detail != null)
+            str += "(" + alert.detail + ")";
+        str += "\n";
+    }
+    return str;
+}
+
+private void sh_alerts()
+{
+    boolean vis = false;
+
+    if (egauge != null && egauge.alerts_count() > 0)
+        vis = true;
+	menu_bar.findItem(R.id.action_alerts).setVisible(vis);
+}
+
 private void doit()
 {
 
@@ -861,12 +909,13 @@ private void doit()
         cv.setVisibility(P.get_boolean("egauge:clock")    ? View.VISIBLE : View.GONE);
     }
     if (egauge_view != null)
-        egauge = new Egauge(this, new DoitCallback() {
+        egauge = new Egauge(this, P.get_long("egauge:ts"), new DoitCallback() {
             @Override
             public void doit(Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         egauge.show(egauge_view);
+                        sh_alerts();
                     }
                 });
             }

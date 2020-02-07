@@ -33,10 +33,12 @@ public final static int SAVER_STOP =    5;  // stop screen saver threads
 //
 //  Screen saver states
 //
-public final static int SAVER_COUNTING =    0;  // counting down to start
-public final static int SAVER_SHOWING =     1;  // saver actively running
-public final static int SAVER_BLOCKED =     2;  // block for popups
-public final static int SAVER_FROZEN =      3;  // freeze saver with picture displayed
+public final static int SS_UNKNOWN =     0;  // counting down to start
+public final static int SS_COUNTING =    1;  // counting down to start
+public final static int SS_SHOWING =     2;  // saver actively running
+public final static int SS_FROZEN =      3;  // freeze saver with picture displayed
+
+private final static int FADE_MAX =    100;
 
 //
 //  Main loop interruption types
@@ -67,7 +69,6 @@ private View[] ss_views = new View[2];
 private int ss_viewid = 0;
 private Faders faders;
 
-int intr_type = INTR_NONE;
 int fade_type;
 
 ImageVM image_vm = null;
@@ -124,7 +125,7 @@ public void do_fade(View start, View end)
     faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new DoneCallback() {
         @Override
         public void done(Object obj) {
-            if (disp_counter > -100)
+            if (ss_state() != SS_FROZEN)
                 disp_counter = ss_info.delay;
         }
     });
@@ -156,7 +157,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                         if (img_start != null)
                             img_start.setVisibility(View.GONE);
                         img_end.setVisibility(View.VISIBLE);
-                        if (disp_counter > -100)
+                        if (ss_state() != SS_FROZEN)
                             disp_counter = ss_info.delay;
                     }
                 }
@@ -244,7 +245,7 @@ Log.d("DDD-SS", "screen_saver command - " + cmd);
 
     case SAVER_BLOCK:
         idle_counter = -1;
-        disp_counter = -100;
+        disp_counter = -FADE_MAX;
         break;
 
     case SAVER_STOP:
@@ -264,20 +265,20 @@ public boolean touch()
     //
     //  SS is paused, ignore the touch
     //
-    if (disp_counter <= -100)
+    if (ss_state() == SS_FROZEN)
         return true;
 
     //
     //  SS is counting down, start cycling now
     //
-    if (idle_counter > 0) {
+    if (ss_state() == SS_COUNTING) {
         idle_counter = ss_info.start;
         return true;
     }
 
     callbacks.ss_stop();
     hide_views();
-    disp_counter = -100;
+    disp_counter = -FADE_MAX;
     disp_list = 1;
     idle_counter = ss_info.start;
     return false;
@@ -330,24 +331,27 @@ public void saver_fling(int dir)
         saver_fade(dir);
 }
 
-public void saver_click()
+//
+//  User tapped on the saver icon in the action bar
+//
+public void action_click()
 {
 
     //
-    //  Screen saver counting down, start it now
+    //  SS_COUNTING: Screen saver counting down, start cycling images
     //
-    if (idle_counter > 0) {
+    if (ss_state() == SS_COUNTING) {
         idle_counter = 1;
         disp_list = 0;
 	    return;
     }
 
     //
-    //  SS is cycling through images
+    //  SS_FROZEN: SS is frozen for manual image changes, start cycling again
     //    NB: This depends upon a fade taking less than
-    //        100 seconds
+    //        FADE_MAX(100) seconds
     //
-    if (disp_counter <= -100) {
+    if (ss_state() == SS_FROZEN) {
         fling_ok = false;
         callbacks.ss_toolbar(null, R.drawable.ss_play);
         ss_info.fade = fade_type;
@@ -355,11 +359,27 @@ public void saver_click()
         return;
     }
 
+    //
+    //  SS_SHOWING: SS is cycling through images, freeze
+    //    in order to manually change images
+    //
     fling_ok = true;
     callbacks.ss_toolbar(null, R.drawable.ss_pause);
     fade_type = ss_info.fade;
     ss_info.fade = 5;
-    disp_counter = -100;
+    disp_counter = -FADE_MAX;
+}
+
+private int ss_state()
+{
+
+    if (idle_counter > 0)
+        return SS_COUNTING;
+    if (disp_counter > -FADE_MAX)
+        return SS_SHOWING;
+    if (disp_counter <= -FADE_MAX)
+        return SS_FROZEN;
+    return SS_UNKNOWN;
 }
 
 
@@ -372,7 +392,7 @@ private void main_loop()
     int d, i;
 
 Log.d("DDD-SS", "Screen saver main loop started");
-    disp_counter = -100;
+    disp_counter = -FADE_MAX;
     idle_counter = ss_info.start;
     while (running) {
 //Log.d("DDD-SS", "idle - " + idle_counter + ", " + disp_counter);

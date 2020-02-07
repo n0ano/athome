@@ -2,6 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.n0ano.athome.MainActivity">
+
+    <item
+        android:id="@+id/action_alerts"
+        android:icon="@drawable/alert"
+        android:orderInCategory="100"
+        android:title="Alerts"
+        app:showAsAction="always" />
  
      <item
         android:id="@+id/action_left"

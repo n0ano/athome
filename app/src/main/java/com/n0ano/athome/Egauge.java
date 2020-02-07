@@ -8,6 +8,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 // Created by n0ano on 10/10/16.
 //
 // Class to handle weather data
@@ -16,9 +19,11 @@ public class Egauge
 {
 
 public final static int PERIOD = (10 * 1000);   // check eGauge every 10 seconds
+public final static int PERIOD_ALERTS = 6;      // check for alerts every 6*PERIOD seconds
 
 public final static String EGAUGE_API = "/cgi-bin/egauge";
 public final static String EGAUGE_QUERY = "tot&inst";
+public final static String EGAUGE_ALERTS = "/cgi-bin/alert";
 
 MainActivity act;
 
@@ -28,27 +33,41 @@ boolean paused = false;
 int use_watt = 0;
 int gen_watt = 0;
 
+ArrayList<Alert> alerts;
+long alert_ts;
+
 int width = 0;
 
 // Egauge: class constructor
 //
 //   act - activity that instantiated the class
 //
-public Egauge(MainActivity act, final DoitCallback cb)
+public Egauge(MainActivity act, long ts, final DoitCallback cb)
 {
 
 	this.act = act;
+    this.alert_ts = ts;
 
     new Thread(new Runnable() {
         public void run() {
+            int ck_alert = 0;
+            boolean show;
             while (running) {
+                show = false;
+
                 //
-                //  Get the data
+                //  Get the data & alerts
                 //
-                if (!paused) {
-                    get_data();
-                    cb.doit(null);
+                if (--ck_alert < 0) {
+                    ck_alert = PERIOD_ALERTS - 1;
+                    show = (get_alerts() > 0);
                 }
+
+                if (!paused)
+                    show = get_data();
+
+                if (show)
+                    cb.doit(null);
 
                 SystemClock.sleep(PERIOD);
             }
@@ -59,9 +78,8 @@ public Egauge(MainActivity act, final DoitCallback cb)
 public void stop() { running = false; }
 public void pause(boolean p) { paused = p; }
 
-private void get_data()
+private boolean get_data()
 {
-
 
     //
     // Get the data
@@ -73,6 +91,63 @@ private void get_data()
                                null);
     use_watt = get_value("Total Usage", resp);
     gen_watt = get_value("Total Generation", resp);
+    return true;
+}
+
+private int get_alerts()
+{
+    Alert alert;
+    int pri;
+    long ts;
+    String name, detail;
+
+    //
+    // Get the alerts
+    //
+    alerts = new ArrayList<Alert>();
+    String resp = act.call_api("GET",
+                        P.get_string("egauge:url") + EGAUGE_ALERTS,
+                        "",
+                        "",
+                        null);
+    int idx = 0;
+    while ((idx = resp.indexOf("<prio>", idx)) >= 0) {
+        pri = (int)get_long("<prio>", 10, resp, idx);
+        ts = get_long("<last_time>0x", 16, resp, idx);
+        name = get_string("<name>", resp, idx);
+        detail = get_string("<detail>", resp, idx);
+        if (ts > this.alert_ts)
+            alerts.add(new Alert(pri, ts, name, detail));
+        ++idx;
+    }
+    Collections.sort(alerts);
+    return alerts.size();
+}
+
+public int alerts_count()
+{
+
+    return alerts.size();
+}
+
+public Alert alerts_item(int idx)
+{
+
+    return alerts.get(idx);
+}
+
+public long alerts_ack()
+{
+    Alert alert;
+
+Log.d("DDD", "egauge: acknowledge newest alert");
+    int max = alerts_count();
+    for (int i = 0; i < max; ++i) {
+        alert = alerts_item(i);
+        if (alert.ts > this.alert_ts)
+            this.alert_ts = alert.ts;
+    }
+    return this.alert_ts;
 }
 
 private int get_value(String name, String resp)
@@ -91,6 +166,23 @@ private int get_value(String name, String resp)
         w = C.a2i(resp.substring(start, end));
     }
     return w;
+}
+
+private String get_string(String key, String resp, int idx)
+{
+    int l, start, end;
+
+    l = key.length();
+    if ((start = resp.indexOf(key, idx)) < 0)
+        return null;
+    end = resp.indexOf("<", start + l);
+    return resp.substring(start + l, end);
+}
+
+private long get_long(String key, int radix, String resp, int idx)
+{
+
+    return Long.parseLong(get_string(key, resp, idx), radix);
 }
 
 private void set_arrow(ImageView iv, int watt, int left, int right)
@@ -153,7 +245,7 @@ public void show(View v)
     int disp_y = Resources.getSystem().getDisplayMetrics().heightPixels;
     //Log.d("display = " + disp_x + "x" + disp_y);
 
-    LinearLayout ll = (LinearLayout)v.findViewById(R.id.egauge);
+    //LinearLayout ll = (LinearLayout)v.findViewById(R.id.egauge);
     //Logandroid and.d("layout = " + ll.getWidth() + "x" + ll.getHeight() + " => " + disp_x + "x" + disp_y);
 
     //ClockView vv = (ClockView)v.findViewById(R.id.clock_view);
@@ -173,21 +265,27 @@ public void show(View v)
 
     int grid_watt = gen_watt - use_watt;
 
-    if ((tv = (TextView) v.findViewById(R.id.grid_watt)) != null)
+    if ((tv = (TextView) v.findViewById(R.id.grid_watt)) != null) {
         tv.setText(k_watts(grid_watt));
 
-    if ((tv = (TextView) v.findViewById(R.id.house_watt)) != null)
-        tv.setText(k_watts(use_watt));
+        ((TextView)v.findViewById(R.id.house_watt)).setText(k_watts(use_watt));
 
-    if ((tv = (TextView) v.findViewById(R.id.panel_watt)) != null)
-        tv.setText(k_watts(gen_watt));
-    if ((iv = (ImageView) v.findViewById(R.id.panel_image)) != null)
-        iv.setImageResource(gen_icon(gen_watt));
-    if ((iv = (ImageView) v.findViewById(R.id.panel_arrow)) != null)
-        iv.setImageResource(gen_arrow(gen_watt));
+        ((TextView)v.findViewById(R.id.panel_watt)).setText(k_watts(gen_watt));
+        ((ImageView)v.findViewById(R.id.panel_image)).setImageResource(gen_icon(gen_watt));
+        ((ImageView)v.findViewById(R.id.panel_arrow)).setImageResource(gen_arrow(gen_watt));
+        LinearLayout ll = (LinearLayout)v.findViewById(R.id.egauge_alert);
+        int num = alerts.size();
+        if (num <= 0)
+            ll.setVisibility(View.GONE);
+        else {
+            ll.setVisibility(View.VISIBLE);
+            tv = (TextView)v.findViewById(R.id.alert_count);
+            tv.setText(num + ((num == 1) ? " Alert" : " Alerts") + " pending");
+        }
 
-    if ((iv = (ImageView) v.findViewById(R.id.grid_arrow)) != null)
-        set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
+        if ((iv = (ImageView) v.findViewById(R.id.grid_arrow)) != null)
+            set_arrow(iv, grid_watt, R.drawable.arrow_left_green, R.drawable.arrow_right_red);
+    }
 }
 
 }

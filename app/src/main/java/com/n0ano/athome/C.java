@@ -8,7 +8,11 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 //
 // Created by n0ano on 11/7/18.
@@ -32,6 +36,13 @@ public final static String CONFIG_SAVE =  "save";
 
 public static boolean paused = true;
 
+public static String suffix(String str)
+{
+
+    int idx = str.lastIndexOf(":");
+    return (idx >= 0) ? str.substring(idx + 1) : "";
+}
+
 public static int a2i(String num)
 {
 
@@ -44,11 +55,13 @@ public static String i2a(int num)
     return Integer.toString(num);
 }
 
-public static String suffix(String str)
+public static String epoch_str(long epoch)
 {
 
-    int idx = str.lastIndexOf(":");
-    return (idx >= 0) ? str.substring(idx + 1) : "";
+    Date date = new Date(epoch * 1000L);
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    format.setTimeZone(TimeZone.getDefault());
+    return format.format(date);
 }
 
 public static JSONObject str2json(String str)

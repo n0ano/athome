@@ -4,6 +4,13 @@
     tools:context="com.n0ano.athome.MainActivity">
 
     <item
+        android:id="@+id/action_alerts"
+        android:icon="@drawable/alert"
+        android:orderInCategory="100"
+        android:title="Alerts"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_saver"
         android:icon="@drawable/ss_monitor"
         android:orderInCategory="100"

@@ -97,8 +97,8 @@ private static void init_defaults()
 
     //
     //  Turns out, only the integer parameters have different
-    //    defaults, the only boolean defaults to false and all
-    //    of the strings default to ""
+    //    defaults, the only boolean defaults to false, the only
+    //    long defaults to 0,  and all of the strings default to ""
     //
 	def_int.put("general_layout", new Integer(Popup.LAYOUT_TABLET));
 	def_int.put("general_on", new Integer(-1));
@@ -227,6 +227,33 @@ public static int get_int(String key)
     return obj.optInt(get_key(key), def == null ? 0 : def.intValue());
 }
 public static void put(String key, int value)
+{
+
+    try {
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.put(get_key(key), value);
+        else {
+            JSONObject obj = get_obj(key);
+            obj.put(get_key(key), value);
+            json_cfg.put(json, obj);
+        }
+    } catch (Exception e) {
+        Log.d("Preferences JSON put error:" + key + "=" + value + " - " + e);
+        return;
+    }
+	SharedPreferences.Editor editor = pref.edit();
+	editor.putString("config", C.json2str(json_cfg));
+	editor.commit();
+}
+
+public static long get_long(String key)
+{
+    
+    JSONObject obj = get_obj(key);
+    return obj.optLong(get_key(key), 0);
+}
+public static void put(String key, long value)
 {
 
     try {

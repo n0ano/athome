@@ -81,7 +81,7 @@ public boolean menu_click(int item)
     switch (item) {
 
     case R.id.action_saver:
-        act.saver_click();
+        act.action_click();
         return true;
 
     case R.id.action_display:
@@ -334,6 +334,28 @@ private void general_dialog()
     });
 }
 
+private void alerts_dialog()
+{
+
+    final Dialog dialog = start_dialog(R.layout.bar_alerts);
+
+    TextView tv = (TextView)dialog.findViewById(R.id.alerts_list);
+    tv.setText(act.alerts_str());
+
+    final CheckBox cb = (CheckBox) dialog.findViewById(R.id.alerts_ack);
+    cb.setChecked(false);
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (cb.isChecked())
+                act.alerts_ack();
+            end_dialog(dialog, false);
+        }
+    });
+}
+
 private void egauge_dialog()
 {
 
@@ -351,6 +373,15 @@ private void egauge_dialog()
 
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
     et.setText(P.get_string("egauge:url"));
+
+    Button show = (Button) dialog.findViewById(R.id.egauge_alerts);
+    show.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            end_dialog(dialog, false);
+            alerts_dialog();
+        }
+    });
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {

@@ -107,6 +107,7 @@
                     android:id="@+id/panel_image"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
                     android:src="@drawable/panel" />
 
                 <TextView
@@ -117,6 +118,48 @@
                     android:layout_marginBottom="10dp"
                     android:layout_gravity="center_horizontal"
                     android:text="0 W" />
+
+                <LinearLayout
+                    android:id="@+id/egauge_alert"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal" >
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal" >
+
+                        <ImageView
+                            android:id="@+id/alert_image"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/alert" />
+
+                        <TextView
+                            android:id="@+id/alert_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="4dp"
+                            android:textSize="18sp"
+                            android:text="1 Alert"
+                            android:textColor="@color/alert_msg" />
+
+                        </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/alert_msg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="4dp"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:text="Low Voltage this is a long message"
+                        android:layout_gravity="center_horizontal" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
