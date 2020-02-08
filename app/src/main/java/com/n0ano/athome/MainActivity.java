@@ -370,6 +370,7 @@ public void display(final boolean onoff)
 public void screen_mgmt(View v)
 {
 
+    ss_control(C.SS_OP_STOP);
     Intent intent = new Intent(this, ImageMgmt.class);
     startActivityForResult(intent, ImageMgmt.IMAGES_UPDATE);
 }
@@ -412,85 +413,83 @@ public void ss_control(int op)
             return;
         }
 
-        if (ss_saver == null) {
-            ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
-            pb.setVisibility(View.VISIBLE);
-            pause_threads(true);
-            ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
-                @Override
-                public ScreenInfo ss_start()
-                {
-                    Log.d("DDD-SS", "screen saver start");
-                    pause_threads(true);
+        ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
+        pb.setVisibility(View.VISIBLE);
+        pause_threads(true);
+        ss_saver = new ScreenSaver((View)findViewById(R.id.scroll_view), (View)findViewById(R.id.saver_view1), (View)findViewById(R.id.saver_view2), (Activity)this, new SS_Callbacks() {
+            @Override
+            public ScreenInfo ss_start()
+            {
+                Log.d("DDD-SS", "screen saver start");
+                pause_threads(true);
 
-                    runOnUiThread(new Runnable() {
-                        public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                        tb.setTitle("AtHome");
+
+                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                        icon.setIcon(R.drawable.ss_play);
+                        menu_icons(false);
+                        View v = (View)findViewById(R.id.scroll_view);
+                        v.setAlpha(1.0f);
+                    }
+                });
+
+                return ss_info;
+            }
+
+            @Override
+            public void ss_stop()
+            {
+                pause_threads(false);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+                        tb.setTitle("AtHome");
+                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                        icon.setIcon(R.drawable.ss_monitor);
+                        menu_icons(true);
+
+                        View v = (View)findViewById(R.id.scroll_view);
+                        v.setScaleX(1.0f);
+                        v.setScaleY(1.0f);
+                        v.setAlpha(1.0f);
+                        display(screen);
+                    }
+                });
+            }
+
+            @Override
+            public void ss_toolbar(final String from, final int mode)
+            {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (from != null) {
                             Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                            tb.setTitle("AtHome");
+                            tb.setTitle(from);
+                        }
 
+                        if (mode != 0) {
                             MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                            icon.setIcon(R.drawable.ss_play);
-                            menu_icons(false);
-                            View v = (View)findViewById(R.id.scroll_view);
-                            v.setAlpha(1.0f);
+                            icon.setIcon(mode);
                         }
-                    });
+                    }
+                });
+            }
 
-                    return ss_info;
-                }
-
-                @Override
-                public void ss_stop()
-                {
-                    pause_threads(false);
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                            tb.setTitle("AtHome");
-                            MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                            icon.setIcon(R.drawable.ss_monitor);
-                            menu_icons(true);
-
-                            View v = (View)findViewById(R.id.scroll_view);
-                            v.setScaleX(1.0f);
-                            v.setScaleY(1.0f);
-                            v.setAlpha(1.0f);
-                            display(screen);
-                        }
-                    });
-                }
-
-                @Override
-                public void ss_toolbar(final String from, final int mode)
-                {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            if (from != null) {
-                                Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-                                tb.setTitle(from);
-                            }
-
-                            if (mode != 0) {
-                                MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                                icon.setIcon(mode);
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void ss_inited()
-                {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
-                            pb.setVisibility(View.GONE);
-                        }
-                    });
-                    pause_threads(false);
-                }
-            });
-        }
+            @Override
+            public void ss_inited()
+            {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        ProgressBar pb = (ProgressBar)findViewById(R.id.main_progress);
+                        pb.setVisibility(View.GONE);
+                    }
+                });
+                pause_threads(false);
+            }
+        });
         break;
 
     case C.SS_OP_RESET:
@@ -504,8 +503,10 @@ public void ss_control(int op)
         break;
 
     case C.SS_OP_STOP:
-        if (ss_saver != null)
+        if (ss_saver != null) {
             ss_saver.screen_saver(ScreenSaver.SAVER_STOP);
+            ss_saver = null;
+        }
         break;
 
     case C.SS_OP_UPDATE:
