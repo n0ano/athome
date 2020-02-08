@@ -582,12 +582,17 @@ public Tuple<String> call_api_nolog(String type, String uri, String params, Stri
 public String call_api(String type, String uri, String params, String auth, String body)
 {
     HttpURLConnection con = null;
+    String line;
 
     Tuple<String>res = call_api_nolog(type, uri, params, auth, body);
-    Log.s(type + " - " + uri + ", params - " + params + ", auth - " + auth +
-        ", body - " + body + " ==> " +
-        ((res.first() == null) ?  res.second() : "[" + res.first() + "]"),
-        this);
+    line = type + " - " + uri;
+    if (!params.isEmpty())
+        line += ", params - " + params;
+    if (!auth.isEmpty())
+        line += ", auth - " + auth;
+    if (body != null)
+        line += ", body - " + body;
+    Log.s(line + " ==> " + ((res.first() == null) ?  res.second() : "[" + res.first() + "]"), this);
     return res.second();
 }
 
