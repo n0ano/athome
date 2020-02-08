@@ -106,6 +106,7 @@ public R call_api(String type, String uri, String params, String auth, String bo
         line += ", auth - " + auth;
     if (body != null)
         line += ", body - " + body;
+    line += " ==> ";
     if (res.code == OK)
         line += res.body;
     else

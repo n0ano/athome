@@ -42,6 +42,61 @@
         android:onClick="display_toggle"
         android:visibility="gone" />
 
+    <LinearLayout
+        android:id="@+id/log_view"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingBottom="5dp"
+            android:paddingTop="10dp" >
+
+            <Button
+                android:id="@+id/log_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Clear"
+                android:textColor="@color/fore"
+                android:background="@color/back" />
+            <Button
+                android:id="@+id/log_return"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="OK"
+                android:textColor="@color/fore"
+                android:background="@color/back" />
+
+            </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <HorizontalScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+
+            <ListView
+                android:id="@+id/log_list"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/saver_view1"
         android:layout_width="fill_parent"

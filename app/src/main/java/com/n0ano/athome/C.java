@@ -64,6 +64,72 @@ public static String epoch_str(long epoch)
     return format.format(date);
 }
 
+public static String indent(String str)
+{
+    char c;
+    String c1;
+
+    boolean quote = false;
+    String s = "";
+    String pre = "";
+    int max = str.length();
+    for (int i = 0; i < max; i++) {
+        if ((i < (max - 5)) && str.substring(i, i + 5).equals(" ==> ")) {
+            s += " ==> \n";
+            i += 4;
+            continue;
+        }
+        if ((c = str.charAt(i)) == '"') {
+            s += String.valueOf(c);
+            quote = !quote;
+            continue;
+        } else if (quote) {
+            s += String.valueOf(c);
+            continue;
+        }
+        switch (c) {
+
+        case '\\':
+            if (str.charAt(i + 1) != 'n')
+                s += "\\" + str.charAt(i + 1);
+            ++i;
+            break;
+
+        case '{':
+            pre += "  ";
+            s += "{\n" + pre;
+            break;
+
+        case '}':
+            if (pre.length() >= 2)
+                pre = pre.substring(2);
+            s += "}\n" + pre;
+            break;
+
+        case '[':
+            pre += "  ";
+            s += "[\n" + pre;
+            break;
+
+        case ']':
+            if (pre.length() >= 2)
+                pre = pre.substring(2);
+            s += "]\n" + pre;
+            break;
+
+        case ',':
+            s += ",\n" + pre;
+            break;
+
+        default:
+            s += String.valueOf(c);
+            break;
+
+        }
+    }
+    return s;
+}
+
 public static JSONObject str2json(String str)
 {
     JSONObject json;

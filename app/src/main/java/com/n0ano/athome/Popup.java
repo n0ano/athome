@@ -198,17 +198,30 @@ public void device_dialog(final OutletsDevice dev)
     });
 }
 
-public void log_detail_dialog(int i, String l)
+public void log_detail_dialog(int i, final String l)
 {
-    TextView tv;
 
     final Dialog dialog = start_dialog(R.layout.bar_log_detail);
 
-    tv = (TextView) dialog.findViewById(R.id.log_lineno);
-    tv.setText(":" + i);
+    TextView lv = (TextView) dialog.findViewById(R.id.log_lineno);
+    lv.setText("" + i);
 
-    tv = (TextView) dialog.findViewById(R.id.log_detail);
+    final TextView tv = (TextView) dialog.findViewById(R.id.log_detail);
     tv.setText(l);
+
+    final Button but = (Button)dialog.findViewById(R.id.log_json);
+    but.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (but.getText().toString().equals("JSON")) {
+                but.setText("RAW");
+                tv.setText(C.indent(l));
+            } else {
+                but.setText("JSON");
+                tv.setText(l);
+            }
+        }
+    });
 }
 
 private void config_dialog()
