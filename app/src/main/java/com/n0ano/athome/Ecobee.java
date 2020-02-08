@@ -25,6 +25,8 @@ public final static String ECO_QUERY = "format=json&body={\"selection\":{\"selec
 
 MainActivity act;
 
+Http http = new Http();
+
 public int period = PERIOD;        // Weather only changes once a minute
 
 Map<String, String> data = new HashMap<String, String>();
@@ -109,11 +111,11 @@ private String ecobee_param(String info, String id)
 public String ecobee_get_pin(String api)
 {
     JSONObject json;
-    String resp;
+    Http.R resp;
 
-    resp = act.call_api(ECO_URL + ECO_AUTHORIZE,
+    resp = http.call_api(ECO_URL + ECO_AUTHORIZE,
                         "response_type=ecobeePin&client_id=" + api + "&scope=smartWrite");
-    if ((json = C.str2json(resp)) == null)
+    if ((json = C.str2json(resp.body)) == null)
         return "";
 
     P.put("thermostat:ecobee_access", json.optString("code", ""));
@@ -124,17 +126,17 @@ public String ecobee_get_pin(String api)
 private void ecobee_token(String type, String code, String api)
 {
     JSONObject json;
-    String resp;
     String token;
+    Http.R resp;
 
-    resp = act.call_api("POST",
+    resp = http.call_api("POST",
                         ECO_URL + ECO_REFRESH,
                         "grant_type=" + type +
                             "&code=" + code +
                             "&client_id=" + api,
                         "",
                         null);
-    if ((json = C.str2json(resp)) == null)
+    if ((json = C.str2json(resp.body)) == null)
         return;
 
     token = json.optString("access_token", "");
@@ -169,19 +171,19 @@ private JSONObject ecobee_query(String info, String id)
     JSONObject json;
     JSONObject status;
 
-    String resp = act.call_api("GET",
+    Http.R resp = http.call_api("GET",
                                ECO_URL + ECO_DATA,
                                ecobee_param(info, id),
                                "Bearer " + P.get_string("thermostat:ecobee_access"),
                                null);
     try {
-        json = C.str2json(resp);
+        json = C.str2json(resp.body);
         status = (JSONObject)json.get("status");
         if (status.getInt("code") == 0)
             return json;
-        Log.d("Ecobee: query(" + resp + ") bad status");
+        Log.d("Ecobee: query(" + resp.body + ") bad status");
     } catch (Exception e) {
-        Log.d("Ecobee: query(" + resp + ") json parse error - " + e);
+        Log.d("Ecobee: query(" + resp.body + ") json parse error - " + e);
     }
     return null;
 }
@@ -204,7 +206,7 @@ public void ecobee_resume(ThermostatDevice dev)
                   "  }" + "\n" +
                   " ]" + "\n" +
                   "}";
-    String resp = act.call_api("POST",
+    Http.R resp = http.call_api("POST",
                                ECO_URL + ECO_DATA,
                                "format=json",
                                "Bearer " + P.get_string("thermostat:ecobee_access"),
@@ -238,7 +240,7 @@ public void ecobee_hold(int heat, ThermostatDevice dev)
                   "  }" + "\n" +
                   " ]" + "\n" +
                   "}";
-    String resp = act.call_api("POST",
+    Http.R resp = http.call_api("POST",
                                ECO_URL + ECO_DATA,
                                "format=json",
                                "Bearer " + P.get_string("thermostat:ecobee_access"),

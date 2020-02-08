@@ -46,6 +46,8 @@ private final static String DATA_TEMPLATE =
 MainActivity act;
 Popup popup;
 
+Http http = new Http();
+
 boolean running = true;
 boolean paused = false;
 
@@ -175,13 +177,14 @@ private boolean get_info_wunder(JSONObject json)
 
 private void get_wunder()
 {
+    Http.R resp;
 
-    String resp = act.call_api(WUNDER_URL + WUNDER_API,
-                               WUNDER_ID + P.get_string("weather:wunder_id") +
-                               WUNDER_KEY + P.get_string("weather:wunder_key") +
-                               WUNDER_QUERY);
+    resp = http.call_api(WUNDER_URL + WUNDER_API,
+                        WUNDER_ID + P.get_string("weather:wunder_id") +
+                        WUNDER_KEY + P.get_string("weather:wunder_key") +
+                        WUNDER_QUERY);
     try {
-        JSONObject json = new JSONObject(resp);
+        JSONObject json = new JSONObject(resp.body);
         get_info_wunder(json);
     } catch (Exception e) {
         Log.d("get_wunder: no data for station " + P.get_string("weather:wunder_id"));

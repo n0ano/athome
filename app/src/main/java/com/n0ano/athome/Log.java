@@ -70,8 +70,11 @@ static void clear()
     Log.log_full = false;
 }
 
+//
+//  Stream to a remote server - need to re-design this
+//
 public synchronized
-static void s(String string, MainActivity act)
+static void s(String string)
 {
 
     Log.log_buf[Log.log_next++] = string.replace("\n", "\\n");
@@ -80,7 +83,6 @@ static void s(String string, MainActivity act)
         Log.log_next = 0;
         Log.log_full = true;
     }
-    act.stream_log(string);
 }
 
 public static void i(String string) { i(TAG, string); }

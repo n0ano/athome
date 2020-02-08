@@ -56,6 +56,7 @@ private boolean paused = false;
 
 public Menu menu_bar;
 
+Http http = new Http();
 private String url;
 
 int degree = 0;
@@ -517,135 +518,16 @@ public void ss_control(int op)
     }
 }
 
-public void stream_log(String line)
-{
-
-    if (P.get_string("general:log_uri").equals(""))
-        return;
-    call_api_nolog("GET", P.get_string("general:log_uri"), P.get_string("general:log_params") + URLEncoder.encode(line), "", null);
-}
-
-/*
- *  call an HTTP(S) uri to get a response.  Note that this will return
- *      a string with the `entire` response.  If the API returns a lot
- *      of data you might be better off using the open_url/read_url/close_url
- *      interface available right below this one.
- */
-public Tuple<String> call_api_nolog(String type, String uri, String params, String auth, String body)
-{
-    HttpURLConnection con = null;
-    String res = "";
-    String except = null;
-
-    if (!params.equals(""))
-        uri = uri + "?" + params;
-    try {
-        URL url = new URL(uri);
-        con = (HttpURLConnection) url.openConnection();
-        con.setConnectTimeout(5000);
-        con.setReadTimeout(5000);
-        if (type.equals("POST"))
-            con.setDoOutput(true);
-        if (!auth.equals(""))
-            con.setRequestProperty("Authorization", auth);
-        if (body != null) {
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setDoInput(true);
-            OutputStream os = con.getOutputStream();
-            BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            wr.write(body);
-            wr.flush();
-            wr.close();
-        }
-        InputStreamReader in = new InputStreamReader(con.getInputStream());
-        BufferedReader inp = new BufferedReader (in);
-        StringBuilder response = new StringBuilder();
-        for (String line; (line = inp.readLine()) != null; )
-            response.append(line).append('\n');
-        res = response.toString();
-    } catch (java.net.SocketTimeoutException e) {
-        except = e.toString();
-        res = "";
-    } catch (Exception e) {
-        except = e.toString();
-        res = "";
-    } finally {
-        if (con != null)
-            con.disconnect();
-    }
-    return new Tuple<String>(except, res);
-}
-
-/*
- *  call an HTTP(S) uri to get a response and log the request & response
- */
-public String call_api(String type, String uri, String params, String auth, String body)
-{
-    HttpURLConnection con = null;
-    String line;
-    long stime, etime;
-
-    stime = SystemClock.elapsedRealtime();
-    Tuple<String>res = call_api_nolog(type, uri, params, auth, body);
-    etime = SystemClock.elapsedRealtime();
-    line = type + "(" + (etime - stime) + "):" + uri;
-    if (!params.isEmpty())
-        line += ", params - " + params;
-    if (!auth.isEmpty())
-        line += ", auth - " + auth;
-    if (body != null)
-        line += ", body - " + body;
-    Log.s(line + " ==> " + ((res.first() == null) ?  res.second() : "[" + res.first() + "]"), this);
-    return res.second();
-}
-
-public String call_api(String uri, String params)
-{
-
-    return call_api("GET", uri, params, "", null);
-}
-
-public BufferedReader open_url(String url, String auth)
-{
-    URL server;
-    InputStreamReader in_rdr;
-    BufferedReader inp;
-
-    try {
-        Log.d("get data from " + url);
-        server = new URL(url);
-        HttpURLConnection url_con = (HttpURLConnection) server.openConnection();
-        in_rdr = new InputStreamReader(url_con.getInputStream());
-        inp = new BufferedReader (in_rdr);
-    } catch (Exception e) {
-        Log.d("open_url failed - " + e);
-        return null;
-    }
-    return inp;
-}
-
-public String read_url(BufferedReader inp)
-{
-    String line = null;
-
-    try {
-        line = inp.readLine();
-    } catch (Exception e) {
-        Log.d("read_url failed - " + e);
-        return null;
-    }
-    return line;
-}
-
-public void close_url(BufferedReader inp)
-{
-
-    try {
-        inp.close();
-    } catch (Exception e) {
-        Log.d("close_url failed - " + e);
-    }
-}
+//  Need to re-design how to do this (e.g. stream the logging
+//    lines to an external server
+//
+//public void stream_log(String line)
+//{
+//
+//    if (P.get_string("general:log_uri").equals(""))
+//        return;
+//    call_api_nolog("GET", P.get_string("general:log_uri"), P.get_string("general:log_params") + URLEncoder.encode(line), "", null);
+//}
 
 public void show_log()
 {
@@ -730,14 +612,14 @@ public void remote_doit(final String host, final String type, final String cfg)
 {
 
     new Thread(new Runnable() {
+
         public void run() {
             if (type.equals(C.CONFIG_SAVE))
-                call_api("POST", host + C.CONFIG_URI, type, "", cfg);
+                http.call_api("POST", host + C.CONFIG_URI, type, "", cfg);
             else {
-                String resp = call_api(host + C.CONFIG_URI, type);
-                final boolean ok = (resp.length() > 1);
-                if (ok) {
-                    C.new_cfg(resp.substring(1));
+                Http.R resp = http.call_api(host + C.CONFIG_URI, type);
+                if (resp.code == Http.OK) {
+                    C.new_cfg(resp.body.substring(1));
                     restart();
                 }
             }

@@ -27,6 +27,8 @@ int offline_count = 0;
 
 MainActivity act;
 
+Http http = new Http();
+
 Map<String, String> onoff_state = new HashMap<String, String>();
 
 // X10: class constructor
@@ -45,14 +47,14 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
     JSONArray devices, house;
     String code, name;
 
-    final String resp = act.call_api(P.get_string("outlets:x10_url") + X10_API,
+    Http.R resp = http.call_api(P.get_string("outlets:x10_url") + X10_API,
                                      X10_LIST + "&token=" + P.get_string("outlets:x10_jwt"));
 
     try {
-        json = C.str2json(resp);
+        json = C.str2json(resp.body);
         house = json.optJSONArray("house");
     } catch (Exception e) {
-        Log.d("X10 get devices(" + resp + ") json parse error - " + e);
+        Log.d("X10 get devices(" + resp.body + ") json parse error - " + e);
         cb.doit(0, null);
         return;
     }
@@ -89,7 +91,7 @@ public void control(final OutletsDevice dev, boolean onoff)
     final String state = onoff ? "on" : "off";
     new Thread(new Runnable() {
         public void run() {
-            String resp = act.call_api(P.get_string("outlets:x10_url") + X10_API,
+            Http.R resp = http.call_api(P.get_string("outlets:x10_url") + X10_API,
                                        X10_SET + "&code=" + dev.get_dev_code() +
                                                  "&state=" + state +
                                                  "&token=" + P.get_string("outlets:x10_jwt"));
@@ -141,10 +143,10 @@ public boolean get_data(OutletsAdapter adapter)
     //
     //  Get the data and display any changes
     //
-    String resp = act.call_api(P.get_string("outlets:x10_url") + X10_API,
+    Http.R resp = http.call_api(P.get_string("outlets:x10_url") + X10_API,
                                X10_GET);
 
-    if ((json = C.str2json(resp)) == null) {
+    if ((json = C.str2json(resp.body)) == null) {
         if (++offline_count > OFFLINE_MAX)
             x10_state(adapter, OutletsDevice.OFFLINE);
         return false;
@@ -154,7 +156,7 @@ public boolean get_data(OutletsAdapter adapter)
 
     JSONArray house = json.optJSONArray("house");
     if (house == null) {
-        Log.d("X10 house info missing - " + resp);
+        Log.d("X10 house info missing - " + resp.body);
         return false;
     }
 

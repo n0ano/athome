@@ -21,6 +21,8 @@ private final static String TPLINK_UUID = "621dd649-160c-41dd-9ceb-5a46ad8fb90e"
 
 MainActivity act;
 
+Http http = new Http();
+
 private int period = PERIOD;        // Weather only changes once a minute
 
 String token;
@@ -37,20 +39,21 @@ public Tplink(final MainActivity act)
 
 private boolean current_state(OutletsDevice dev)
 {
+    Http.R resp;
 
-    String resp = act.call_api("POST",
-                                dev.get_url(),
-                                "token=" + token,
-                                "",
-                                "{" +
-                                    "\"method\":\"passthrough\"," +
-                                    "\"params\":{" +
-                                    "\"deviceId\":\"" + dev.get_code() + "\"," +
-                                    "\"requestData\":\"{\\\"system\\\":{\\\"get_sysinfo\\\":{}}}\"" +
-                                    "}}"
-                               );
+    resp = http.call_api("POST",
+                        dev.get_url(),
+                        "token=" + token,
+                        "",
+                        "{" +
+                            "\"method\":\"passthrough\"," +
+                            "\"params\":{" +
+                            "\"deviceId\":\"" + dev.get_code() + "\"," +
+                            "\"requestData\":\"{\\\"system\\\":{\\\"get_sysinfo\\\":{}}}\"" +
+                            "}}"
+                       );
     try {
-        JSONObject json = C.str2json(resp);
+        JSONObject json = C.str2json(resp.body);
         if (json.getInt("error_code") == TPLINK_OFFLINE) {
             dev.set_state(OutletsDevice.OFFLINE, false);
             Log.d("TPLink: " + dev.get_name() + " offline");
@@ -66,19 +69,19 @@ private boolean current_state(OutletsDevice dev)
         return onoff.equals("1");
     } catch (Exception e) {
         dev.set_state(OutletsDevice.OFFLINE, false);
-        Log.d("TPLink: " + dev.get_name() + " offline, json parse(" + resp + ") error - " + e);
+        Log.d("TPLink: " + dev.get_name() + " offline, json parse(" + resp.body + ") error - " + e);
     }
     return false;
 }
 
 public void get_devices(OutletsAdapter adapter, DoitCallback cb)
 {
-    String resp;
+    Http.R resp;
     JSONObject json, result, info;
     JSONArray list;
     OutletsDevice dev;
 
-    resp = act.call_api("POST",
+    resp = http.call_api("POST",
                         TPLINK_URL,
                         "",
                         "",
@@ -92,27 +95,27 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
                             "}}"
                        );
     try {
-        json = C.str2json(resp);
+        json = C.str2json(resp.body);
         result = (JSONObject)json.get("result");
     } catch (Exception e) {
-        Log.d("TPLink get devices(" + resp + ") json parse error " + e);
+        Log.d("TPLink get devices(" + resp.body + ") json parse error " + e);
         cb.doit(0, null);
         return;
     }
 
     token = result.optString("token", "");
-    resp = act.call_api("POST",
+    resp = http.call_api("POST",
                         TPLINK_URL,
                         "token=" + token,
                         "",
                         "{\"method\":\"getDeviceList\"}"
                        );
     try {
-        json = C.str2json(resp);
+        json = C.str2json(resp.body);
         result = (JSONObject)json.get("result");
         list = result.optJSONArray("deviceList");
     } catch (Exception e) {
-        Log.d("TPLink get_devices(" + resp + ") parse error - " + e);
+        Log.d("TPLink get_devices(" + resp.body + ") parse error - " + e);
         cb.doit(0, null);
         return;
     }
@@ -138,20 +141,22 @@ public void control(final OutletsDevice dev, boolean onoff)
     final String state = onoff ? "1" : "0";
     new Thread(new Runnable() {
         public void run() {
-            String resp = act.call_api("POST",
-                                        dev.get_url(),
-                                        "token=" + token,
-                                        "",
-                                        "{" +
-                                            "\"method\":\"passthrough\"," +
-                                            "\"params\":{" +
-                                            "\"deviceId\":\"" + dev.get_code() + "\"," +
-                                            "\"requestData\":\"{\\\"system\\\":{" +
-                                                "\\\"set_relay_state\\\":{" +
-                                                    "\\\"state\\\":" + state + "}" +
-                                                "}}\"" +
-                                            "}}"
-                                       );
+            Http.R resp;
+
+            resp = http.call_api("POST",
+                                dev.get_url(),
+                                "token=" + token,
+                                "",
+                                "{" +
+                                    "\"method\":\"passthrough\"," +
+                                    "\"params\":{" +
+                                    "\"deviceId\":\"" + dev.get_code() + "\"," +
+                                    "\"requestData\":\"{\\\"system\\\":{" +
+                                        "\\\"set_relay_state\\\":{" +
+                                            "\\\"state\\\":" + state + "}" +
+                                        "}}\"" +
+                                    "}}"
+                               );
         }
     }).start();
 }

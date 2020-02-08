@@ -28,6 +28,8 @@ public final static String EGAUGE_ALERTS = "/cgi-bin/alert";
 MainActivity act;
 View view;
 
+Http http = new Http();
+
 boolean running = true;
 boolean paused = false;
 
@@ -86,10 +88,10 @@ private boolean get_data()
     //
     // Get the data
     //
-    String resp = act.call_api(P.get_string("egauge:url") + EGAUGE_API,
+    Http.R resp = http.call_api(P.get_string("egauge:url") + EGAUGE_API,
                                EGAUGE_QUERY);
-    use_watt = get_value("Total Usage", resp);
-    gen_watt = get_value("Total Generation", resp);
+    use_watt = get_value("Total Usage", resp.body);
+    gen_watt = get_value("Total Generation", resp.body);
     return true;
 }
 
@@ -99,12 +101,14 @@ private int get_alerts()
     int pri;
     long ts;
     String name, detail;
+    String resp;
 
     //
     // Get the alerts
     //
     alerts = new ArrayList<Alert>();
-    String resp = act.call_api(P.get_string("egauge:url") + EGAUGE_ALERTS, "");
+    Http.R r = http.call_api(P.get_string("egauge:url") + EGAUGE_ALERTS, "");
+    resp = r.body;
     int idx = 0;
     while ((idx = resp.indexOf("<prio>", idx)) >= 0) {
         pri = (int)get_long("<prio>", 10, resp, idx);
