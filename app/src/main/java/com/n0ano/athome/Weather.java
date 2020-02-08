@@ -43,7 +43,6 @@ public final static String WUNDER_QUERY = "&units=e&format=json&numericPrecision
 private final static String DATA_TEMPLATE =
 "{\"temp\":0.0,\"winddir\":0,\"windSpeed\":0.0,\"precipTotal\":0.0,\"pressure\":0.0,\"humidity\":0.0}";
 
-MainActivity act;
 Popup popup;
 
 Http http = new Http();
@@ -65,12 +64,9 @@ String max_temp_time;
 
 // Weather: class constructor
 //
-//   act - activity that instantiated the class
-//
-public Weather(MainActivity act, Popup popup, final DoitCallback cb)
+public Weather(Popup popup, final DoitCallback cb)
 {
 
-	this.act = act;
     this.popup = popup;
 
     try {

@@ -806,7 +806,7 @@ private void doit()
         cv.setVisibility(P.get_boolean("egauge:clock")    ? View.VISIBLE : View.GONE);
     }
     if (egauge_view != null)
-        egauge = new Egauge(this, egauge_view, P.get_long("egauge:ts"), new DoitCallback() {
+        egauge = new Egauge(egauge_view, P.get_long("egauge:ts"), new DoitCallback() {
             @Override
             public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
@@ -820,7 +820,7 @@ private void doit()
 
     final View weather_view = view_show(P.get_int("weather_layout"), R.id.weather_main);
     if (weather_view != null)
-        weather = new Weather(this, popup, new DoitCallback() {
+        weather = new Weather(popup, new DoitCallback() {
             @Override
             public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {

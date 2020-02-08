@@ -25,7 +25,6 @@ public final static String EGAUGE_API = "/cgi-bin/egauge";
 public final static String EGAUGE_QUERY = "tot&inst";
 public final static String EGAUGE_ALERTS = "/cgi-bin/alert";
 
-MainActivity act;
 View view;
 
 Http http = new Http();
@@ -43,12 +42,9 @@ int width = 0;
 
 // Egauge: class constructor
 //
-//   act - activity that instantiated the class
-//
-public Egauge(MainActivity act, View view, long ts, final DoitCallback cb)
+public Egauge(View view, long ts, final DoitCallback cb)
 {
 
-	this.act = act;
     this.view = view;
     this.alert_ts = ts;
 
