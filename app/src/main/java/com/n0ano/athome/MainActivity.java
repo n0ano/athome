@@ -542,8 +542,8 @@ public Tuple<String> call_api_nolog(String type, String uri, String params, Stri
     try {
         URL url = new URL(uri);
         con = (HttpURLConnection) url.openConnection();
-        con.setConnectTimeout(1000);
-        con.setReadTimeout(1000);
+        con.setConnectTimeout(5000);
+        con.setReadTimeout(5000);
         if (type.equals("POST"))
             con.setDoOutput(true);
         if (!auth.equals(""))
@@ -583,9 +583,12 @@ public String call_api(String type, String uri, String params, String auth, Stri
 {
     HttpURLConnection con = null;
     String line;
+    long stime, etime;
 
+    stime = SystemClock.elapsedRealtime();
     Tuple<String>res = call_api_nolog(type, uri, params, auth, body);
-    line = type + " - " + uri;
+    etime = SystemClock.elapsedRealtime();
+    line = type + "(" + (etime - stime) + "):" + uri;
     if (!params.isEmpty())
         line += ", params - " + params;
     if (!auth.isEmpty())

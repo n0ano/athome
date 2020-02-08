@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -215,8 +216,10 @@ private InputStream open_http(ScreenInfo ss_info, int r, int width, int height)
 {
     String url;
 	InputStream in_rdr;
+    long stime, etime;
 
 	try {
+        stime = SystemClock.elapsedRealtime();
         url = ss_info.server +
                 C.CGI_BIN +
                 "?get" +
@@ -226,9 +229,10 @@ private InputStream open_http(ScreenInfo ss_info, int r, int width, int height)
                 "&w=" + width +
                 "&h=" + height +
                 "&r=" + r;
-        Log.d("DDD-SS", "get image from :..." + url.substring((ss_info.server + C.CGI_BIN).length()));
         Authenticator.setDefault(new CustomAuthenticator(ss_info.user, ss_info.pwd));
 		in_rdr = new URL(url).openStream();
+        etime = SystemClock.elapsedRealtime();
+        Log.d("DDD-SS", "get image(" + (etime - stime) + "):..." + url.substring((ss_info.server + C.CGI_BIN).length()));
         meta = C.get_meta(in_rdr, new HashMap<String, String>());
 	} catch (Exception e) {
 		Log.d("DDD-SS", "get http image failed - " + e);
