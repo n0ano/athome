@@ -21,9 +21,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -564,30 +567,16 @@ public void show_log()
         }
     });
 
-    TableLayout tl = (TableLayout) findViewById(R.id.log_table);
-    tl.removeAllViews();
-    TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
-    params.setMargins(0, 0, 0, 0); /* left, top, right, bottom */
-    int max = Log.size();
-    for (int i = 0; i < max; i++) {
-        line = Log.get(i);
-        View v = View.inflate(this, R.layout.log_line, null);
-        v.setTag(i);
-        v.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View lv) {
-                int i = (int)lv.getTag();
-                String l = Log.get(i);
-                popup.log_detail_dialog(i, l);
-            }
-        });
-        tv = (TextView) v.findViewById(R.id.line_no);
-        tv.setText(i + ":");
-        tv = (TextView) v.findViewById(R.id.line_text);
-        int len = (line.length() < Log.LOG_BRIEF) ? line.length() : Log.LOG_BRIEF;
-        tv.setText(line.substring(0, len));
-        tl.addView(v, params);
-    }
+    ArrayAdapter adapt = new LogAdapter(this, Log.size());
+    ListView lv = (ListView)findViewById(R.id.log_list);
+    lv.setAdapter(adapt);
+    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        @Override                               
+        public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+            String l = Log.get(pos);   
+            popup.log_detail_dialog(pos, l);
+        }                                 
+    });
 }
 
 private void set_cfg(String cfg)

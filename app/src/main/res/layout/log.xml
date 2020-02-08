@@ -49,21 +49,16 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray" />
 
-        <ScrollView
-            android:id="@+id/log_scroll"
+        <HorizontalScrollView
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
+            android:layout_height="fill_parent" >
 
-            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/log_table"
+            <ListView
+                android:id="@+id/log_list"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:stretchColumns="*" >
+                android:layout_height="wrap_content" />
 
-                </TableLayout>
-
-            </ScrollView>
+            </HorizontalScrollView>
 
         </LinearLayout>
 
