@@ -26,6 +26,7 @@ public final static String EGAUGE_QUERY = "tot&inst";
 public final static String EGAUGE_ALERTS = "/cgi-bin/alert";
 
 MainActivity act;
+View view;
 
 boolean running = true;
 boolean paused = false;
@@ -42,10 +43,11 @@ int width = 0;
 //
 //   act - activity that instantiated the class
 //
-public Egauge(MainActivity act, long ts, final DoitCallback cb)
+public Egauge(MainActivity act, View view, long ts, final DoitCallback cb)
 {
 
 	this.act = act;
+    this.view = view;
     this.alert_ts = ts;
 
     new Thread(new Runnable() {
@@ -147,6 +149,9 @@ Log.d("DDD", "egauge: acknowledge newest alert");
         if (alert.ts > this.alert_ts)
             this.alert_ts = alert.ts;
     }
+    alerts = new ArrayList<Alert>();
+    if (view != null)
+        show(view);
     return this.alert_ts;
 }
 
@@ -281,6 +286,8 @@ public void show(View v)
             ll.setVisibility(View.VISIBLE);
             tv = (TextView)v.findViewById(R.id.alert_count);
             tv.setText(num + ((num == 1) ? " Alert" : " Alerts") + " pending");
+            tv = (TextView)v.findViewById(R.id.alert_msg);
+            tv.setText(alerts.get(0).name);
         }
 
         if ((iv = (ImageView) v.findViewById(R.id.grid_arrow)) != null)

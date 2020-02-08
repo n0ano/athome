@@ -156,7 +156,6 @@
                         android:paddingLeft="4dp"
                         android:textSize="18sp"
                         android:maxLines="1"
-                        android:text="Low Voltage this is a long message"
                         android:layout_gravity="center_horizontal" />
 
                     </LinearLayout>

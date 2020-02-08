@@ -909,7 +909,7 @@ private void doit()
         cv.setVisibility(P.get_boolean("egauge:clock")    ? View.VISIBLE : View.GONE);
     }
     if (egauge_view != null)
-        egauge = new Egauge(this, P.get_long("egauge:ts"), new DoitCallback() {
+        egauge = new Egauge(this, egauge_view, P.get_long("egauge:ts"), new DoitCallback() {
             @Override
             public void doit(Object obj) {
                 runOnUiThread(new Runnable() {
