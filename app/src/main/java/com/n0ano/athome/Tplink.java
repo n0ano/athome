@@ -56,7 +56,6 @@ private boolean current_state(OutletsDevice dev)
         JSONObject json = C.str2json(resp.body);
         if (json.getInt("error_code") == TPLINK_OFFLINE) {
             dev.set_state(OutletsDevice.OFFLINE, false);
-            Log.d("TPLink: " + dev.get_name() + " offline");
             return false;
         }
         dev.set_state(OutletsDevice.ONLINE, false);

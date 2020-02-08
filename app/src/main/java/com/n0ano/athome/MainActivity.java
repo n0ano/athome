@@ -729,14 +729,6 @@ private void clock()
     });
 }
 
-private void sh_rain()
-{
-
-    TextView tv = (TextView)findViewById(R.id.weather_rain);
-    tv.setText("--");
-tv.invalidate();
-}
-
 private void pause_threads(boolean p)
 {
 
@@ -825,7 +817,6 @@ private void doit()
             public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-sh_rain();
                         weather.show(weather_view);
                     }
                 });
