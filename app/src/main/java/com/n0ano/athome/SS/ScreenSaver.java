@@ -33,7 +33,7 @@ public final static int SAVER_STOP =    5;  // stop screen saver threads
 //
 //  Screen saver states
 //
-public final static int SS_UNKNOWN =     0;  // counting down to start
+public final static int SS_UNKNOWN =     0;  // impossible state
 public final static int SS_COUNTING =    1;  // counting down to start
 public final static int SS_SHOWING =     2;  // saver actively running
 public final static int SS_FROZEN =      3;  // freeze saver with picture displayed
@@ -126,7 +126,7 @@ public void do_fade(View start, View end)
     faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new DoneCallback() {
         @Override
         public void done(Object obj) {
-            if (ss_state() != SS_FROZEN)
+            if (ss_state() == SS_SHOWING)
                 disp_counter = ss_info.delay;
         }
     });
@@ -160,7 +160,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                         if (img_start != null)
                             img_start.setVisibility(View.GONE);
                         img_end.setVisibility(View.VISIBLE);
-                        if (ss_state() != SS_FROZEN)
+                        if (ss_state() == SS_SHOWING)
                             disp_counter = ss_info.delay;
                     }
                 }
@@ -245,6 +245,11 @@ public void screen_saver(int cmd)
 Log.d("DDD-SS", "screen_saver command - " + cmd);
 
     switch (cmd) {
+
+    case SAVER_RESET:
+        idle_counter = ss_info.start;
+        disp_counter = -FADE_MAX;
+        break;
 
     case SAVER_BLOCK:
         idle_counter = -1;

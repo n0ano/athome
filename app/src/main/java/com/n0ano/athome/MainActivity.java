@@ -495,7 +495,7 @@ public void ss_control(int op)
 
     case C.SS_OP_RESET:
         if (ss_saver != null)
-            ss_saver.touch();
+            ss_saver.screen_saver(ScreenSaver.SAVER_RESET);
         break;
 
     case C.SS_OP_BLOCK:
