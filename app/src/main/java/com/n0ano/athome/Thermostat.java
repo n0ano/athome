@@ -27,6 +27,8 @@ public final static int HOLD_PERMANENT = 2;
 private final static int PERIOD = (10 * 1000);   // check outlets every 10 seconds
 
 MainActivity act;
+Popup popup;
+
 Ecobee ecobee;
 
 boolean running = true;
@@ -38,10 +40,11 @@ ThermostatAdapter thermostat_adapter;
 //
 //   act - activity that instantiated the class
 //
-public Thermostat(final MainActivity act, View v, final DoitCallback cb)
+public Thermostat(final MainActivity act, View v, Popup popup, final DoitCallback cb)
 {
 
 	this.act = act;
+    this.popup = popup;
 
     this.ecobee = new Ecobee(act);
 
@@ -96,97 +99,6 @@ public void enumerate(final View v, final DoitCallback cb)
     }).start();
 }
 
-private int hold_type(int t)
-{
-
-    switch (t) {
-
-    case R.id.hold_temporary:
-        return Thermostat.HOLD_TEMPORARY;
-
-    case R.id.hold_permanent:
-        return Thermostat.HOLD_PERMANENT;
-
-    }
-    return Thermostat.HOLD_TEMPORARY;
-}
-
-private void hold_dialog(final ThermostatDevice dev)
-{
-
-    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
-    dialog.setContentView(R.layout.hold);
-
-    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.hold_type);
-
-    TextView tv = (TextView) dialog.findViewById(R.id.hold_status);
-    switch (dev.get_hold()) {
-
-    case EcobeeData.HOLD_RUNNING:
-        tv.setText("Running");
-        break;
-
-    case EcobeeData.HOLD_TEMPORARY:
-        tv.setText("Hold (temporary)");
-        rg.check(R.id.hold_temporary);
-        break;
-
-    case EcobeeData.HOLD_PERMANENT:
-        tv.setText("Hold (permanent)");
-        rg.check(R.id.hold_permanent);
-        break;
-
-    }
-
-    final NumberPicker np = (NumberPicker) dialog.findViewById(R.id.hold_temp);
-    np.setMinValue(dev.get_h_min()/10);
-    np.setMaxValue(dev.get_h_max()/10);
-    int temp = (int)dev.get_temp();
-    np.setValue(temp);
-    np.setWrapSelectorWheel(false);
-
-    Button cancel = (Button) dialog.findViewById(R.id.cancel);
-    cancel.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            dialog.dismiss();
-        }
-    });
-
-    Button resume = (Button) dialog.findViewById(R.id.resume);
-    resume.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            dialog.dismiss();
-            new Thread(new Runnable() {
-                public void run() {
-                    dev.set_hold(Thermostat.HOLD_RUNNING);
-                    ecobee.ecobee_resume(dev);
-                }
-            }).start();
-        }
-    });
-
-    Button hold = (Button) dialog.findViewById(R.id.hold);
-    hold.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            final String t = np.getValue() + "0";
-            dialog.dismiss();
-            new Thread(new Runnable() {
-                public void run() {
-                    dev.set_hold(hold_type(rg.getCheckedRadioButtonId()));
-                    ecobee.ecobee_hold(C.a2i(t), dev);
-                }
-            }).start();
-        }
-    });
-
-    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-    dialog.show();
-}
-
 public void init_view(View main)
 {
     int i;
@@ -216,7 +128,7 @@ public void init_view(View main)
         iv.setTag(dev);
         iv.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                hold_dialog((ThermostatDevice)v.getTag());
+                popup.hold_dialog((ThermostatDevice)v.getTag(), ecobee);
             }
         });
         ViewGroup parent = (ViewGroup)v.getParent();
@@ -231,10 +143,10 @@ public void init_view(View main)
 public void go_hold(View v)
 {
 
-    hold_dialog((ThermostatDevice) v.getTag());
+    popup.hold_dialog((ThermostatDevice) v.getTag(), ecobee);
 }
 
-public void show(View v)
+public void show(View v, int color_fore, int color_hold)
 {
 
     //
@@ -246,9 +158,7 @@ public void show(View v)
         View dv = dev.get_view();
         GaugeView gv = (GaugeView) dv.findViewById(R.id.thermostat_temp);
         gv.set_value(dev.get_temp());
-//      tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ?
-//                                            act.getResources().getColor(R.color.fore) :
-//                                            act.getResources().getColor(R.color.hold));
+//      tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ? color_fore : color_hole);
     }
 }
 

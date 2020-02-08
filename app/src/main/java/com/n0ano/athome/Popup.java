@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -501,6 +502,37 @@ private void ecobee_dialog()
     });
 }
 
+public void detail_dialog(float max_temp, float min_temp, String max_temp_time, String min_temp_time)
+{
+
+    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.detail);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.detail_max);
+    tv.setText(Double.toString(max_temp));
+
+    tv = (TextView) dialog.findViewById(R.id.detail_min);
+    tv.setText(Double.toString(min_temp));
+
+    tv = (TextView) dialog.findViewById(R.id.detail_max_time);
+    tv.setText(max_temp_time);
+
+    tv = (TextView) dialog.findViewById(R.id.detail_min_time);
+    tv.setText(min_temp_time);
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+    dialog.show();
+}
+
 private void weather_dialog()
 {
     int i;
@@ -531,6 +563,97 @@ private void weather_dialog()
             end_dialog(dialog, true);
         }
     });
+}
+
+private int hold_type(int t)
+{
+
+    switch (t) {
+
+    case R.id.hold_temporary:
+        return Thermostat.HOLD_TEMPORARY;
+
+    case R.id.hold_permanent:
+        return Thermostat.HOLD_PERMANENT;
+
+    }
+    return Thermostat.HOLD_TEMPORARY;
+}
+
+public void hold_dialog(final ThermostatDevice dev, final Ecobee ecobee)
+{
+
+    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
+    dialog.setContentView(R.layout.hold);
+
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.hold_type);
+
+    TextView tv = (TextView) dialog.findViewById(R.id.hold_status);
+    switch (dev.get_hold()) {
+
+    case EcobeeData.HOLD_RUNNING:
+        tv.setText("Running");
+        break;
+
+    case EcobeeData.HOLD_TEMPORARY:
+        tv.setText("Hold (temporary)");
+        rg.check(R.id.hold_temporary);
+        break;
+
+    case EcobeeData.HOLD_PERMANENT:
+        tv.setText("Hold (permanent)");
+        rg.check(R.id.hold_permanent);
+        break;
+
+    }
+
+    final NumberPicker np = (NumberPicker) dialog.findViewById(R.id.hold_temp);
+    np.setMinValue(dev.get_h_min()/10);
+    np.setMaxValue(dev.get_h_max()/10);
+    int temp = (int)dev.get_temp();
+    np.setValue(temp);
+    np.setWrapSelectorWheel(false);
+
+    Button cancel = (Button) dialog.findViewById(R.id.cancel);
+    cancel.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+        }
+    });
+
+    Button resume = (Button) dialog.findViewById(R.id.resume);
+    resume.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            dialog.dismiss();
+            new Thread(new Runnable() {
+                public void run() {
+                    dev.set_hold(Thermostat.HOLD_RUNNING);
+                    ecobee.ecobee_resume(dev);
+                }
+            }).start();
+        }
+    });
+
+    Button hold = (Button) dialog.findViewById(R.id.hold);
+    hold.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final String t = np.getValue() + "0";
+            dialog.dismiss();
+            new Thread(new Runnable() {
+                public void run() {
+                    dev.set_hold(hold_type(rg.getCheckedRadioButtonId()));
+                    ecobee.ecobee_hold(C.a2i(t), dev);
+                }
+            }).start();
+        }
+    });
+
+    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+    dialog.show();
 }
 
 private void thermostat_dialog()

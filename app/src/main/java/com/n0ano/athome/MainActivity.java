@@ -938,7 +938,7 @@ private void doit()
 
     final View weather_view = view_show(P.get_int("weather_layout"), R.id.weather_main);
     if (weather_view != null)
-        weather = new Weather(this, new DoitCallback() {
+        weather = new Weather(this, popup, new DoitCallback() {
             @Override
             public void doit(Object obj) {
                 runOnUiThread(new Runnable() {
@@ -952,12 +952,14 @@ sh_rain();
 
     final View thermostat_view = view_show(P.get_int("thermostat_layout"), R.id.thermostats_table);
     if (thermostat_view != null)
-        thermostat = new Thermostat(this, thermostat_view, new DoitCallback() {
+        thermostat = new Thermostat(this, thermostat_view, popup, new DoitCallback() {
             @Override
             public void doit(Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        thermostat.show(thermostat_view);
+                        thermostat.show(thermostat_view,
+                                        getResources().getColor(R.color.fore),
+                                        getResources().getColor(R.color.hold));
                     }
                 });
             }

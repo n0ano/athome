@@ -207,18 +207,17 @@ private void battery()
     if ((outlets_power == null) ||
         (outlets_power.get_state() == OutletsDevice.HOLD) ||
         (outlets_power.get_state() == OutletsDevice.OFFLINE)) {
-        Log.s("battery - no control", act);
         return;
     }
 
     boolean onoff = outlets_power.get_onoff();
     int chg = act.get_battery();
     if (P.get_int("debug") > 0)
-            Log.s("battery: " + outlets_power.get_name() +
+            Log.d("battery: " + outlets_power.get_name() +
                             (onoff ? "(on)" : "(off)") + " => " +
                             P.get_int("outlets:batt_min") + " < " +
                             chg + " > " +
-                            P.get_int("outlets:batt_max"), act);
+                            P.get_int("outlets:batt_max"));
     if ((chg < P.get_int("outlets:batt_min")) && !onoff)
         go_control(outlets_power, 1);
     else if ((chg > P.get_int("outlets:batt_max")) && onoff)

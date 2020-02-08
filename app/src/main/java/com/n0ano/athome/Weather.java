@@ -44,6 +44,7 @@ private final static String DATA_TEMPLATE =
 "{\"temp\":0.0,\"winddir\":0,\"windSpeed\":0.0,\"precipTotal\":0.0,\"pressure\":0.0,\"humidity\":0.0}";
 
 MainActivity act;
+Popup popup;
 
 boolean running = true;
 boolean paused = false;
@@ -64,10 +65,11 @@ String max_temp_time;
 //
 //   act - activity that instantiated the class
 //
-public Weather(MainActivity act, final DoitCallback cb)
+public Weather(MainActivity act, Popup popup, final DoitCallback cb)
 {
 
 	this.act = act;
+    this.popup = popup;
 
     try {
         w_data = new JSONObject(DATA_TEMPLATE);
@@ -186,41 +188,10 @@ private void get_wunder()
     }
 }
 
-private void detail_dialog()
-{
-
-    final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
-    dialog.setContentView(R.layout.detail);
-
-    TextView tv = (TextView) dialog.findViewById(R.id.detail_max);
-    tv.setText(Double.toString(max_temp));
-
-    tv = (TextView) dialog.findViewById(R.id.detail_min);
-    tv.setText(Double.toString(min_temp));
-
-    tv = (TextView) dialog.findViewById(R.id.detail_max_time);
-    tv.setText(max_temp_time);
-
-    tv = (TextView) dialog.findViewById(R.id.detail_min_time);
-    tv.setText(min_temp_time);
-
-    Button ok = (Button) dialog.findViewById(R.id.ok);
-    ok.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            dialog.dismiss();
-        }
-    });
-
-    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-    dialog.show();
-}
-
 public void go_temp_detail(View v)
 {
 
-    detail_dialog();
+    popup.detail_dialog(max_temp, min_temp, max_temp_time, min_temp_time);
 }
 
 public void show(View v)
