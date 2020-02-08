@@ -384,6 +384,8 @@ public void action_click()
 private int ss_state()
 {
 
+    if (ss_info.start == 0 && disp_counter <= -FADE_MAX)
+        return SS_COUNTING;
     if (idle_counter > 0)
         return SS_COUNTING;
     if (disp_counter > -FADE_MAX)
