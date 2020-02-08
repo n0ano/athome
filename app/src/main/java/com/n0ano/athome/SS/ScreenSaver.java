@@ -57,6 +57,7 @@ String menu_title = null;
 
 private ScreenInfo ss_info;
 private ImageFind finder;
+private int new_gen = 0;
 
 private boolean fling_ok = false;
 private boolean running = true;
@@ -141,6 +142,8 @@ private void image_name(String name)
 public void show_image(final ImageEntry entry, final View img_start, final View img_end)
 {
 
+    if (new_gen != 0)
+        upd_list(new_gen);
     final ImageView iv = (ImageView)((RelativeLayout)img_end).findViewById(R.id.image);
     entry.get_bitmap(0, ss_info, new DoneCallback() {
         @Override
@@ -163,7 +166,7 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                 }
             });
             if (entry.generation != img_lists.get_generation())
-                upd_list(entry.generation);
+                new_gen = entry.generation;
         }
     });
 }
@@ -300,6 +303,7 @@ public void upd_list(final int gen)
     String from;
     String name = "unknown";
 
+Log.d("DDD-SS", "update list, gen - " + gen);
     int count = img_lists.get_size();
     do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(img_lists.get_generation()));
 
@@ -317,11 +321,13 @@ public void upd_list(final int gen)
     else
         from = "list:-changed-";
     menu_title = from;
+Log.d("DDD-SS", "new menu - " + menu_title);
 
     img_lists.set_generation((img_lists.get_size() > 0) ? img_lists.get_image(0).get_generation() : gen);
     String image_list = img_lists.list2str();
     P.put("images:" + img_lists.get_name(), image_list);
     P.put("image_last:" + img_lists.get_name(), img_lists.get_size());
+    new_gen = 0;
 }
 
 public void saver_fling(int dir)
