@@ -111,12 +111,8 @@ public String ecobee_get_pin(String api)
     JSONObject json;
     String resp;
 
-    resp = act.call_api("GET",
-                               ECO_URL + ECO_AUTHORIZE,
-                               "response_type=ecobeePin&client_id=" + api +
-                                   "&scope=smartWrite",
-                               "",
-                               null);
+    resp = act.call_api(ECO_URL + ECO_AUTHORIZE,
+                        "response_type=ecobeePin&client_id=" + api + "&scope=smartWrite");
     if ((json = C.str2json(resp)) == null)
         return "";
 

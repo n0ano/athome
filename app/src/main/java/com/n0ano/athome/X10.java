@@ -45,11 +45,8 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
     JSONArray devices, house;
     String code, name;
 
-    final String resp = act.call_api("GET",
-                               P.get_string("outlets:x10_url") + X10_API,
-                               X10_LIST + "&token=" + P.get_string("outlets:x10_jwt"),
-                               "",
-                               null);
+    final String resp = act.call_api(P.get_string("outlets:x10_url") + X10_API,
+                                     X10_LIST + "&token=" + P.get_string("outlets:x10_jwt"));
 
     try {
         json = C.str2json(resp);
@@ -92,13 +89,10 @@ public void control(final OutletsDevice dev, boolean onoff)
     final String state = onoff ? "on" : "off";
     new Thread(new Runnable() {
         public void run() {
-            String resp = act.call_api("GET",
-                                       P.get_string("outlets:x10_url") + X10_API,
+            String resp = act.call_api(P.get_string("outlets:x10_url") + X10_API,
                                        X10_SET + "&code=" + dev.get_dev_code() +
                                                  "&state=" + state +
-                                                 "&token=" + P.get_string("outlets:x10_jwt"),
-                                       "",
-                                       null);
+                                                 "&token=" + P.get_string("outlets:x10_jwt"));
         }
     }).start();
 }
@@ -147,11 +141,8 @@ public boolean get_data(OutletsAdapter adapter)
     //
     //  Get the data and display any changes
     //
-    String resp = act.call_api("GET",
-                               P.get_string("outlets:x10_url") + X10_API,
-                               X10_GET,
-                               "",
-                               null);
+    String resp = act.call_api(P.get_string("outlets:x10_url") + X10_API,
+                               X10_GET);
 
     if ((json = C.str2json(resp)) == null) {
         if (++offline_count > OFFLINE_MAX)

@@ -591,6 +591,12 @@ public String call_api(String type, String uri, String params, String auth, Stri
     return res.second();
 }
 
+public String call_api(String uri, String params)
+{
+
+    return call_api("GET", uri, params, "", null);
+}
+
 public BufferedReader open_url(String url, String auth)
 {
     URL server;
@@ -720,7 +726,7 @@ public void remote_doit(final String host, final String type, final String cfg)
             if (type.equals(C.CONFIG_SAVE))
                 call_api("POST", host + C.CONFIG_URI, type, "", cfg);
             else {
-                String resp = call_api("GET", host + C.CONFIG_URI, type, "", null);
+                String resp = call_api(host + C.CONFIG_URI, type);
                 final boolean ok = (resp.length() > 1);
                 if (ok) {
                     C.new_cfg(resp.substring(1));

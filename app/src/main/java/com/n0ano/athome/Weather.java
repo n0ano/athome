@@ -174,14 +174,10 @@ private boolean get_info_wunder(JSONObject json)
 private void get_wunder()
 {
 
-    String resp = act.call_api("GET",
-                               WUNDER_URL + WUNDER_API,
+    String resp = act.call_api(WUNDER_URL + WUNDER_API,
                                WUNDER_ID + P.get_string("weather:wunder_id") +
                                WUNDER_KEY + P.get_string("weather:wunder_key") +
-                               WUNDER_QUERY,
-                               "",
-                               null);
-Log.d("wunder:" + resp);
+                               WUNDER_QUERY);
     try {
         JSONObject json = new JSONObject(resp);
         get_info_wunder(json);

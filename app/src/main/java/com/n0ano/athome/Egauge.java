@@ -86,11 +86,8 @@ private boolean get_data()
     //
     // Get the data
     //
-    String resp = act.call_api("GET",
-                               P.get_string("egauge:url") + EGAUGE_API,
-                               EGAUGE_QUERY,
-                               "",
-                               null);
+    String resp = act.call_api(P.get_string("egauge:url") + EGAUGE_API,
+                               EGAUGE_QUERY);
     use_watt = get_value("Total Usage", resp);
     gen_watt = get_value("Total Generation", resp);
     return true;
@@ -107,11 +104,7 @@ private int get_alerts()
     // Get the alerts
     //
     alerts = new ArrayList<Alert>();
-    String resp = act.call_api("GET",
-                        P.get_string("egauge:url") + EGAUGE_ALERTS,
-                        "",
-                        "",
-                        null);
+    String resp = act.call_api(P.get_string("egauge:url") + EGAUGE_ALERTS, "");
     int idx = 0;
     while ((idx = resp.indexOf("<prio>", idx)) >= 0) {
         pri = (int)get_long("<prio>", 10, resp, idx);
