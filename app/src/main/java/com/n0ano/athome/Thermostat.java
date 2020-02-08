@@ -55,7 +55,7 @@ public Thermostat(final MainActivity act, View v, Popup popup, final DoitCallbac
     //
     enumerate(v, new DoitCallback() {
         @Override
-        public void doit(Object obj) {
+        public void doit(int res, Object obj) {
             //
             //  Thread to get data from the thermostats
             //
@@ -67,7 +67,7 @@ public Thermostat(final MainActivity act, View v, Popup popup, final DoitCallbac
                         //
                         if (!paused) {
                             ecobee.get_data(thermostat_adapter);
-                            cb.doit(null);
+                            cb.doit(0, null);
                         }
 
                         SystemClock.sleep(PERIOD);
@@ -92,7 +92,7 @@ public void enumerate(final View v, final DoitCallback cb)
             act.runOnUiThread(new Runnable() {
                 public void run() {
                     init_view(v);
-                    cb.doit(null);
+                    cb.doit(0, null);
                 }
             });
         }

@@ -53,7 +53,7 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
         house = json.optJSONArray("house");
     } catch (Exception e) {
         Log.d("X10 get devices(" + resp + ") json parse error - " + e);
-        cb.doit(null);
+        cb.doit(0, null);
         return;
     }
 
@@ -79,7 +79,7 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
         }
     }
 
-    cb.doit(null);
+    cb.doit(0, null);
 }
 
 public void control(final OutletsDevice dev, boolean onoff)

@@ -926,7 +926,7 @@ private void doit()
     if (egauge_view != null)
         egauge = new Egauge(this, egauge_view, P.get_long("egauge:ts"), new DoitCallback() {
             @Override
-            public void doit(Object obj) {
+            public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         egauge.show(egauge_view);
@@ -940,7 +940,7 @@ private void doit()
     if (weather_view != null)
         weather = new Weather(this, popup, new DoitCallback() {
             @Override
-            public void doit(Object obj) {
+            public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
 sh_rain();
@@ -954,7 +954,7 @@ sh_rain();
     if (thermostat_view != null)
         thermostat = new Thermostat(this, thermostat_view, popup, new DoitCallback() {
             @Override
-            public void doit(Object obj) {
+            public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         thermostat.show(thermostat_view,
@@ -969,7 +969,7 @@ sh_rain();
     if (outlets_view != null)
         outlets = new Outlets(this, outlets_view, new DoitCallback() {
             @Override
-            public void doit(Object obj) {
+            public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         outlets.show(outlets_view);

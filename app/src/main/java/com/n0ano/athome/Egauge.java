@@ -69,7 +69,7 @@ public Egauge(MainActivity act, View view, long ts, final DoitCallback cb)
                     show = get_data();
 
                 if (show)
-                    cb.doit(null);
+                    cb.doit(0, null);
 
                 SystemClock.sleep(PERIOD);
             }

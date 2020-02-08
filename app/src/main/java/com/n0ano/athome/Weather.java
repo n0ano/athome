@@ -86,7 +86,7 @@ public Weather(MainActivity act, Popup popup, final DoitCallback cb)
                 //
                 if (!paused) {
                     get_wunder();
-                    cb.doit(null);
+                    cb.doit(0, null);
                 }
 
                 SystemClock.sleep(PERIOD);

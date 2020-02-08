@@ -49,7 +49,7 @@ public Outlets(final MainActivity act, View v, final DoitCallback cb)
     //
     enumerate(outlets_adapter, v, new DoitCallback() {
         @Override
-        public void doit(Object obj) {
+        public void doit(int res, Object obj) {
             //
             //  Thread to get data from the outlets
             //
@@ -63,7 +63,7 @@ public Outlets(final MainActivity act, View v, final DoitCallback cb)
 
                         boolean x10_change = x10.get_data(outlets_adapter);
                         boolean tp_change = tplink.get_data(outlets_adapter);
-                        cb.doit(x10_change || tp_change);
+                        cb.doit(0, x10_change || tp_change);
 
                         SystemClock.sleep(PERIOD);
                     }
@@ -85,16 +85,16 @@ public void enumerate(final OutletsAdapter adapter, final View main, final DoitC
 
             x10.get_devices(adapter, new DoitCallback() {
                 @Override
-                public void doit(Object obj) {
+                public void doit(int res, Object obj) {
 
                     tplink.get_devices(adapter, new DoitCallback() {
                         @Override
-                        public void doit(Object obj) {
+                        public void doit(int res, Object obj) {
 
                             act.runOnUiThread(new Runnable() {
                                 public void run() {
                                     init_view(main);
-                                    cb.doit(null);
+                                    cb.doit(0, null);
                                 }
                             });
                         }
@@ -180,7 +180,7 @@ private void go_control(OutletsDevice dev, int toggle)
         break;
 
     }
-    cb_show.doit(null);
+    cb_show.doit(0, null);
 }
 
 public void set_power(String name)

@@ -96,7 +96,7 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
         result = (JSONObject)json.get("result");
     } catch (Exception e) {
         Log.d("TPLink get devices(" + resp + ") json parse error " + e);
-        cb.doit(null);
+        cb.doit(0, null);
         return;
     }
 
@@ -113,7 +113,7 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
         list = result.optJSONArray("deviceList");
     } catch (Exception e) {
         Log.d("TPLink get_devices(" + resp + ") parse error - " + e);
-        cb.doit(null);
+        cb.doit(0, null);
         return;
     }
 
@@ -128,7 +128,7 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
         adapter.add_device(dev);
     }
 
-    cb.doit(null);
+    cb.doit(0, null);
 }
 
 public void control(final OutletsDevice dev, boolean onoff)
