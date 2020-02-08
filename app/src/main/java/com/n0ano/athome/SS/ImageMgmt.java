@@ -172,6 +172,8 @@ public boolean onCreateOptionsMenu(Menu menu)
     getMenuInflater().inflate(R.menu.ss_menu, menu);
     menu_bar = menu;
     set_menu(R.id.mgmt_gridview);
+    MenuItem alert = menu_bar.findItem(R.id.action_alerts);
+    alert.setVisible(false);
     return true;
 }
 
