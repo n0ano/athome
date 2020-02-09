@@ -13,10 +13,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.TimeZone;
 
 //
@@ -262,6 +264,125 @@ public static void remote_log(String url, String params, String line)
     }
     if (max > 0)
         remote_line(url, params, pre + line);
+}
+
+public static String resp_header(String key, HttpURLConnection con)
+{
+    int i;
+    String body;
+    String k;
+
+    i = 0;
+    for (;;) {
+        if ((body = con.getHeaderField(i)) == null)
+            return "";
+        k = con.getHeaderFieldKey(i);
+        if (k.equals(key))
+            return body;
+        ++i;
+    }   
+}
+
+public static HashMap<String, String> parse_auth(String str)
+{
+
+    HashMap<String, String> auth = new HashMap<String, String>();
+    String[] parts = str.split(", ");
+    for (int i = 0; i < parts.length; i++) {
+        int idx = parts[i].indexOf("=");
+        if (idx < 0)
+            continue;
+        auth.put(parts[i].substring(0, idx), parts[i].substring(idx + 2, parts[i].length() - 1));
+    }
+    return auth;
+}
+
+private static String mk_cnonce()
+{
+    String s = "";
+
+    for (int i = 0; i < 8; i++)
+        s += Integer.toHexString(new Random().nextInt(16));
+    return s;
+}
+
+private static final String HEX_LOOKUP = "0123456789abcdef";
+
+private static String to_hex(byte[] bytes)
+{
+    StringBuilder sb = new StringBuilder(bytes.length * 2);
+    for(int i = 0; i < bytes.length; i++){
+        sb.append(HEX_LOOKUP.charAt((bytes[i] & 0xF0) >> 4));
+        sb.append(HEX_LOOKUP.charAt((bytes[i] & 0x0F) >> 0));
+    }
+    return sb.toString();
+}
+
+private static String mk_md5(String str)
+{
+    String r = null;
+    MessageDigest md5;
+
+    try {
+        md5 = MessageDigest.getInstance("MD5");
+    } catch (Exception e) {
+        Log.d("DDD", "md5 algorithm missing");
+        return r;
+    }
+
+    try {
+        md5.reset();
+        md5.update(str.getBytes("ISO-8859-1"));
+        r = to_hex(md5.digest());
+    } catch (Exception e) {
+        Log.d("DDD", "mk_md5 failed");
+    }
+    return r;
+}
+
+//  mk_digest - create a digest authentication string
+//
+//  Note: This code makes some assumptions about the
+//    challenge string received from the HTTP server, e.g.
+//
+//      alorithm - MD5 (default if unspecified)
+//      qop - auth or auth-int
+//      opaque - not provided
+//
+//    if the eGauge server changes these assumptions then
+//    this code will have to change
+//
+public static String mk_digest(String header, String uri, String usr, String pwd)
+{
+    String digest = null;
+
+    HashMap<String, String> auth = parse_auth(header);
+
+    String nonce = auth.get("nonce");
+    String realm = auth.get("Digest realm");
+    String qop = auth.get("qop");
+    String cnonce = mk_cnonce();
+    String nc = "1";
+    String ha1 = mk_md5(usr + ":" + realm + ":" + pwd);
+    String ha2 = mk_md5("GET" + ":" + uri);
+    String response = null;
+    if (!ha1.isEmpty() && !ha2.isEmpty())
+        response = mk_md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2);
+
+    if (response != null) {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("Digest ");
+        sb.append("username").append("=\"").append(usr).append("\", ");
+        sb.append("realm").append("=\"").append(realm).append("\", ");
+        sb.append("nonce").append("=\"").append(nonce).append("\", ");
+        sb.append("uri").append("=\"").append(uri).append("\", ");
+        sb.append("response").append("=\"").append(response).append("\", ");
+        sb.append("qop").append("=").append(qop).append(", ");
+        sb.append("nc").append("=").append(nc).append(", ");
+        sb.append("cnonce").append("=\"").append(cnonce).append("\"");
+        digest = sb.toString();
+    }
+    return digest;
 }
 
 }

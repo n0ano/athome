@@ -388,6 +388,12 @@ private void egauge_dialog()
     final EditText et = (EditText) dialog.findViewById(R.id.egauge_url);
     et.setText(P.get_string("egauge:url"));
 
+    final EditText ut = (EditText) dialog.findViewById(R.id.egauge_user);
+    ut.setText(P.get_string("egauge:user"));
+
+    final EditText pt = (EditText) dialog.findViewById(R.id.egauge_pwd);
+    pt.setText(P.get_string("egauge:pwd"));
+
     Button show = (Button) dialog.findViewById(R.id.egauge_alerts);
     show.setOnClickListener(new OnClickListener() {
         @Override
@@ -404,6 +410,8 @@ private void egauge_dialog()
             P.put("egauge:clock", ((rg.getCheckedRadioButtonId() == R.id.egauge_clock) ?  true : false));
 
             P.put("egauge:url", et.getText().toString());
+            P.put("egauge:user", ut.getText().toString());
+            P.put("egauge:pwd", pt.getText().toString());
 
             end_dialog(dialog, true);
         }

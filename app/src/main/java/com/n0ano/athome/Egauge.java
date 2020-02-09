@@ -23,7 +23,7 @@ public final static int PERIOD_ALERTS = 6;      // check for alerts every 6*PERI
 
 public final static String EGAUGE_API = "/cgi-bin/egauge";
 public final static String EGAUGE_QUERY = "tot&inst";
-public final static String EGAUGE_ALERTS = "/cgi-bin/alert";
+public final static String EGAUGE_ALERTS = "/cgi-bin/protected/alert";
 
 View view;
 
@@ -103,7 +103,16 @@ private int get_alerts()
     // Get the alerts
     //
     alerts = new ArrayList<Alert>();
-    Http.R r = http.call_api(P.get_string("egauge:url") + EGAUGE_ALERTS, "");
+    String url = P.get_string("egauge:url");
+    Http.R r = http.call_api(url + EGAUGE_ALERTS, "");
+    if (r.code == Http.AUTH) {
+        r = http.call_api("GET",
+                          url + EGAUGE_ALERTS,
+                          "",
+                          C.mk_digest(r.body, EGAUGE_ALERTS, P.get_string("egauge:user"),
+                                                             P.get_string("egauge:pwd")),
+                          null);
+    }
     resp = r.body;
     int idx = 0;
     while ((idx = resp.indexOf("<prio>", idx)) >= 0) {

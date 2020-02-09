@@ -127,6 +127,8 @@ private static void init_defaults()
     //  If there were any other String defaults
     //
 	//def_string.put("egauge:url", "");
+	//def_string.put("egauge:user", "");
+	//def_string.put("egauge:pwd", "");
 	//def_string.put("weather:wunder_id", "");
 	//def_string.put("weather:wunder_key", "");
     //def_string.put("weather:min_time", "");
