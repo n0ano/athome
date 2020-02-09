@@ -4,15 +4,14 @@ use URI::Escape qw( uri_unescape );
 
 $tr="rotate&list=pbw&name=.pbw%2Fwnbr-2019.jpg&r=270";
 $tm="names&all&host=lenovo&list=pbw";
-$tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&xy&w=600&h=888";
-$tf="get&host=lenovo&list=pbw&name=.pbw%2FWwW.Wallpapers2012.com__+%28WwW.Wallpapers2012.com__7%29.jpg&w=1600&h=2560&r=0";
+$tf="get&host=lenovo&list=&name=Barb/IMG_8501.jpg&w=600&h=888";
+$tf="get&host=lenovo&list=lrg&name=.lrg-34%2FMET-ART_TMU_70_0048.jpg&w=150&h=150&r=0";
 $query = $ENV{"QUERY_STRING"};
 $type = "get";
 $hidden = "";
 $maxw = 2048;
 $maxh = 2048;
 $rotate = 0;
-$xy = 0;
 $host = "default";
 $list = "";
 $name = "";
@@ -32,7 +31,6 @@ foreach my $t (@tokens) {
 	($type = $t)				if $t =~ /^delete/;
 	($type = $t)				if $t =~ /^rotate/;
 	($hidden = $t)				if $t =~ /^all/;
-	($xy = 1)				if $t =~ /^xy/;
 	($maxw = $t) =~ s/w=//			if $t =~ /^w=/;
 	($maxh = $t) =~ s/h=//			if $t =~ /^h=/;
 	($rotate = $t) =~ s/r=//		if $t =~ /^r=/;
@@ -103,7 +101,7 @@ END
 sub get_image
 {
 	local ($h,$n) = @_;
-	local ($r,$t,$dim,$gen,$name,$F);
+	local ($r,$t,$c,$cmd,$dim,$gen,$name,$F);
 
 	print <<END;
 Content-type: application/octet-stream
@@ -112,7 +110,10 @@ END
 
 	$gen = &get_generation();
 
-	if ($fit eq "full") {
+	$c = "$DIR" . ".cache/" . "$n" . ":" . "$maxw" . "x" . "$maxh";
+	if (-f $c) {
+		$cmd = "<$c";
+	} elsif ($fit eq "full") {
 		$cmd = "<$DIR$n";
 	} else {
 		if ($fit eq "screen") {
@@ -139,10 +140,10 @@ END
 		&out_line("T", $title);
 	}
 
-	if ($xy) {
-		$dim=`identify -format "%wx%h" "$DIR$n"`;
-		&out_line("D", $dim);
-	}
+	$c = qx/identify -format %w "$DIR$n"/;
+	&out_line("W", $c);
+	$c = qx/identify -format %h "$DIR$n"/;
+	&out_line("H", $c);
 	&out_line("E", $gen);
 	$F = cache_file($name, $cmd, $maxw, $maxh);
 	print <$F>;
@@ -234,6 +235,13 @@ sub cache_file
 	open $I, "<$cname";
 	binmode $I;
 	return $I;
+}
+
+sub in_cache
+{
+	local($n) = @_;
+
+	return "";
 }
 
 sub get_generation
