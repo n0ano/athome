@@ -6,7 +6,12 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -204,6 +209,59 @@ public static void new_cfg(String cfg)
     P_SS.put("ss_start", P.get_int("ss:start"));
     P_SS.put("ss_delay", P.get_int("ss:delay"));
     P_SS.put("ss_fade", P.get_int("ss:fade"));
+}
+
+public static void remote_line(String url, String params, String line)
+{
+    URL server;
+    InputStreamReader in_rdr;
+    BufferedReader inp;
+
+    if (url.isEmpty())
+        return;
+
+    url = url + "?" + params + URLEncoder.encode(line);
+	try {
+        server = new URL(url);
+        HttpURLConnection url_con = (HttpURLConnection) server.openConnection();
+        in_rdr = new InputStreamReader(url_con.getInputStream());
+        inp = new BufferedReader(in_rdr);
+	} catch (Exception e) {
+		Log.d("DDD", "remote_log failed" + e);
+        return;
+	}
+    try {
+        inp.close();
+    } catch (Exception e) {
+		Log.d("DDD", "remote_log close failed" + e);
+    }
+}
+
+public static void remote_log(String url, String params, String line)
+{
+
+    if (P.get_int("debug") <= 0)
+        return;
+    int len = 80;
+    String pre = "";
+    line = line.replace("\n", "\\n");
+
+    int max = line.length();
+    int maxl = P.get_int("general:log_length");
+    if ((maxl > 0) && (max > maxl)) {
+        line = line.substring(0, maxl);
+        max = line.length();
+    }
+
+    while (max > len) {
+        remote_line(url, params, pre + line.substring(0, len));
+        line = line.substring(len);
+        max -= len;
+        pre = "  ";
+        len = 80 - 2;
+    }
+    if (max > 0)
+        remote_line(url, params, pre + line);
 }
 
 }

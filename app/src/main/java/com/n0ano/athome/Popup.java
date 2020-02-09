@@ -947,6 +947,9 @@ private void developer_dialog()
     final TextView params = (TextView) dialog.findViewById(R.id.log_params);
     params.setText(P.get_string("general:log_params"));
 
+    final TextView llen = (TextView) dialog.findViewById(R.id.log_line_length);
+    llen.setText(C.i2a(P.get_int("general:log_length")));
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
@@ -955,6 +958,7 @@ private void developer_dialog()
 
             P.put("general:log_uri", uri.getText().toString());
             P.put("general:log_params", params.getText().toString());
+            P.put("general:log_length", C.a2i(llen.getText().toString()));
 
             P.put("debug", (cb.isChecked() ? 1 : 0));
             Log.cfg(P.get_int("debug"), P.get_string("general:log_uri"), P.get_string("general:log_params"));

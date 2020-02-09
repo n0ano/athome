@@ -113,6 +113,7 @@ private static void init_defaults()
 	def_int.put("outlets_batt_min", new Integer(C.BATTERY_LOW));
 	def_int.put("outlets_batt_max", new Integer(C.BATTERY_HIGH));
 	//def_int.put("outlets_batt_level", new Integer(0);
+	//def_int.put("log_length", new Integer(0);
 	//def_int.put("debug", new Integer(0);
 
     //
