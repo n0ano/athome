@@ -135,6 +135,7 @@ private static void init_defaults()
 	//def_string.put("thermostat:ecobee_access", "");
 	//def_string.put("thermostat:ecobee_refresh", "");
 	//def_string.put("outlets:battery", "");
+	//def_string.put("outlets:hold", "");
 	//def_string.put("outlets:x10_url", "");
 	//def_string.put("outlets:x10_jwt", "");
 	//def_string.put("outlets:tplink_user", "");

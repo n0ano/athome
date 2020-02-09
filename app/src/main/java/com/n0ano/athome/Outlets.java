@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
+import java.util.HashMap;
+
 // Created by n0ano on 10/10/16.
 //
 // Class to handle weather data
@@ -27,6 +29,8 @@ Tplink tplink;
 OutletsDevice outlets_power = null;
 
 OutletsAdapter outlets_adapter;
+
+HashMap<String, String> hold = new HashMap<String, String>();
 
 // Outlets: class constructor
 //
@@ -55,6 +59,7 @@ public Outlets(final MainActivity act, View v, final DoitCallback cb)
             //
             new Thread(new Runnable() {
                 public void run() {
+                    load_holds();
                     while (running) {
                         //
                         //  Get the data
@@ -73,7 +78,53 @@ public Outlets(final MainActivity act, View v, final DoitCallback cb)
     });
 }
 
-public void stop() { running = false; }
+private void set_hold(String name)
+{
+
+    OutletsDevice dev = outlets_adapter.findItem(name);
+    if (dev != null)
+        dev.set_state(OutletsDevice.HOLD, true);
+}
+
+private void load_holds()
+{
+
+    String hold = P.get_string("outlets:hold");
+    if (hold.isEmpty())
+        return;
+
+    String[] holds = hold.split(";");
+    int max = holds.length;
+    for (int i = 0; i < max; i++) {
+Log.d("DDD", "load_hold - " + holds[i]);
+        set_hold(holds[i]);
+    }
+}
+
+private void save_holds()
+{
+    OutletsDevice outlet;
+
+    String save = "";
+    String pre = "";
+    int max = outlets_adapter.getCount();
+    for (int i = 0; i < max; ++i) {
+        outlet = outlets_adapter.getItem(i);
+        if (outlet.get_state() == OutletsDevice.HOLD) {
+            save += pre + outlet.get_name();
+            pre = ";";
+        }
+    }
+    P.put("outlets:hold", save);
+}
+
+public void stop()
+{
+
+    running = false;
+
+    save_holds();
+}
 public void pause(boolean p) { paused = p; }
 
 public void enumerate(final OutletsAdapter adapter, final View main, final DoitCallback cb)
