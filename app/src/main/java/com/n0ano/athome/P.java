@@ -107,6 +107,8 @@ private static void init_defaults()
 	def_int.put("egauge:progress", new Integer(1));
 	def_int.put("weather:layout", new Integer(Popup.LAYOUT_TABLET));
 	def_int.put("weather:progress", new Integer(1));
+    def_int.put("weather:min_temp", new Integer(9999));
+    def_int.put("weather:max_temp", new Integer(-9999));
 	def_int.put("thermostat:layout", new Integer(Popup.LAYOUT_TABLET));
 	def_int.put("outlets:layout", new Integer(Popup.LAYOUT_TABLET));
 	def_int.put("outlets:cols", new Integer(C.OUTLETS_COLS));
@@ -127,6 +129,8 @@ private static void init_defaults()
 	//def_string.put("egauge:url", "");
 	//def_string.put("weather:wunder_id", "");
 	//def_string.put("weather:wunder_key", "");
+    //def_string.put("weather:min_time", "");
+    //def_string.put("weather:max_time", "");
 	//def_string.put("thermostat:ecobee_api", "");
 	//def_string.put("thermostat:ecobee_access", "");
 	//def_string.put("thermostat:ecobee_refresh", "");

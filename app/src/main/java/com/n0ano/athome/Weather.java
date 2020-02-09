@@ -69,6 +69,11 @@ public Weather(Popup popup, final DoitCallback cb)
 
     this.popup = popup;
 
+    min_temp = Float.valueOf(P.get_int("weather:min_temp")) / 10.0f;
+    min_temp_time = P.get_string("weather:min_temp_time");
+    max_temp = Float.valueOf(P.get_int("weather:max_temp")) / 10.0f;
+    max_temp_time = P.get_string("weather:max_temp_time");
+
     try {
         w_data = new JSONObject(DATA_TEMPLATE);
     } catch (Exception e) {
@@ -93,7 +98,15 @@ public Weather(Popup popup, final DoitCallback cb)
     }).start();
 }
 
-public void stop() { running = false; }
+public void stop()
+{
+
+    running = false;
+    P.put("weather:min_temp", (int)(min_temp * 10.0f));
+    P.put("weather:min_temp_time", min_temp_time);
+    P.put("weather:max_temp", (int)(min_temp * 10.0f));
+    P.put("weather:max_temp_time", max_temp_time);
+}
 public void pause(boolean p) { paused = p; }
 
 private JSONObject find_station(String id, JSONObject json)

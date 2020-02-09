@@ -522,10 +522,10 @@ public void detail_dialog(float max_temp, float min_temp, String max_temp_time, 
     dialog.setContentView(R.layout.detail);
 
     TextView tv = (TextView) dialog.findViewById(R.id.detail_max);
-    tv.setText(Double.toString(max_temp));
+    tv.setText(String.format("%.1f", max_temp));
 
     tv = (TextView) dialog.findViewById(R.id.detail_min);
-    tv.setText(Double.toString(min_temp));
+    tv.setText(String.format("%.1f", min_temp));
 
     tv = (TextView) dialog.findViewById(R.id.detail_max_time);
     tv.setText(max_temp_time);
