@@ -126,16 +126,12 @@ public R call_api(String type, String uri, String params, String auth, String bo
     etime = SystemClock.elapsedRealtime();
     line = type + "(" + (etime - stime) + "):" + uri;
     if (!params.isEmpty())
-        line += ", params - " + params;
+        line += "?" + params;
     if (!auth.isEmpty())
-        line += ", auth - " + auth;
+        line += ", auth - '" + auth + "'";
     if (body != null)
         line += ", body - " + body;
-    line += " ==> ";
-    if (res.code == OK)
-        line += res.body;
-    else
-        line += "[" + res.body + "]";
+    line += " ==> " + res.code + ":" + res.body;
     Log.s(line);
     return res;
 }
