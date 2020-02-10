@@ -5,6 +5,7 @@ import android.view.View;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,8 +144,7 @@ public boolean get_data(OutletsAdapter adapter)
     //
     //  Get the data and display any changes
     //
-    Http.R resp = http.call_api(P.get_string("outlets:x10_url") + X10_API,
-                               X10_GET);
+    Http.R resp = http.call_api(P.get_string("outlets:x10_url") + X10_API, X10_GET);
 
     if ((json = C.str2json(resp.body)) == null) {
         if (++offline_count > OFFLINE_MAX)

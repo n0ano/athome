@@ -538,18 +538,19 @@ public void show_log()
     TextView tv;
 
     Log.d("Show log");
-    setContentView(R.layout.log);
+    View vv = (View)findViewById(R.id.scroll_view);
+    vv.setVisibility(View.GONE);
+    vv = (View)findViewById(R.id.log_view);
+    vv.setVisibility(View.VISIBLE);
 
     Button bt = findViewById(R.id.log_return);
     bt.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            setContentView((P.get_int("general:layout") == Popup.LAYOUT_TABLET) ?
-                                                                R.layout.activity_tab :
-                                                                R.layout.activity_ph);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            doit();
+            View vv = (View)findViewById(R.id.scroll_view);
+            vv.setVisibility(View.VISIBLE);
+            vv = (View)findViewById(R.id.log_view);
+            vv.setVisibility(View.GONE);
         }
     });
 
@@ -558,12 +559,10 @@ public void show_log()
         @Override
         public void onClick(View v) {
             Log.clear();
-            setContentView((P.get_int("general:layout") == Popup.LAYOUT_TABLET) ?
-                                                                R.layout.activity_tab :
-                                                                R.layout.activity_ph);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            doit();
+            View vv = (View)findViewById(R.id.scroll_view);
+            vv.setVisibility(View.VISIBLE);
+            vv = (View)findViewById(R.id.log_view);
+            vv.setVisibility(View.GONE);
         }
     });
 
@@ -779,7 +778,7 @@ private void sh_alerts()
 private void doit()
 {
 
-    final View egauge_view = view_show(P.get_int("egauge_layout"), R.id.egauge_main);
+    final View egauge_view = view_show(P.get_int("egauge:layout"), R.id.egauge_main);
     ClockView cv = (ClockView)findViewById(R.id.clock_view);
     if (cv != null) {
         ImageView h_img = (ImageView)findViewById(R.id.house_image);
@@ -799,7 +798,7 @@ private void doit()
             }
         });
 
-    final View weather_view = view_show(P.get_int("weather_layout"), R.id.weather_main);
+    final View weather_view = view_show(P.get_int("weather:layout"), R.id.weather_main);
     if (weather_view != null)
         weather = new Weather(popup, new DoitCallback() {
             @Override
@@ -812,7 +811,7 @@ private void doit()
             }
         });
 
-    final View thermostat_view = view_show(P.get_int("thermostat_layout"), R.id.thermostats_table);
+    final View thermostat_view = view_show(P.get_int("thermostat:layout"), R.id.thermostats_table);
     if (thermostat_view != null)
         thermostat = new Thermostat(this, thermostat_view, popup, new DoitCallback() {
             @Override
@@ -827,7 +826,7 @@ private void doit()
             }
         });
 
-    final View outlets_view = view_show(P.get_int("outlets_layout"), R.id.outlets_table);
+    final View outlets_view = view_show(P.get_int("outlets:layout"), R.id.outlets_table);
     if (outlets_view != null)
         outlets = new Outlets(this, outlets_view, new DoitCallback() {
             @Override

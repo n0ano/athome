@@ -100,43 +100,50 @@ private static void init_defaults()
     //    defaults, the only boolean defaults to false, the only
     //    long defaults to 0,  and all of the strings default to ""
     //
-	def_int.put("general_layout", new Integer(Popup.LAYOUT_TABLET));
-	def_int.put("general_on", new Integer(-1));
-	def_int.put("general_off", new Integer(-1));
-	def_int.put("egauge_layout", new Integer(Popup.LAYOUT_TABLET));
-	def_int.put("egauge_progress", new Integer(1));
-	def_int.put("weather_layout", new Integer(Popup.LAYOUT_TABLET));
-	def_int.put("weather_progress", new Integer(1));
-	def_int.put("thermostat_layout", new Integer(Popup.LAYOUT_TABLET));
-	def_int.put("outlets_layout", new Integer(Popup.LAYOUT_TABLET));
-	def_int.put("outlets_cols", new Integer(C.OUTLETS_COLS));
-	def_int.put("outlets_batt_min", new Integer(C.BATTERY_LOW));
-	def_int.put("outlets_batt_max", new Integer(C.BATTERY_HIGH));
-	//def_int.put("outlets_batt_level", new Integer(0);
+	def_int.put("general:layout", new Integer(Popup.LAYOUT_TABLET));
+	def_int.put("general:on", new Integer(-1));
+	def_int.put("general:off", new Integer(-1));
+	def_int.put("egauge:layout", new Integer(Popup.LAYOUT_TABLET));
+	def_int.put("egauge:progress", new Integer(1));
+	def_int.put("weather:layout", new Integer(Popup.LAYOUT_TABLET));
+	def_int.put("weather:progress", new Integer(1));
+    def_int.put("weather:min_temp", new Integer(9999));
+    def_int.put("weather:max_temp", new Integer(-9999));
+	def_int.put("thermostat:layout", new Integer(Popup.LAYOUT_TABLET));
+	def_int.put("outlets:layout", new Integer(Popup.LAYOUT_TABLET));
+	def_int.put("outlets:cols", new Integer(C.OUTLETS_COLS));
+	def_int.put("outlets:batt_min", new Integer(C.BATTERY_LOW));
+	def_int.put("outlets:batt_max", new Integer(C.BATTERY_HIGH));
+	//def_int.put("outlets:batt_level", new Integer(0);
+	//def_int.put("general:log_length", new Integer(0);
 	//def_int.put("debug", new Integer(0);
 
     //
     //  If there were any other boolean defaults
     //
-	//def_boolean("egauge_clock", false);
+	//def_boolean("egauge:clock", false);
 
     //
     //  If there were any other String defaults
     //
-	//def_string.put("egauge_url", "");
-	//def_string.put("wunder_id", "");
-	//def_string.put("wunder_key", "");
-	//def_string.put("ecobee_api", "");
-	//def_string.put("ecobee_access", "");
-	//def_string.put("ecobee_refresh", "");
-	//def_string.put("outlets_battery", "");
-	//def_string.put("x10_url", "");
-	//def_string.put("x10_jwt", "");
-	//def_string.put("tplink_user", "");
-	//def_string.put("tplink_pwd", "");
-	//def_string.put("log_uri", "");
-	//def_string.put("log_params", "");
-	//def_string.put("config_uri", "");
+	//def_string.put("egauge:url", "");
+	//def_string.put("egauge:user", "");
+	//def_string.put("egauge:pwd", "");
+	//def_string.put("weather:wunder_id", "");
+	//def_string.put("weather:wunder_key", "");
+    //def_string.put("weather:min_time", "");
+    //def_string.put("weather:max_time", "");
+	//def_string.put("thermostat:ecobee_api", "");
+	//def_string.put("thermostat:ecobee_access", "");
+	//def_string.put("thermostat:ecobee_refresh", "");
+	//def_string.put("outlets:battery", "");
+	//def_string.put("outlets:hold", "");
+	//def_string.put("outlets:x10_url", "");
+	//def_string.put("outlets:x10_jwt", "");
+	//def_string.put("outlets:tplink_user", "");
+	//def_string.put("outlets:tplink_pwd", "");
+	//def_string.put("general:log_uri", "");
+	//def_string.put("general:log_params", "");
 }
 
 public static String get_cfg(int indent)

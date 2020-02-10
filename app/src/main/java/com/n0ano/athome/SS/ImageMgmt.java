@@ -342,7 +342,7 @@ public void set_title(final ImageEntry image, final String title)
     tv.setText(title);
 }
 
-public void go_image(View v, final ImageEntry entry, int r)
+public void go_image(View v, final ImageEntry entry, int r, final int view_id)
 {
 
     set_menu(R.id.mgmt_imageview);
@@ -370,7 +370,7 @@ public void go_image(View v, final ImageEntry entry, int r)
 
     iv.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
-            go_back(null);
+            set_view(view_id);
         }
     });
     iv.setOnLongClickListener(new View.OnLongClickListener() {
@@ -419,7 +419,7 @@ public void rotate(int deg)
         r += 360;
     while (r >= 360)
         r -= 360;
-    go_image(null, cur_image, r);
+    go_image(null, cur_image, r, R.id.mgmt_gridview);
 }
 
 public void save()
@@ -506,6 +506,7 @@ public void show_files()
         @Override
         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
             P.put("image_last:" + ss_info.list, position);
+            go_image(v, (ImageEntry)image_adapt.getItem(position), 0, R.id.mgmt_fileview);
        }
     });
 }

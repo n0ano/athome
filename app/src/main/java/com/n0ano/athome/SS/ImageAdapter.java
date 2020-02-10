@@ -99,7 +99,7 @@ public View getView(final int position, View view, ViewGroup parent)
     view.setOnClickListener(new View.OnClickListener() {
         public void onClick(View v) {
             if (C.grid_type == C.GRID_SHOW)
-                act.go_image(v, image, 0);
+                act.go_image(v, image, 0, R.id.mgmt_gridview);
             else if (C.grid_type == C.GRID_CHECK) {
                 image.set_check(!image.get_check());
                 notifyDataSetChanged();

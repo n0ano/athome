@@ -16,39 +16,6 @@
         android:paddingRight="10dp"
         android:paddingLeft="10dp" >
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingBottom="5dp"
-            android:paddingTop="10dp" >
-
-            <Button
-                android:id="@+id/log_return"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="Return"
-                android:textColor="@color/dialog_fore"
-                android:background="@color/buttonBack" />
-
-            <Button
-                android:id="@+id/log_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="Clear"
-                android:textColor="@color/dialog_fore"
-                android:background="@color/buttonBack" />
-
-            </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
-
         <HorizontalScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >
@@ -59,6 +26,39 @@
                 android:layout_height="wrap_content" />
 
             </HorizontalScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingBottom="5dp"
+            android:paddingTop="10dp" >
+
+            <Button
+                android:id="@+id/log_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Clear"
+                android:textColor="@color/fore"
+                android:background="@color/back" />
+            <Button
+                android:id="@+id/log_return"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Return"
+                android:textColor="@color/fore"
+                android:background="@color/back" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

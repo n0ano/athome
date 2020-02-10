@@ -27,10 +27,10 @@ public R(int code, String body)
 }
 }
 
-public final static int OK =        0;
-public final static int ERR =       1;
-public final static int AUTH =      2;
-public final static int TIMEOUT =   3;
+public final static int OK =        HttpURLConnection.HTTP_OK;
+public final static int ERR =       HttpURLConnection.HTTP_INTERNAL_ERROR;
+public final static int AUTH =      HttpURLConnection.HTTP_UNAUTHORIZED;
+public final static int TIMEOUT =   HttpURLConnection.HTTP_CLIENT_TIMEOUT;
 
 public Http()
 {
@@ -45,8 +45,10 @@ public Http()
 public R call_api_nolog(String type, String uri, String params, String auth, String body)
 {
     HttpURLConnection con = null;
+    InputStreamReader in = null;
+    BufferedReader inp = null;
     String res = "";
-    int except = Http.OK;
+    R r = new R(OK, "");
 
     if (!params.equals(""))
         uri = uri + "?" + params;
@@ -57,7 +59,7 @@ public R call_api_nolog(String type, String uri, String params, String auth, Str
         con.setReadTimeout(5000);
         if (type.equals("POST"))
             con.setDoOutput(true);
-        if (!auth.equals(""))
+        if (!auth.isEmpty())
             con.setRequestProperty("Authorization", auth);
         if (body != null) {
             con.setRequestProperty("Content-Type", "application/json");
@@ -68,23 +70,46 @@ public R call_api_nolog(String type, String uri, String params, String auth, Str
             wr.flush();
             wr.close();
         }
-        InputStreamReader in = new InputStreamReader(con.getInputStream());
-        BufferedReader inp = new BufferedReader (in);
+    } catch (Exception e) {
+        r.code = ERR;
+        r.body = e.toString();
+        if (con != null)
+            con.disconnect();
+        return r;
+    }
+
+    try {
+        r.code = con.getResponseCode();
+        if (r.code == AUTH) {
+            r.body = C.resp_header("WWW-Authenticate", con);
+            return r;
+        } else if (r.code != OK) {
+            r.body = "HTTP error";
+            return r;
+        }
+    } catch (Exception e) {
+        con.disconnect();
+        r.body = e.toString();
+        return r;
+    }
+
+    try {
+        in = new InputStreamReader(con.getInputStream());
+        inp = new BufferedReader (in);
         StringBuilder response = new StringBuilder();
         for (String line; (line = inp.readLine()) != null; )
             response.append(line).append('\n');
-        res = response.toString();
+        r.body = response.toString();
     } catch (java.net.SocketTimeoutException e) {
-        except = TIMEOUT;
-        res = e.toString();
+        r.code = TIMEOUT;
+        r.body = e.toString();
     } catch (Exception e) {
-        except = ERR;
-        res = e.toString();
+        r.code = ERR;
+        r.body = e.toString();
     } finally {
-        if (con != null)
-            con.disconnect();
+        con.disconnect();
     }
-    return new R(except, res);
+    return r;
 }
 
 /*
@@ -106,6 +131,7 @@ public R call_api(String type, String uri, String params, String auth, String bo
         line += ", auth - " + auth;
     if (body != null)
         line += ", body - " + body;
+    line += " ==> ";
     if (res.code == OK)
         line += res.body;
     else

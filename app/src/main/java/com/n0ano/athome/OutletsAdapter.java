@@ -58,6 +58,18 @@ void add_device(OutletsDevice dev)
     devices.add(max++, dev);
 }
 
+public OutletsDevice findItem(String name)
+{
+    OutletsDevice dev;
+
+    for (int i = 0; i < max; ++i) {
+        dev = devices.get(i);
+        if (name.equals(dev.get_name()))
+            return dev;
+    }
+    return null;
+}
+
 @Override
 public void clear()
 {

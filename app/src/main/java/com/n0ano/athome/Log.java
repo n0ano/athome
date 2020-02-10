@@ -70,9 +70,6 @@ static void clear()
     Log.log_full = false;
 }
 
-//
-//  Stream to a remote server - need to re-design this
-//
 public synchronized
 static void s(String string)
 {
@@ -83,6 +80,7 @@ static void s(String string)
         Log.log_next = 0;
         Log.log_full = true;
     }
+    C.remote_log(P.get_string("general:log_uri"), P.get_string("general:log_params"), string);
 }
 
 public static void i(String string) { i(TAG, string); }

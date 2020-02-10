@@ -81,6 +81,65 @@
 
 		</LinearLayout>
 
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="User name: "
+            android:textColor="@color/dialog_fore"
+			/>
+		<EditText
+			android:id="@+id/egauge_user"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor"
+			/>
+
+		</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text="Password: "
+            android:textColor="@color/dialog_fore" />
+		<EditText
+			android:id="@+id/egauge_pwd"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:textSize="14sp"
+			android:text=""
+            android:inputType="textPassword"
+            android:textColor="@color/dialog_fore"
+            android:backgroundTint="@color/dialog_fore"
+			android:paddingLeft="5dp"
+            android:textCursorDrawable="@drawable/edit_cursor" />
+
+		</LinearLayout>
+
     <Button
         android:id="@+id/egauge_alerts"
         android:layout_width="wrap_content"

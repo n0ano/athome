@@ -7,10 +7,7 @@
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+		android:orientation="horizontal" >
 
 		<TextView
 			android:id="@+id/log_label"
@@ -19,7 +16,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:textSize="18sp"
-			android:text="Line:"
+			android:text="Line: "
             android:textColor="@color/dialog_fore" />
 
 		<TextView
@@ -33,22 +30,21 @@
             android:textColor="@color/dialog_fore" />
 
 		<Button
-			android:id="@+id/cancel"
+			android:id="@+id/log_json"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-			android:paddingRight="30dp"
-			android:text="OK"
-            android:gravity="right"
+			android:text="JSON"
             android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
+            android:background="@color/buttonBack" />
 
         </RelativeLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:paddingTop="4dp"
         android:background="@android:color/darker_gray" />
 
     <ScrollView
@@ -66,5 +62,28 @@
             android:textColor="@color/dialog_fore" />
 
         </ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="30dp" >
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="30dp"
+            android:text="OK"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+
+        </LinearLayout>
 
 </LinearLayout>

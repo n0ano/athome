@@ -10,12 +10,12 @@
         android:id="@+id/line_no"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/line_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="" />
+        android:textSize="18sp" />
 
     </LinearLayout>
