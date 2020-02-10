@@ -262,6 +262,7 @@ private void config_dialog()
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
+            P.put("general:config_url", cfg_url.getText().toString());
             end_dialog(dialog, false);
         }
     });

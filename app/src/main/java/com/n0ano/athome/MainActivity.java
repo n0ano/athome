@@ -772,7 +772,8 @@ private void sh_alerts()
 
     if (egauge != null && egauge.alerts_count() > 0)
         vis = true;
-	menu_bar.findItem(R.id.action_alerts).setVisible(vis);
+    if (menu_bar != null)
+        menu_bar.findItem(R.id.action_alerts).setVisible(vis);
 }
 
 private void doit()
