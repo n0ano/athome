@@ -126,13 +126,13 @@ private void set_onoff(OutletsAdapter adapter)
     }
 }
 
-private void x10_state(OutletsAdapter adapter, int state)
+private void x10_online(OutletsAdapter adapter, boolean state)
 {
 
     int max_devices = adapter.getCount();
     for (int i = 0; i < max_devices; i++) {
         OutletsDevice dev = adapter.getItem(i);
-        dev.set_state(state, false);
+        dev.set_online(state);
     }
 }
 
@@ -148,10 +148,10 @@ public boolean get_data(OutletsAdapter adapter)
 
     if ((json = C.str2json(resp.body)) == null) {
         if (++offline_count > OFFLINE_MAX)
-            x10_state(adapter, OutletsDevice.OFFLINE);
+            x10_online(adapter, false);
         return false;
     }
-    x10_state(adapter, OutletsDevice.ONLINE);
+    x10_online(adapter, true);
     offline_count = 0;
 
     JSONArray house = json.optJSONArray("house");

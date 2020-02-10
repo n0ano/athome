@@ -14,17 +14,14 @@ public class OutletsDevice {
 public final static int TYPE_X10 =      0;
 public final static int TYPE_TPLINK =   1;
 
-public final static int HOLD =          0;
-public final static int ONLINE =        1;
-public final static int OFFLINE =       2;
-
 private String name;
 private int type;
 private int index;
 private String code;
 private String url;
 private boolean onoff;
-private int state;
+private boolean hold;
+private boolean online;
 private View view;
 
 private ImageView icon;
@@ -45,7 +42,8 @@ Log.d("outlet " + name + " = " + code + id);
     tv_name.setText(name);
 
     this.onoff = false;
-    this.state = OFFLINE;
+    this.hold = false;
+    this.online = true;
 }
 
 public OutletsDevice(String name, String code, String url, View view)
@@ -63,7 +61,8 @@ Log.d("device " + name + " = " + code);
     tv_name.setText(name);
 
     this.onoff = false;
-    this.state = OFFLINE;
+    this.hold = false;
+    this.online = true;
 }
 
 public String get_name() { return name; }
@@ -71,26 +70,22 @@ public String get_name() { return name; }
 public int get_type() { return this.type; }
 
 public int get_index() { return index; }
-
 public void set_index(int index) { this.index = index; }
 
 public String get_code() { return code; }
-
 public String get_url() { return this.url; }
 
 public View get_view() { return view; }
-
 public void set_view(View view) { this.view = view; }
 
-public int get_state() { return state; }
-public void set_state(int s, boolean force)
-{
-    if (force || (state != HOLD))
-        state = s;
-}
-
-public boolean get_onoff() { return this.onoff; }
+public boolean get_onoff() { return onoff; }
 public void set_onoff(boolean s) { onoff = s; }
+
+public boolean get_hold() { return hold; }
+public void set_hold(boolean h) { hold = h; }
+
+public boolean get_online() { return online; }
+public void set_online(boolean o) { online = o; }
 
 public String get_dev_code()
 {
@@ -130,22 +125,12 @@ public void show()
 {
     final int draw;
 
-    switch (state) {
-
-    case HOLD:
-        draw = onoff ? R.drawable.outlet_on_blue : R.drawable.outlet_off_blue;
-        break;
-
-    case ONLINE:
-        draw = onoff ? R.drawable.outlet_on_green : R.drawable.outlet_off_red;
-        break;
-
-    default:
-    case OFFLINE:
+    if (!get_online())
         draw = R.drawable.outlet_offline;
-        break;
-
-    }
+    else if (get_hold())
+        draw = onoff ? R.drawable.outlet_on_blue : R.drawable.outlet_off_blue;
+    else
+        draw = onoff ? R.drawable.outlet_on_green : R.drawable.outlet_off_red;
     icon.setImageResource(draw);
 }
 

@@ -83,7 +83,7 @@ private void set_hold(String name)
 
     OutletsDevice dev = outlets_adapter.findItem(name);
     if (dev != null)
-        dev.set_state(OutletsDevice.HOLD, true);
+        dev.set_hold(true);
 }
 
 private void load_holds()
@@ -110,7 +110,7 @@ private void save_holds()
     int max = outlets_adapter.getCount();
     for (int i = 0; i < max; ++i) {
         outlet = outlets_adapter.getItem(i);
-        if (outlet.get_state() == OutletsDevice.HOLD) {
+        if (outlet.get_hold()) {
             save += pre + outlet.get_name();
             pre = ";";
         }
@@ -208,7 +208,7 @@ private void go_control(OutletsDevice dev, int toggle)
 {
     boolean new_onoff;
 
-    if ((dev.get_state() == OutletsDevice.HOLD) || (dev.get_state() == OutletsDevice.OFFLINE))
+    if (dev.get_hold() || !dev.get_online())
         return;
 
     if (toggle < 0)
@@ -255,11 +255,8 @@ public void set_power(String name)
 private void battery()
 {
 
-    if ((outlets_power == null) ||
-        (outlets_power.get_state() == OutletsDevice.HOLD) ||
-        (outlets_power.get_state() == OutletsDevice.OFFLINE)) {
+    if ((outlets_power == null) || outlets_power.get_hold() || !outlets_power.get_online())
         return;
-    }
 
     boolean onoff = outlets_power.get_onoff();
     int chg = act.get_battery();

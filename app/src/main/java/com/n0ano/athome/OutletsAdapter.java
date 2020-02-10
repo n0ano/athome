@@ -70,6 +70,13 @@ public OutletsDevice findItem(String name)
     return null;
 }
 
+public void putItem(int idx, OutletsDevice dev)
+{
+
+    devices.remove(idx);
+    devices.add(idx, dev);
+}
+
 @Override
 public void clear()
 {

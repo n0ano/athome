@@ -25,7 +25,7 @@ Http http = new Http();
 
 private int period = PERIOD;        // Weather only changes once a minute
 
-String token;
+String token = "";
 
 // Tplink: class constructor
 //
@@ -55,10 +55,10 @@ private boolean current_state(OutletsDevice dev)
     try {
         JSONObject json = C.str2json(resp.body);
         if (json.getInt("error_code") == TPLINK_OFFLINE) {
-            dev.set_state(OutletsDevice.OFFLINE, false);
+            dev.set_online(false);
             return false;
         }
-        dev.set_state(OutletsDevice.ONLINE, false);
+        dev.set_online(true);
         JSONObject result = (JSONObject)json.get("result");
         JSONObject info = C.str2json(result.optString("responseData", ""));
 
@@ -67,10 +67,42 @@ private boolean current_state(OutletsDevice dev)
         String onoff = sysinfo.optString("relay_state", "");
         return onoff.equals("1");
     } catch (Exception e) {
-        dev.set_state(OutletsDevice.OFFLINE, false);
+        dev.set_online(false);
         Log.d("TPLink: " + dev.get_name() + " offline, json parse(" + resp.body + ") error - " + e);
     }
     return false;
+}
+
+private boolean get_token()
+{
+    Http.R resp;
+    JSONObject json, result;
+
+    resp = http.call_api("POST",
+                         TPLINK_URL,
+                         "",
+                         "",
+                         "{" +
+                            "\"method\":\"login\"," +
+                            "\"params\":{" +
+                            "\"appType\":\"Kasa_Android\"," +
+                            "\"cloudUserName\":\"" + P.get_string("outlets:tplink_user") + "\"," +
+                            "\"cloudPassword\":\"" + P.get_string("outlets:tplink_pwd") + "\"," +
+                            "\"terminalUUID\":\"" + TPLINK_UUID + "\"" +
+                            "}}"
+                        );
+    try {
+        json = C.str2json(resp.body);
+        result = (JSONObject)json.get("result");
+    } catch (Exception e) {
+        Log.d("TPLink get devices(" + resp.body + ") json parse error " + e);
+        token = "";
+        return false;
+    }
+
+    token = result.optString("token", "");
+//Log.d("DDD", "tplink token - " + token);
+    return true;
 }
 
 public void get_devices(OutletsAdapter adapter, DoitCallback cb)
@@ -80,29 +112,10 @@ public void get_devices(OutletsAdapter adapter, DoitCallback cb)
     JSONArray list;
     OutletsDevice dev;
 
-    resp = http.call_api("POST",
-                        TPLINK_URL,
-                        "",
-                        "",
-                        "{" +
-                            "\"method\":\"login\"," +
-                            "\"params\":{" +
-                            "\"appType\":\"Kasa_Android\"," +
-                            "\"cloudUserName\":\"" + P.get_string("outlets:tplink_user") + "\"," +
-                            "\"cloudPassword\":\"" + P.get_string("outlets:tplink_pwd") + "\"," +
-                            "\"terminalUUID\":\"" + TPLINK_UUID + "\"" +
-                            "}}"
-                       );
-    try {
-        json = C.str2json(resp.body);
-        result = (JSONObject)json.get("result");
-    } catch (Exception e) {
-        Log.d("TPLink get devices(" + resp.body + ") json parse error " + e);
+    if (!get_token()) {
         cb.doit(0, null);
         return;
     }
-
-    token = result.optString("token", "");
     resp = http.call_api("POST",
                         TPLINK_URL,
                         "token=" + token,
@@ -163,12 +176,19 @@ public void control(final OutletsDevice dev, boolean onoff)
 public boolean get_data(OutletsAdapter adapter)
 {
 
+    boolean offline = false;
     int max_devices = adapter.getCount();
     for (int i = 0; i < max_devices; i++) {
         OutletsDevice dev = adapter.getItem(i);
-        if (dev.get_type() == OutletsDevice.TYPE_TPLINK)
+        if (dev.get_type() == OutletsDevice.TYPE_TPLINK) {
             dev.set_onoff(current_state(dev));
+            if (!dev.get_online())
+                offline = true;
+        }
     }
+
+    if (offline)
+        get_token();
     return true;
 }
 
