@@ -37,6 +37,7 @@ int gen_watt = 0;
 
 ArrayList<Alert> alerts;
 long alert_ts;
+String auth_str = "";
 
 int width = 0;
 
@@ -104,13 +105,18 @@ private int get_alerts()
     //
     alerts = new ArrayList<Alert>();
     String url = P.get_string("egauge:url");
-    Http.R r = http.call_api(url + EGAUGE_ALERTS, "");
+    Http.R r = http.call_api("GET",
+                             url + EGAUGE_ALERTS,
+                             "",
+                             auth_str,
+                             null);
     if (r.code == Http.AUTH) {
+        auth_str = C.mk_digest(r.body, EGAUGE_ALERTS, P.get_string("egauge:user"),
+                                                      P.get_string("egauge:pwd"));
         r = http.call_api("GET",
                           url + EGAUGE_ALERTS,
                           "",
-                          C.mk_digest(r.body, EGAUGE_ALERTS, P.get_string("egauge:user"),
-                                                             P.get_string("egauge:pwd")),
+                          auth_str,
                           null);
     }
     resp = r.body;
