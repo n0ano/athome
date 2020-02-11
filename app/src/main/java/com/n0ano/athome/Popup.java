@@ -469,12 +469,7 @@ private void ecobee_doauth(final String api, final String pin)
         @Override
         public void onClick(View v) {
             P.put("thermostat:ecobee_api", api);
-            new Thread(new Runnable() {
-                public void run() {
-                    act.thermostat.ecobee.ecobee_authorize(P.get_string("thermostat:ecobee_api"));
-                }
-            }).start();
-            end_dialog(dialog, false);
+            end_dialog(dialog, true);
         }
     });
 }
