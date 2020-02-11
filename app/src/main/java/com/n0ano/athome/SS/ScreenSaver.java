@@ -38,6 +38,14 @@ public final static int SS_COUNTING =    1;  // counting down to start
 public final static int SS_SHOWING =     2;  // saver actively running
 public final static int SS_FROZEN =      3;  // freeze saver with picture displayed
 
+//
+//  Toolbar icons
+//
+public static final int TB_NONE =       0;
+public static final int TB_PLAY =       1;
+public static final int TB_PAUSE =      2;
+public static final int TB_ACTIVE =     3;
+
 private final static int FADE_MAX =    100;
 
 //
@@ -61,6 +69,7 @@ private int new_gen = 0;
 
 private boolean fling_ok = false;
 private boolean running = true;
+private int image_no = 0;
 private int idle_counter;
 private int disp_counter;
 private int disp_list = 1;
@@ -126,6 +135,8 @@ public void do_fade(View start, View end)
     faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new DoneCallback() {
         @Override
         public void done(Object obj) {
+            if (++image_no == 2)
+                callbacks.ss_toolbar(null, TB_PLAY);
             if (ss_state() == SS_SHOWING)
                 disp_counter = ss_info.delay;
         }
@@ -157,6 +168,8 @@ public void show_image(final ImageEntry entry, final View img_start, final View 
                     if (img_start != null && ss_info.fade != 5)
                         do_fade(img_start, img_end);
                     else {
+                        if (++image_no == 2)
+                            callbacks.ss_toolbar(null, TB_PLAY);
                         if (img_start != null)
                             img_start.setVisibility(View.GONE);
                         img_end.setVisibility(View.VISIBLE);
@@ -218,6 +231,7 @@ public void saver_start(int listno)
 {
 
     fling_ok = false;
+    image_no = 1;
     ss_info = callbacks.ss_start();
     menu_title = null;
 
@@ -242,8 +256,8 @@ public void saver_start(int listno)
 public void screen_saver(int cmd)
 {
 
-Log.d("DDD-SS", "screen_saver command - " + cmd);
 
+    Log.d("DDD-SS", "screen_saver command - " + cmd);
     switch (cmd) {
 
     case SAVER_RESET:
@@ -273,7 +287,7 @@ public boolean touch()
     //
     //  SS is paused, ignore the touch
     //
-    if (ss_state() == SS_FROZEN)
+    if (ss_state() == SS_FROZEN || image_no == 1)
         return true;
 
     //
@@ -308,7 +322,7 @@ public void upd_list(final int gen)
     String from;
     String name = "unknown";
 
-Log.d("DDD-SS", "update list, gen - " + gen);
+    Log.d("DDD-SS", "update list, gen - " + gen);
     int count = img_lists.get_size();
     do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(img_lists.get_generation()));
 
@@ -326,7 +340,7 @@ Log.d("DDD-SS", "update list, gen - " + gen);
     else
         from = "list:-changed-";
     menu_title = from;
-Log.d("DDD-SS", "new menu - " + menu_title);
+    Log.d("DDD-SS", "new menu - " + menu_title);
 
     img_lists.set_generation((img_lists.get_size() > 0) ? img_lists.get_image(0).get_generation() : gen);
     String image_list = img_lists.list2str();
@@ -364,7 +378,7 @@ public void action_click()
     //
     if (ss_state() == SS_FROZEN) {
         fling_ok = false;
-        callbacks.ss_toolbar(null, R.drawable.ss_play);
+        callbacks.ss_toolbar(null, TB_PLAY);
         ss_info.fade = fade_type;
         disp_counter = 1;
         return;
@@ -375,7 +389,7 @@ public void action_click()
     //    in order to manually change images
     //
     fling_ok = true;
-    callbacks.ss_toolbar(null, R.drawable.ss_pause);
+    callbacks.ss_toolbar(null, TB_PAUSE);
     fade_type = ss_info.fade;
     ss_info.fade = 5;
     disp_counter = -FADE_MAX;
@@ -404,7 +418,7 @@ private void main_loop()
 {
     int d, i;
 
-Log.d("DDD-SS", "Screen saver main loop started");
+    Log.d("DDD-SS", "Screen saver main loop started");
     disp_counter = -FADE_MAX;
     idle_counter = ss_info.start;
     while (running) {

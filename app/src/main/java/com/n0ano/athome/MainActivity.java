@@ -215,6 +215,8 @@ public boolean onCreateOptionsMenu(Menu menu)
 
     MenuItem icon = menu_bar.findItem(R.id.action_saver);
     icon.setVisible(ss_info.enable);
+    icon = menu_bar.findItem(R.id.action_progress);
+    icon.setVisible(false);
 
     menu_bar.findItem(R.id.action_alerts).setVisible(false);
 
@@ -248,7 +250,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Log.d("image update worked");
         }
-Log.d("DDD-SS", "activity result - " + P.get_string("images:" + ss_info.list, ""));
+        Log.d("DDD-SS", "activity result - " + P.get_string("images:" + ss_info.list, ""));
         runOnUiThread(new Runnable() {
             public void run() {
                 Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
@@ -433,7 +435,10 @@ public void ss_control(int op)
                         tb.setTitle("AtHome");
 
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                        icon.setIcon(R.drawable.ss_play);
+                        icon.setVisible(false);
+                        icon = menu_bar.findItem(R.id.action_progress);
+                        icon.setVisible(true);
+
                         menu_icons(false);
                         View v = (View)findViewById(R.id.scroll_view);
                         v.setAlpha(1.0f);
@@ -453,6 +458,7 @@ public void ss_control(int op)
                         tb.setTitle("AtHome");
                         MenuItem icon = menu_bar.findItem(R.id.action_saver);
                         icon.setIcon(R.drawable.ss_monitor);
+                        icon.setVisible(true);
                         menu_icons(true);
 
                         View v = (View)findViewById(R.id.scroll_view);
@@ -474,9 +480,20 @@ public void ss_control(int op)
                             tb.setTitle(from);
                         }
 
-                        if (mode != 0) {
-                            MenuItem icon = menu_bar.findItem(R.id.action_saver);
-                            icon.setIcon(mode);
+                        MenuItem icon = menu_bar.findItem(R.id.action_saver);
+                        switch (mode) {
+
+                        case ScreenSaver.TB_PAUSE:
+                            icon.setIcon(R.drawable.ss_pause);
+                            break;
+
+                        case ScreenSaver.TB_PLAY:
+                            icon.setIcon(R.drawable.ss_play);
+                            icon.setVisible(true);
+                            icon = menu_bar.findItem(R.id.action_progress);
+                            icon.setVisible(false);
+                            break;
+
                         }
                     }
                 });

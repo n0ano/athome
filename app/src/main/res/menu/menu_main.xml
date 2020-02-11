@@ -11,6 +11,13 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_progress"
+        app:actionLayout="@layout/progress"
+        android:orderInCategory="100"
+        android:title="Waiting"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_saver"
         android:icon="@drawable/ss_monitor"
         android:orderInCategory="100"
