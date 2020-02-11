@@ -102,10 +102,6 @@ public void stop()
 {
 
     running = false;
-    P.put("weather:min_temp", (int)(min_temp * 10.0f));
-    P.put("weather:min_temp_time", min_temp_time);
-    P.put("weather:max_temp", (int)(min_temp * 10.0f));
-    P.put("weather:max_temp_time", max_temp_time);
 }
 public void pause(boolean p) { paused = p; }
 
@@ -143,10 +139,14 @@ private boolean get_info_wunder(JSONObject json)
         if (temp < min_temp) {
             min_temp = (float)temp;
             min_temp_time = Calendar.getInstance().getTime().toString();
+            P.put("weather:min_temp", (int)(min_temp * 10.0f));
+            P.put("weather:min_temp_time", min_temp_time);
         }
         if (temp > max_temp) {
             max_temp = (float)temp;
             max_temp_time = Calendar.getInstance().getTime().toString();
+            P.put("weather:max_temp", (int)(min_temp * 10.0f));
+            P.put("weather:max_temp_time", max_temp_time);
         }
     }
 
