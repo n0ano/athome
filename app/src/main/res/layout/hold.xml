@@ -25,7 +25,7 @@
             android:id="@+id/hold_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="?"
+            android:text=""
             android:textSize="24dp"
             android:textColor="@color/dialog_fore" />
 

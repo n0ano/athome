@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/weather_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    tools:showIn="@layout/content_main">
+    tools:showIn="@layout/content_ph">
 
     <LinearLayout
         android:id="@+id/weather"
@@ -68,8 +70,8 @@
                 android:id="@+id/weather_dir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@id/weather_drop"
-                android:layout_below="@id/weather_out"
                 android:src="@drawable/circle_tick" />
 
             <TextView
@@ -101,7 +103,7 @@
                 android:id="@+id/weather_bar_dir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/weather_out"
+                android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@id/weather_dir"
                 android:paddingTop="20dp"
                 android:paddingRight="10dp"
@@ -121,4 +123,4 @@
 
         </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

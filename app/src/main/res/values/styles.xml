@@ -1,4 +1,6 @@
-<resources xmlns:android="http://schemas.android.com/tools">
+<resources
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <attr name="toolBack" format="reference"/>
 
     <!-- Base application theme. -->

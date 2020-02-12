@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/weather_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    tools:showIn="@layout/content_main">
+    tools:showIn="@layout/content_tab">
 
     <LinearLayout
         android:id="@+id/weather"
@@ -22,7 +24,7 @@
             android:paddingTop="10dp"
             android:paddingRight="10dp"
             android:paddingLeft="10dp"
-            >
+            tools:ignore="DuplicateIds">
 
             <RelativeLayout
                 android:id="@+id/weather_out"
@@ -123,4 +125,4 @@
 
         </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

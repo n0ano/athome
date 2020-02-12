@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_view"
@@ -7,38 +8,54 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_tab">
 
-    <ScrollView
+    <LinearLayout
         android:id="@+id/scroll_view"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:visibility="visible" >
 
-        <LinearLayout
-            android:id="@+id/main"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp" >
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_weight="1"
+            tools:ignore="DuplicateIds">
 
-            <include layout="@layout/egauge_tab" />
+            <LinearLayout
+                android:id="@+id/main"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp" >
 
-            <include layout="@layout/weather_tab" />
+                <include layout="@layout/egauge_tab" />
 
-            <include layout="@layout/thermostats_table" />
+                <include layout="@layout/weather_tab" />
 
-            <include layout="@layout/outlets_table" />
+                <include layout="@layout/thermostats_table" />
 
-            </LinearLayout>
+                <include layout="@layout/outlets_table" />
 
-        </ScrollView>
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
 
     <ImageView
         android:id="@+id/blank_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:onClick="display_toggle"
         android:visibility="gone" />
 
@@ -47,6 +64,8 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:paddingRight="10dp"
         android:paddingLeft="10dp"
         android:visibility="gone" >
@@ -101,12 +120,15 @@
         android:id="@+id/saver_view1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:visibility="gone" >
 
         <ImageView
             android:id="@+id/image"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            tools:ignore="DuplicateIds" />
 
 		<TextView
 			android:id="@+id/title"
@@ -123,12 +145,15 @@
         android:id="@+id/saver_view2"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:visibility="gone" >
 
         <ImageView
             android:id="@+id/image"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            tools:ignore="DuplicateIds" />
 
 		<TextView
 			android:id="@+id/title"
@@ -137,8 +162,9 @@
 			android:text="Image"
             android:textSize="48dp"
             android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentBottom="true"
+            tools:ignore="DuplicateIds" />
 
         </RelativeLayout>
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

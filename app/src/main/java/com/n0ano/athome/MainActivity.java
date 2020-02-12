@@ -356,7 +356,6 @@ public void display(final boolean onoff)
                 Settings.System.putInt(resolver, Settings.System.SCREEN_BRIGHTNESS, onoff ? screen_bright : 0);
             } catch (Exception e) {
                 Log.d("can't change brightness " + e);
-                toast("Can't change brightness - permissions?");
             }
             View view = (View) findViewById(R.id.scroll_view);
             view.setVisibility(onoff ? View.VISIBLE : View.GONE);
