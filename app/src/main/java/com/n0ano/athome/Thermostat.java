@@ -157,6 +157,7 @@ public void show(View v, int color_fore, int color_hold)
         ThermostatDevice dev = thermostat_adapter.getItem(i);
         View dv = dev.get_view();
         GaugeView gv = (GaugeView) dv.findViewById(R.id.thermostat_temp);
+        gv.set_minmax(dev.get_mintemp(), dev.get_maxtemp());
         gv.set_value(dev.get_temp());
 //      tv.setTextColor((dev.get_hold() == Thermostat.HOLD_RUNNING) ? color_fore : color_hole);
     }

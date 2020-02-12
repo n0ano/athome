@@ -60,9 +60,12 @@ public void get_devices(ThermostatAdapter adapter)
     max = list.length();
     for (int i = 0; i < max; i++) {
         info = (JSONObject)C.json_get(list, i);
-        adapter.add_device(new ThermostatDevice(info.optString("name", ""),
+        name = info.optString("name", "");
+        adapter.add_device(new ThermostatDevice(name,
                                                 i + 1,
                                                 info.optString("identifier", ""),
+                                                P.get_double("thermostat:" + name + "_min", 1000.0),
+                                                P.get_double("thermostat:" + name + "_max", -1000.0),
                                                 View.inflate(act, R.layout.thermostat, null)));
     }
 
@@ -263,7 +266,12 @@ public void get_therm(JSONObject info, ThermostatDevice dev)
 {
 
     if (info != null) {
-        dev.set_temp(((float)info.optLong("actualTemperature", 0)) / 10.0f);
+        float temp = ((float)info.optLong("actualTemperature", 0)) / 10.0f;
+        dev.set_temp(temp);
+        if (temp < dev.get_mintemp())
+            dev.set_mintemp(temp, "thermostat:" + dev.get_name() + "_min");
+        if (temp > dev.get_maxtemp())
+            dev.set_maxtemp(temp, "thermostat:" + dev.get_name() + "_max");
         dev.set_humid(info.optLong("actualHumidity", 0));
     }
 }

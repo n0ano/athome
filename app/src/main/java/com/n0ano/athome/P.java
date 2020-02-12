@@ -44,54 +44,6 @@ public static void init(SharedPreferences pref)
     json_cfg = C.str2json(pref.getString("config", "{\"pref_version\":0}"));
 }
 
-private static void cfg_v2_v3()
-{
-
-    Log.d("Convert preferences to version " + P.PREF_VERSION);
-
-	//put("debug", get_old("debug", 0));
-
-	put("general:layout", get_old("general_layout", Popup.LAYOUT_TABLET));
-	put("general:on", get_old("general_on", -1));
-	put("general:off", get_old("general_off", -1));
-	put("general:log_uri", get_old("log_uri", ""));
-	put("general:log_params", get_old("log_params", ""));
-	put("general:config_url", get_old("config_url", ""));
-
-	put("egauge:layout", get_old("egauge_layout", Popup.LAYOUT_TABLET));
-	put("egauge:progress", get_old("egauge_progress", 1));
-	put("egauge:url", get_old("egauge_url", ""));
-	put("egauge:clock", get_old("egauge_clock", false));
-
-	put("weather:layout", get_old("weather_layout", Popup.LAYOUT_TABLET));
-	put("weather:progress", get_old("weather_progress", 1));
-	put("weather:wunder_id", get_old("wunder_id", ""));
-	put("weather:wunder_key", get_old("wunder_key", ""));
-
-	put("thermostat:layout", get_old("thermostat_layout", Popup.LAYOUT_TABLET));
-	put("thermostat:ecobee_api", get_old("ecobee_api", ""));
-	put("thermostat:ecobee_access", get_old("ecobee_access", ""));
-	put("thermostat:ecobee_refresh", get_old("ecobee_refresh", ""));
-
-	put("outlets:layout", get_old("outlets_layout", Popup.LAYOUT_TABLET));
-	put("outlets:battery", get_old("outlets_battery", ""));
-	put("outlets:cols", get_old("outlets_cols", C.OUTLETS_COLS));
-	put("outlets:batt_min", get_old("outlets_batt_min", C.BATTERY_LOW));
-	put("outlets:batt_max", get_old("outlets_batt_max", C.BATTERY_HIGH));
-	put("outlets:batt_level", get_old("outlets_batt_level", 0));
-	put("outlets:x10_url", get_old("x10_url", ""));
-	put("outlets:x10_jwt", get_old("x10_jwt", "none"));
-	put("outlets:tplink_user", get_old("tplink_user", ""));
-	put("outlets:tplink_pwd", get_old("tplink_pwd", ""));
-
-	put("ss:enable", get_old("ss_enable", false));
-	put("ss:start", get_old("ss_start", 0));
-	put("ss:delay", get_old("ss_delay", 0));
-	put("ss:fade", get_old("ss_fade", 0));
-
-    put("pref_version", P.PREF_VERSION);
-}
-
 private static void init_defaults()
 {
 
@@ -308,6 +260,39 @@ public static void put(String key, boolean value)
 	editor.commit();
 }
 
+public static double get_double(String key)
+{
+    
+    JSONObject obj = get_obj(key);
+    return obj.optDouble(get_key(key), 0.0);
+}
+public static double get_double(String key, double def)
+{
+    
+    JSONObject obj = get_obj(key);
+    return obj.optDouble(get_key(key), def);
+}
+public static void put(String key, double value)
+{
+
+    try {
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.put(get_key(key), value);
+        else {
+            JSONObject obj = get_obj(key);
+            obj.put(get_key(key), value);
+            json_cfg.put(json, obj);
+        }
+    } catch (Exception e) {
+        Log.d("Preferences JSON put error:" + key + "=" + value + " - " + e);
+        return;
+    }
+	SharedPreferences.Editor editor = pref.edit();
+	editor.putString("config", C.json2str(json_cfg));
+	editor.commit();
+}
+
 public static String get_string(String key)
 {
     
@@ -315,6 +300,33 @@ public static String get_string(String key)
     return obj.optString(get_key(key), "");
 }
 public static void put(String key, String value)
+{
+
+    try {
+        String json = get_json(key);
+        if (json == null)
+            json_cfg.put(get_key(key), value);
+        else {
+            JSONObject obj = get_obj(key);
+            obj.put(get_key(key), value);
+            json_cfg.put(json, obj);
+        }
+    } catch (Exception e) {
+        Log.d("Preferences JSON put error:" + key + "=" + value + " - " + e);
+        return;
+    }
+	SharedPreferences.Editor editor = pref.edit();
+	editor.putString("config", C.json2str(json_cfg));
+	editor.commit();
+}
+
+public static JSONObject get_JSONObject(String key)
+{
+    
+    JSONObject obj = get_obj(key);
+    return (JSONObject)obj.opt(get_key(key));
+}
+public static void put(String key, JSONObject value)
 {
 
     try {
