@@ -132,6 +132,8 @@ public void hide_views()
 public void do_fade(View start, View end)
 {
 
+    if (ss_state() == SS_COUNTING)
+        return;
     faders.fade(ss_info.fade, start, end, ss_info.width, ss_info.height, new DoneCallback() {
         @Override
         public void done(Object obj) {
@@ -147,7 +149,8 @@ private void image_name(String name)
 {
 
 //Log.d("DDD-SS", "image_name - " + name + ", title - " + title);
-    callbacks.ss_toolbar((menu_title == null) ? name : menu_title, 0);
+    if (ss_state() != SS_COUNTING)
+        callbacks.ss_toolbar((menu_title == null) ? name : menu_title, 0);
 }
 
 public void show_image(final ImageEntry entry, final View img_start, final View img_end)
