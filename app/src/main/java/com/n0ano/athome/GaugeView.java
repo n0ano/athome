@@ -29,6 +29,7 @@ private float density;
 private Paint dial_paint;
 private Paint deg_paint;
 private Paint value_paint;
+private Paint name_paint;
 private Paint num_paint;
 private Paint hilo_paint;
 
@@ -39,11 +40,14 @@ private float hilo_w;
 private float tick_max;
 private float tick_min;
 private float deg_size;
+private float name_size;
 private float tick_size;
 
 private float current;
 private float low_a;
 private float hi_a;
+
+private String name = "xyzzy";
 
 private float cur_value;
 private float cur_min;
@@ -65,6 +69,7 @@ public GaugeView(Context ctx, AttributeSet attrs)
     dial_w = 1 * density;
     hilo_w = 14 * density;
     deg_size = 32 * density;
+    name_size = 20 * density;
     tick_size = 10 * density;
     tick_max = 8 * density;
     tick_min = -40 * density;
@@ -83,6 +88,10 @@ public GaugeView(Context ctx, AttributeSet attrs)
 	value_paint = brush(0xffffffff, 1);
 	value_paint.setStyle(Paint.Style.FILL);
     value_paint.setTextSize(deg_size);
+
+	name_paint = brush(0xffffffff, 1);
+	name_paint.setStyle(Paint.Style.FILL);
+    name_paint.setTextSize(name_size);
 
 	num_paint = brush(0xff00ffff, 1);
 	num_paint.setStyle(Paint.Style.FILL);
@@ -116,7 +125,7 @@ public void onDraw(Canvas canvas)
 
     // draw current value tick
     if (cur_value != 1000) {
-        pointer(w, h, margin, cur_value, canvas, value_paint, deg_paint);
+        pointer(w, h, margin, cur_value, canvas, value_paint, name_paint, deg_paint);
     }
 }
 
@@ -134,6 +143,12 @@ public void set_dimensions(int tick_max, int tick_min, int hilo_w, int deg_size,
 
     this.tick_size = tick_size;
     num_paint.setTextSize(tick_size);
+}
+
+public void set_name(String name)
+{
+
+    this.name = name;
 }
 
 public void set_value(float val)
@@ -250,12 +265,14 @@ private void dial(int min, int max, int ticks, Canvas c, Paint p, Paint num_p)
     } while (ticks-- > 0);
 }
 
-private void pointer(int w, int h, int m, float v, Canvas c, Paint dp, Paint pp)
+private void pointer(int w, int h, int m, float v, Canvas c, Paint dp, Paint np, Paint pp)
 {
 
     String deg = String.format("%.1f", v);
     float tw = dp.measureText(deg);
     c.drawText(deg, cx - (tw/2), cy + 8, dp);
+    tw = np.measureText(name);
+    c.drawText(name, cx - (tw/2), h - 16, np);
     line(cx - (m + dial_w) + tick_max, cx - (m + dial_w) + tick_min, deg2angle(v), c, pp);
 }
 

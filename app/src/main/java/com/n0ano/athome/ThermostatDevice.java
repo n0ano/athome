@@ -42,8 +42,8 @@ public ThermostatDevice(String name, int id, String code, double mintemp, double
 
     this.url = null;
 
-    TextView tv = (TextView) view.findViewById(R.id.thermostat_name);
-    tv.setText(name);
+    GaugeView gv = (GaugeView)view.findViewById(R.id.thermostat_temp);
+    gv.set_name(name);
     this.hold = Thermostat.HOLD_RUNNING;
 }
 

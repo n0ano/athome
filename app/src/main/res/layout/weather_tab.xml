@@ -6,74 +6,72 @@
     android:id="@+id/weather_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/content_tab">
 
+    <ImageView
+        android:id="@+id/weather_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:paddingTop="10dp"
+        android:src="@drawable/outside"
+        android:onClick="go_temp_detail" />
+
+    <com.n0ano.athome.GaugeView
+        android:id="@+id/weather_temp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="10dp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
     <LinearLayout
-        android:id="@+id/weather"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
-        <RelativeLayout
-            android:id="@+id/weather"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            tools:ignore="DuplicateIds">
-
-            <RelativeLayout
-                android:id="@+id/weather_out"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-                <ImageView
-                    android:id="@+id/weather_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:paddingTop="10dp"
-                    android:src="@drawable/outside"
-                    android:onClick="go_temp_detail" />
-
-                <com.n0ano.athome.GaugeView
-                    android:id="@+id/weather_temp"
-                    android:layout_width="180dp"
-                    android:layout_height="180dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@id/weather_icon"
-                    android:paddingLeft="10dp" />
-
-                </RelativeLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
 
             <ImageView
-                android:id="@+id/weather_drop"
+                android:id="@+id/weather_bar_dir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/rain_drop" />
+                android:paddingTop="20dp"
+                android:paddingRight="10dp"
+                android:src="@drawable/barometer" />
 
             <TextView
-                android:id="@+id/weather_rain"
+                android:id="@+id/weather_barometer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/weather_drop"
-                android:layout_alignParentRight="true"
+                android:paddingRight="10dp"
                 android:textSize="18sp"
                 android:text="0.0 in" />
+
+            </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
 
             <ImageView
                 android:id="@+id/weather_dir"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@id/weather_drop"
+                android:layout_alignParentLeft="true"
                 android:src="@drawable/circle_tick" />
 
             <TextView
@@ -101,28 +99,31 @@
                 android:textSize="14sp"
                 android:text="mph" />
 
+            </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/weather_precip"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true" >
+
             <ImageView
-                android:id="@+id/weather_bar_dir"
+                android:id="@+id/weather_drop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@id/weather_dir"
-                android:paddingTop="20dp"
-                android:paddingRight="10dp"
-                android:src="@drawable/barometer" />
+                android:src="@drawable/rain_drop" />
 
             <TextView
-                android:id="@+id/weather_barometer"
+                android:id="@+id/weather_rain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignRight="@id/weather_bar_dir"
-                android:layout_below="@id/weather_bar_dir"
-                android:paddingRight="10dp"
                 android:textSize="18sp"
-                android:text="0.0 in" />
+                android:text="---" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
         </LinearLayout>
 
-</LinearLayout>
+    </LinearLayout>
