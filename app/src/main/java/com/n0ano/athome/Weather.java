@@ -37,13 +37,14 @@ Http http;
 ArrayList<WeatherStation> stations;
 int station_idx = 0;
 
+public String default_key = "";
+
 JSONArray json;
 
 // Weather: class constructor
 //
 public Weather(Popup popup, final DoitCallback cb)
 {
-    WeatherStation station;
 
     this.popup = popup;
 
@@ -51,16 +52,7 @@ public Weather(Popup popup, final DoitCallback cb)
 
     stations = new ArrayList<WeatherStation>();
 
-    json = (JSONArray)P.get_JSONObject("weather:stations");
-    if (json == null)
-        json = new JSONArray();
-
-Log.d("DDD", "weather: stations - " + json.toString());
-
-    int max = json.length();
-    for (int i = 0; i < max; i++)
-        if ((station = json_entry(json, i)) != null)
-            stations.add(station);
+    load_persist();
 
     new Thread(new Runnable() {
         public void run() {
@@ -77,6 +69,43 @@ Log.d("DDD", "weather: stations - " + json.toString());
             }
         }
     }).start();
+}
+
+private void load_persist()
+{
+    WeatherStation station;
+
+    json = (JSONArray)P.get_JSONObject("weather:stations");
+    if (json == null) {
+        json = new JSONArray();
+
+        //
+        //  Convert and delete old keys
+        //
+        String wid = P.get_string("weather:wunder_id");
+        if (!wid.isEmpty()) {
+            String wkey = P.get_string("weather:wunder_key");
+            add(WeatherStation.UNDER, "old", wid, wkey);
+        }
+        P.rm_key("weather:wunder_id");
+        P.rm_key("weather:wunder_key");
+        P.rm_key("weather:min_temp");
+        P.rm_key("weather:min_temp_time");
+        P.rm_key("weather:max_temp");
+        P.rm_key("weather:max_temp_time");
+        P.rm_key("weather:max_time");
+        P.rm_key("weather:min_time");
+    }
+
+Log.d("DDD", "weather: stations - " + json.toString());
+
+    int max = json.length();
+    for (int i = 0; i < max; i++)
+        if ((station = json_entry(json, i)) != null) {
+            stations.add(station);
+            if (station.type == WeatherStation.OPEN)
+                default_key = station.key;
+        }
 }
 
 private WeatherStation json_entry(JSONArray stations, int idx)
