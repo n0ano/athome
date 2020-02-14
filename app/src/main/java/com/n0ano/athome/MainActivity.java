@@ -822,7 +822,7 @@ private void doit()
             public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        weather.show(weather_view);
+                        weather.show(weather_view, 0);
                     }
                 });
             }

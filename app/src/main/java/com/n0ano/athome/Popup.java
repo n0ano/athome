@@ -550,6 +550,42 @@ public void detail_dialog(float max_temp, float min_temp, String max_temp_time, 
     dialog.show();
 }
 
+private void station_dialog()
+{
+    int i;
+    String name, pname;
+
+    final Dialog dialog = start_dialog(R.layout.bar_station);
+
+    final EditText tv_name = (EditText)dialog.findViewById(R.id.weather_name);
+    final EditText tv_id = (EditText)dialog.findViewById(R.id.weather_id);
+    final EditText tv_key = (EditText)dialog.findViewById(R.id.weather_key);
+    final Spinner sv_type = (Spinner)dialog.findViewById(R.id.weather_type);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, WeatherStation.types);
+    adapter.setDropDownViewResource(R.layout.text_spinner);
+    sv_type.setAdapter(adapter);
+    sv_type.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        }
+        
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // TODO Auto-generated method stub
+        }
+
+    });
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+Log.d("DDD", "weather new station = " + tv_name.getText().toString() + ", " + sv_type.getSelectedItemId());
+            end_dialog(dialog, true);
+        }
+    });
+}
+
 private void weather_dialog()
 {
     int i;
@@ -563,21 +599,54 @@ private void weather_dialog()
         return;
     }
 
-    final EditText et_id = (EditText) dialog.findViewById(R.id.weather_id);
-    et_id.setText(P.get_string("weather:wunder_id"));
+    final TextView tv_type = (TextView)dialog.findViewById(R.id.weather_type);
+    final TextView tv_id = (TextView)dialog.findViewById(R.id.weather_id);
+    final TextView tv_key = (TextView)dialog.findViewById(R.id.weather_key);
 
-    final EditText et_key = (EditText) dialog.findViewById(R.id.weather_key);
-    et_key.setText(P.get_string("weather:wunder_key"));
+    int max = act.weather.stations.size();
+    String[] names = new String[max];
+    for (i = 0; i < max; i++)
+        names[i] = act.weather.stations.get(i).name;
+    final Spinner sv = (Spinner) dialog.findViewById(R.id.weather_stations);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, names);
+    adapter.setDropDownViewResource(R.layout.text_spinner);
+    sv.setAdapter(adapter);
+    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            WeatherStation ws = act.weather.stations.get(position);
+            tv_type.setText(WeatherStation.types[ws.type]);
+            tv_id.setText(ws.id);
+            tv_key.setText(ws.key);
+        }
+        
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // TODO Auto-generated method stub
+        }
+
+    });
+    if (max > 0) {
+        WeatherStation ws = act.weather.stations.get(0);
+        tv_type.setText(WeatherStation.types[ws.type]);
+        tv_id.setText(ws.id);
+        tv_key.setText(ws.key);
+    }
+
+    Button add = (Button) dialog.findViewById(R.id.add);
+    add.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            end_dialog(dialog, false);
+            station_dialog();
+        }
+    });
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-            P.put("weather:wunder_id", et_id.getText().toString());
-
-            P.put("weather:wunder_key", et_key.getText().toString());
-
-            end_dialog(dialog, true);
+            end_dialog(dialog, false);
         }
     });
 }

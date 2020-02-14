@@ -10,15 +10,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 // Created by n0ano on 10/10/16.
 //
 // Class to handle weather data
 //
 public class Weather
 {
-
-public final static int TYPE_WUNDER =   0;
-public final static int TYPE_OPEN =     1;
 
 public final static int PERIOD = (60*1000);   // weather only changes once a minute
 
@@ -30,17 +32,34 @@ Popup popup;
 boolean running = true;
 boolean paused = false;
 
-WeatherOpen station;
+Http http;
+
+ArrayList<WeatherStation> stations;
+
+JSONArray json;
 
 // Weather: class constructor
 //
 public Weather(Popup popup, final DoitCallback cb)
 {
+    WeatherStation station;
 
     this.popup = popup;
 
-    //station = new WeatherUnder("Home", P.get_string("weather:wunder_id"), P.get_string("weather:wunder_key"));
-    station = new WeatherOpen("Boulder", "5574999", "8603a6e96af5de08ddbeeb5f4a244622");
+    http = new Http();
+
+    stations = new ArrayList<WeatherStation>();
+
+    json = (JSONArray)P.get_JSONObject("weather:stations");
+    if (json == null)
+        json = new JSONArray();
+
+Log.d("DDD", "weather: stations - " + json.toString());
+
+    int max = json.length();
+    for (int i = 0; i < max; i++)
+        if ((station = json_entry(json, i)) != null)
+            stations.add(station);
 
     new Thread(new Runnable() {
         public void run() {
@@ -49,7 +68,7 @@ public Weather(Popup popup, final DoitCallback cb)
                 //  Get the data
                 //
                 if (!paused) {
-                    station.get_data();
+                    get_data();
                     cb.doit(0, null);
                 }
 
@@ -57,6 +76,50 @@ public Weather(Popup popup, final DoitCallback cb)
             }
         }
     }).start();
+}
+
+private WeatherStation json_entry(JSONArray stations, int idx)
+{
+    WeatherStation station;
+
+    try {
+        JSONObject entry = stations.getJSONObject(idx);
+        station = new WeatherStation(entry.getInt("type"),
+                                     entry.getString("name"),
+                                     entry.getString("id"),
+                                     entry.getString("key"));
+    } catch (Exception e) {
+        Log.d("DDD", "weather station JSON error - " + e);
+        return null;
+    }
+    return station;
+}
+
+public void add(WeatherStation station)
+{
+
+    stations.add(station);
+    json.put(station.to_json());
+    P.put("weather:stations", json);
+}
+
+public void add(int type, String name, String id, String key)
+{
+
+    add(new WeatherStation(type, name, id, key));
+}
+
+public void update(int idx, int type, String name, String id, String key)
+{
+
+    stations.remove(idx);
+    stations.add(idx, new WeatherStation(type, name, id, key));
+}
+
+public void remove(int idx)
+{
+
+    stations.remove(idx);
 }
 
 public void stop()
@@ -70,51 +133,24 @@ public void pause(boolean p) { paused = p; }
 public void go_temp_detail(View v)
 {
 
-    popup.detail_dialog((float)station.max_temp,
-                        (float)station.min_temp,
-                        station.max_time,
-                        station.min_time);
+Log.d("DDD", "weather: temp detail WIP");
+    //popup.detail_dialog((float)station.max_temp, (float)station.min_temp, station.max_time, station.min_time);
 }
 
-public void show(View v)
+private void get_data()
+{
+    WeatherStation ws;
+
+    int max = stations.size();
+    for (int i = 0; i < max; i++)
+        stations.get(i).get_data(http);
+}
+
+public void show(View v, int idx)
 {
 
-    //
-    //  Display it
-    //
-    TextView tv;
-    ImageView iv;
-    GaugeView gv;
-    LinearLayout ll;
-
-    if ((gv = (GaugeView) v.findViewById(R.id.weather_temp)) != null) {
-        gv.set_minmax((float)station.min_temp, (float)station.max_temp);
-        gv.set_name(station.name);
-        gv.set_value((float)station.temp);
-    }
-
-    if ((iv = (ImageView) v.findViewById(R.id.weather_dir)) != null)
-        iv.setRotation(station.wind_dir);
-
-    if ((tv = (TextView) v.findViewById(R.id.weather_speed)) != null)
-        tv.setText(String.format("%.1f", station.wind_speed));
-
-    if ((ll = (LinearLayout)v.findViewById(R.id.weather_precip)) != null) {
-        float rain = (float)station.precip;
-        if (rain < 0)
-            ll.setVisibility(View.GONE);
-        else {
-            ll.setVisibility(View.VISIBLE);
-            if ((tv = (TextView) v.findViewById(R.id.weather_rain)) != null)
-                tv.setText(String.format("%.1f", (float)station.precip));
-        }
-    }
-
-    if ((iv = (ImageView) v.findViewById(R.id.weather_bar_dir)) != null)
-        iv.setImageResource(station.baro_icon);
-
-    if ((tv = (TextView) v.findViewById(R.id.weather_barometer)) != null)
-        tv.setText(String.format("%.1f", station.baro));
+    if (idx < stations.size())
+        stations.get(idx).show(v);
 }
 
 }

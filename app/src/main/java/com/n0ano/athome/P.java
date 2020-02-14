@@ -320,13 +320,13 @@ public static void put(String key, String value)
 	editor.commit();
 }
 
-public static JSONObject get_JSONObject(String key)
+public static Object get_JSONObject(String key)
 {
     
     JSONObject obj = get_obj(key);
-    return (JSONObject)obj.opt(get_key(key));
+    return obj.opt(get_key(key));
 }
-public static void put(String key, JSONObject value)
+public static void put(String key, Object value)
 {
 
     try {
