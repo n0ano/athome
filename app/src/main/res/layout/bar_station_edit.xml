@@ -9,31 +9,9 @@
         android:layout_height="wrap_content"
 		android:paddingTop="10dp"
         android:paddingLeft="10dp"
-        android:text="Weather stations"
+        android:text="Edit weather station"
         android:textSize="20dp"
         android:textColor="@color/dialog_fore" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="Station"
-            android:textColor="@color/dialog_fore" />
-
-        <Spinner
-            android:id="@+id/weather_stations"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="2dp" />
-
-        </LinearLayout>
 
     <LinearLayout
 		android:orientation="horizontal"
@@ -52,6 +30,29 @@
         <TextView
 			android:id="@+id/weather_type"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/dialog_fore" />
+
+        </LinearLayout>
+
+    <LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Name:"
+            android:textColor="@color/dialog_fore" />
+
+        <EditText
+			android:id="@+id/weather_name"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
 			android:paddingLeft="4dp"
             android:textSize="14sp"
@@ -73,9 +74,9 @@
             android:text="Id:"
             android:textColor="@color/dialog_fore" />
 
-        <TextView
+        <EditText
 			android:id="@+id/weather_id"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
 			android:paddingLeft="4dp"
             android:textSize="14sp"
@@ -97,15 +98,23 @@
             android:text="Key:"
             android:textColor="@color/dialog_fore" />
 
-        <TextView
+        <EditText
 			android:id="@+id/weather_key"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
 			android:paddingLeft="4dp"
             android:textSize="14sp"
             android:textColor="@color/dialog_fore" />
 
         </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/weather_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="20dp"
+        android:text="Delete station" />
 
 	<LinearLayout
 		android:gravity="right"
@@ -117,19 +126,11 @@
 		android:paddingBottom="20dp" >
 
 		<Button
-			android:id="@+id/edit"
+			android:id="@+id/cancel"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:paddingRight="30dp"
-			android:text="Edit"
-            android:textColor="@color/dialog_fore"
-            android:background="@color/dialog_back" />
-		<Button
-			android:id="@+id/add"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingRight="30dp"
-			android:text="Add"
+			android:text="Cancel"
             android:textColor="@color/dialog_fore"
             android:background="@color/dialog_back" />
 		<Button

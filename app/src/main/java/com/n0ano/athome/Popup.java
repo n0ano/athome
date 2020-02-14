@@ -59,6 +59,8 @@ private int type_pos;
 public final static int SS_START = 30;
 public final static int SS_DELAY = 30;
 
+private int weather_idx;
+
 public Popup(MainActivity act)
 {
 
@@ -586,6 +588,40 @@ Log.d("DDD", "weather new station = " + tv_name.getText().toString() + ", " + sv
     });
 }
 
+private void station_edit_dialog(final int idx)
+{
+
+    final Dialog dialog = start_dialog(R.layout.bar_station_edit);
+
+    final WeatherStation ws = act.weather.stations.get(idx);
+
+    final TextView tv_type = (TextView)dialog.findViewById(R.id.weather_type);
+    tv_type.setText(WeatherStation.types[ws.type]);
+
+    final EditText tv_name = (EditText)dialog.findViewById(R.id.weather_name);
+    tv_name.setText(ws.get_name());
+
+    final EditText tv_id = (EditText)dialog.findViewById(R.id.weather_id);
+    tv_id.setText(ws.id);
+
+    final EditText tv_key = (EditText)dialog.findViewById(R.id.weather_key);
+    tv_key.setText(ws.key);
+
+    final CheckBox cb = (CheckBox)dialog.findViewById(R.id.weather_delete);
+
+    Button ok = (Button) dialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ws.name = tv_name.getText().toString();
+            ws.id = tv_id.getText().toString();
+            ws.key = tv_key.getText().toString();
+            act.weather.edit(ws, idx, cb.isChecked());
+            end_dialog(dialog, true);
+        }
+    });
+}
+
 private void weather_dialog()
 {
     int i;
@@ -614,10 +650,11 @@ private void weather_dialog()
     sv.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            WeatherStation ws = act.weather.stations.get(position);
-            tv_type.setText(WeatherStation.types[ws.type]);
-            tv_id.setText(ws.id);
-            tv_key.setText(ws.key);
+            weather_idx = position;
+            WeatherStation station = act.weather.stations.get(position);
+            tv_type.setText(WeatherStation.types[station.type]);
+            tv_id.setText(station.id);
+            tv_key.setText(station.key);
         }
         
         @Override
@@ -626,12 +663,23 @@ private void weather_dialog()
         }
 
     });
+    weather_idx = 0;
     if (max > 0) {
-        WeatherStation ws = act.weather.stations.get(0);
-        tv_type.setText(WeatherStation.types[ws.type]);
-        tv_id.setText(ws.id);
-        tv_key.setText(ws.key);
+        WeatherStation station = act.weather.stations.get(0);
+        tv_type.setText(WeatherStation.types[station.type]);
+        tv_id.setText(station.id);
+        tv_key.setText(station.key);
     }
+
+    Button edit = (Button) dialog.findViewById(R.id.edit);
+    edit.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            end_dialog(dialog, false);
+            if (act.weather.stations.size() > 0)
+            station_edit_dialog(weather_idx);
+        }
+    });
 
     Button add = (Button) dialog.findViewById(R.id.add);
     add.setOnClickListener(new OnClickListener() {

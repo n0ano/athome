@@ -110,17 +110,20 @@ public void add(int type, String name, String id, String key)
     add(new WeatherStation(type, name, id, key));
 }
 
-public void update(int idx, int type, String name, String id, String key)
+public void edit(WeatherStation ws, int idx, boolean delete)
 {
 
     stations.remove(idx);
-    stations.add(idx, new WeatherStation(type, name, id, key));
-}
-
-public void remove(int idx)
-{
-
-    stations.remove(idx);
+    json.remove(idx);
+    if (!delete) {
+        stations.add(idx, ws);
+        try {
+            json.put(idx, ws.to_json());
+        } catch (Exception e) {
+            Log.d("DDD", "weather json out of sync - " + e);
+        }
+    }
+    P.put("weather:stations", json);
 }
 
 public void stop()
