@@ -49,7 +49,6 @@ import java.util.Iterator;
 import com.n0ano.athome.SS.ImageMgmt;
 import com.n0ano.athome.SS.ScreenInfo;
 import com.n0ano.athome.SS.ScreenSaver;
-import com.n0ano.athome.SS.MyGesture;
 import com.n0ano.athome.SS.SS_Callbacks;
 
 public class MainActivity extends AppCompatActivity
@@ -144,7 +143,7 @@ protected void onResume()
 
     ss_control(C.SS_OP_INIT);
 
-    ss_gesture = new GestureDetectorCompat(this, new MyGesture(ss_saver));
+    ss_gesture = new GestureDetectorCompat(this, new MyGesture(this));
 
     doit();
 }
@@ -324,6 +323,13 @@ private void start_home()
     popup = new Popup(this);
 
     display(true);
+}
+
+public void fling(int dir)
+{
+
+    if (ss_saver != null)
+        ss_saver.saver_fling(dir < 0 ? 1 : -1);
 }
 
 public void start_browser(String uri)
@@ -816,17 +822,29 @@ private void doit()
         });
 
     final View weather_view = view_show(P.get_int("weather:layout"), R.id.weather_main);
-    if (weather_view != null)
+    if (weather_view != null) {
+            weather_view.setOnTouchListener(new OnSwipeTouchListener(this) {
+                @Override
+                public void onSwipeLeft() {
+                    weather.cycle(-1, weather_view);
+                }
+
+                @Override
+                public void onSwipeRight() {
+                    weather.cycle(1, weather_view);
+                }
+            });
         weather = new Weather(popup, new DoitCallback() {
             @Override
             public void doit(int res, Object obj) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        weather.show(weather_view, 0);
+                        weather.show(weather_view);
                     }
                 });
             }
         });
+    }
 
     final View thermostat_view = view_show(P.get_int("thermostat:layout"), R.id.thermostats_table);
     if (thermostat_view != null)

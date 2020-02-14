@@ -1,4 +1,4 @@
-package com.n0ano.athome.SS;
+package com.n0ano.athome;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -6,9 +6,9 @@ import android.view.MotionEvent;
 public class MyGesture extends GestureDetector.SimpleOnGestureListener
 {
 
-ScreenSaver act;
+MainActivity act;
 
-public MyGesture(ScreenSaver act)
+public MyGesture(MainActivity act)
 {
 
     this.act = act;
@@ -27,8 +27,7 @@ public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, 
 
     //  velocityX > 0 => swipe right
     //            < 0 => swipe left
-    if (act != null)
-        act.saver_fling(velocityX < 0 ? 1 : -1);
+    act.fling(velocityX < 0 ? 1 : -1);
     return true;
 }
 

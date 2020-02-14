@@ -35,6 +35,7 @@ boolean paused = false;
 Http http;
 
 ArrayList<WeatherStation> stations;
+int station_idx = 0;
 
 JSONArray json;
 
@@ -146,11 +147,26 @@ private void get_data()
         stations.get(i).get_data(http);
 }
 
-public void show(View v, int idx)
+public void cycle(int dir, View v)
 {
 
-    if (idx < stations.size())
-        stations.get(idx).show(v);
+    station_idx += dir;
+    int max = stations.size();
+    if (max == 0) {
+        station_idx = 0;
+        return;
+    } else if (station_idx < 0)
+        station_idx = max - 1;
+    else if (station_idx >= max)
+        station_idx = 0;
+    show(v);
+}
+
+public void show(View v)
+{
+
+    if (station_idx < stations.size())
+        stations.get(station_idx).show(v);
 }
 
 }
