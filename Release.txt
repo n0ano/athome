@@ -1,0 +1,4 @@
+2/15/2020
+Fix SS hang on initial installation
+Add min/max detail popup back
+Search Open Weathermap for cities
