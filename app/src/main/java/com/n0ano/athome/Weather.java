@@ -166,8 +166,8 @@ public void pause(boolean p) { paused = p; }
 public void go_temp_detail(View v)
 {
 
-Log.d("DDD", "weather: temp detail WIP");
-    //popup.detail_dialog((float)station.max_temp, (float)station.min_temp, station.max_time, station.min_time);
+    if (station_idx < stations.size())
+        popup.detail_dialog(stations.get(station_idx));
 }
 
 public void search(String name, String key, DoitCallback cb)

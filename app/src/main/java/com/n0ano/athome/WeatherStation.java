@@ -115,6 +115,10 @@ public JSONObject to_json()
         json.put("name", name);
         json.put("id", id);
         json.put("key", key);
+        json.put("min_temp", min_temp);
+        json.put("min_time", min_time);
+        json.put("max_temp", max_temp);
+        json.put("max_time", max_time);
     } catch (Exception e) {
         Log.d("DDD", "to_json put error - " + e);
     }

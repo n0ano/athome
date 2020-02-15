@@ -533,23 +533,23 @@ private void ecobee_dialog()
     });
 }
 
-public void detail_dialog(float max_temp, float min_temp, String max_temp_time, String min_temp_time)
+public void detail_dialog(WeatherStation ws)
 {
 
     final Dialog dialog = new Dialog(act, R.style.AlertDialogCustom);
     dialog.setContentView(R.layout.detail);
 
     TextView tv = (TextView) dialog.findViewById(R.id.detail_max);
-    tv.setText(String.format("%.1f", max_temp));
+    tv.setText(String.format("%.1f", ws.max_temp));
 
     tv = (TextView) dialog.findViewById(R.id.detail_min);
-    tv.setText(String.format("%.1f", min_temp));
+    tv.setText(String.format("%.1f", ws.min_temp));
 
     tv = (TextView) dialog.findViewById(R.id.detail_max_time);
-    tv.setText(max_temp_time);
+    tv.setText(ws.max_time);
 
     tv = (TextView) dialog.findViewById(R.id.detail_min_time);
-    tv.setText(min_temp_time);
+    tv.setText(ws.min_time);
 
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
