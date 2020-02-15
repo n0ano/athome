@@ -16,10 +16,27 @@ public class WeatherCity
 private final static String WOPEN_URL = "http://api.openweathermap.org";
 private final static String WOPEN_API = "/data/2.5/weather";
 private final static String WOPEN_ID = "id=";
+private final static String WOPEN_SEARCH = "q=";
 private final static String WOPEN_KEY = "&appid=";
 private final static String WOPEN_QUERY = "&units=imperial";
 
 private final static double HPA2IN = 33.863886666667;
+
+public static JSONObject search(String name, String key, Http http)
+{
+
+Log.d("DDD", "weather: searching for city " + name + ", " + key);
+    Http.R r = http.call_api(WOPEN_URL + WOPEN_API,
+                            WOPEN_SEARCH + name +
+                            WOPEN_KEY + key);
+    try {
+        JSONObject json = new JSONObject(r.body);
+        return json;
+    } catch (Exception e) {
+        Log.d("DDD", "weather city: bad json from search - " + e);
+        return null;
+    }
+}
 
 private static boolean get_info(WeatherStation ws, JSONObject json)
 {

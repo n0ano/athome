@@ -798,6 +798,25 @@ private void sh_alerts()
         menu_bar.findItem(R.id.action_alerts).setVisible(vis);
 }
 
+public void weather_search(final String name, final String key, final DoitCallback cb)
+{
+
+    new Thread(new Runnable() {
+        public void run() {
+            weather.search(name, key, new DoitCallback() {
+                @Override
+                public void doit(final int res, final Object obj) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            cb.doit(res, obj);
+                        }
+                    });
+                }
+            });
+        }
+    }).start();
+}
+
 private void doit()
 {
 
@@ -826,12 +845,12 @@ private void doit()
             weather_view.setOnTouchListener(new OnSwipeTouchListener(this) {
                 @Override
                 public void onSwipeLeft() {
-                    weather.cycle(-1, weather_view);
+                    weather.cycle(1, weather_view);
                 }
 
                 @Override
                 public void onSwipeRight() {
-                    weather.cycle(1, weather_view);
+                    weather.cycle(-1, weather_view);
                 }
             });
         weather = new Weather(popup, new DoitCallback() {

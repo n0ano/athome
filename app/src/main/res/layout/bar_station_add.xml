@@ -14,24 +14,71 @@
         android:textColor="@color/dialog_fore" />
 
     <LinearLayout
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:paddingTop="10dp"
-        android:paddingLeft="20dp" >
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:text="Type:"
+            android:text="Type: "
             android:textColor="@color/dialog_fore" />
 
-        <Spinner
+        <RadioGroup
             android:id="@+id/weather_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <RadioButton
+                android:id="@+id/weather_under"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PWS" />
+
+            <RadioButton
+                android:id="@+id/weather_open"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="City" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/weather_search"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp"
+        android:visibility="gone" >
+
+        <Button
+            android:id="@+id/weather_do_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/buttonBack" />
+
+        <Spinner
+            android:id="@+id/weather_states"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="2dp" />
+
+        <EditText
+			android:id="@+id/weather_find"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+			android:paddingLeft="4dp"
+            android:textSize="14sp"
+            android:textColor="@color/dialog_fore" />
 
         </LinearLayout>
 
@@ -98,12 +145,21 @@
             android:textColor="@color/dialog_fore" />
 
         <EditText
-			android:id="@+id/weather_key"
+			android:id="@+id/weather_key_pws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 			android:paddingLeft="4dp"
             android:textSize="14sp"
             android:textColor="@color/dialog_fore" />
+
+        <EditText
+			android:id="@+id/weather_key_city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+			android:paddingLeft="4dp"
+            android:textSize="14sp"
+            android:textColor="@color/dialog_fore"
+            android:visibility="gone" />
 
         </LinearLayout>
 

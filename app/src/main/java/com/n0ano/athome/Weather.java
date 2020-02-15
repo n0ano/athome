@@ -170,6 +170,12 @@ Log.d("DDD", "weather: temp detail WIP");
     //popup.detail_dialog((float)station.max_temp, (float)station.min_temp, station.max_time, station.min_time);
 }
 
+public void search(String name, String key, DoitCallback cb)
+{
+
+    cb.doit(0, WeatherCity.search(name, key, http));
+}
+
 private void get_data()
 {
     WeatherStation ws;

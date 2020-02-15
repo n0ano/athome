@@ -11,13 +11,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.n0ano.athome.SS.Faders;
 import com.n0ano.athome.SS.ScreenSaver;
+
+import org.json.JSONObject;
 
 public class Popup extends MainActivity
 {
@@ -60,6 +64,14 @@ public final static int SS_START = 30;
 public final static int SS_DELAY = 30;
 
 private int weather_idx;
+private String weather_state;
+private String[] states = {
+	"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+	"HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+	"MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+	"NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+	"SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+};
 
 public Popup(MainActivity act)
 {
@@ -552,23 +564,53 @@ public void detail_dialog(float max_temp, float min_temp, String max_temp_time, 
     dialog.show();
 }
 
-private void station_dialog()
+private void station_add_dialog()
 {
-    int i;
-    String name, pname;
-
-    final Dialog dialog = start_dialog(R.layout.bar_station);
+    final Dialog dialog = start_dialog(R.layout.bar_station_add);
 
     final EditText tv_name = (EditText)dialog.findViewById(R.id.weather_name);
     final EditText tv_id = (EditText)dialog.findViewById(R.id.weather_id);
-    final EditText tv_key = (EditText)dialog.findViewById(R.id.weather_key);
-    final Spinner sv_type = (Spinner)dialog.findViewById(R.id.weather_type);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, WeatherStation.types);
+    final EditText tv_key_pws = (EditText)dialog.findViewById(R.id.weather_key_pws);
+    final EditText tv_key_city = (EditText)dialog.findViewById(R.id.weather_key_city);
+    final LinearLayout ll_search = (LinearLayout)dialog.findViewById(R.id.weather_search);
+    final EditText tv_find = (EditText)dialog.findViewById(R.id.weather_find);
+
+    final RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.weather_type);
+    rg.check(R.id.weather_under);
+    rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(RadioGroup group,int checkedId) {
+            int type = (rg.getCheckedRadioButtonId() == R.id.weather_under) ? WeatherStation.UNDER :
+                                                                              WeatherStation.OPEN;
+            switch (type) {
+
+            case WeatherStation.UNDER:
+                tv_key_pws.setVisibility(View.VISIBLE);
+                tv_key_city.setVisibility(View.GONE);
+                ll_search.setVisibility(View.GONE);
+                break;
+
+            case WeatherStation.OPEN:
+                tv_key_pws.setVisibility(View.GONE);
+                tv_key_city.setVisibility(View.VISIBLE);
+                ll_search.setVisibility(View.VISIBLE);
+                if (tv_key_city.getText().toString().isEmpty())
+                    tv_key_city.setText(act.weather.default_key);
+                break;
+
+            }
+        }
+    });
+
+    weather_state = "";
+    final Spinner sv = (Spinner) dialog.findViewById(R.id.weather_states);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(act, R.layout.text_spinner, states);
     adapter.setDropDownViewResource(R.layout.text_spinner);
-    sv_type.setAdapter(adapter);
-    sv_type.setOnItemSelectedListener(new OnItemSelectedListener() {
+    sv.setAdapter(adapter);
+    sv.setOnItemSelectedListener(new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            weather_state = states[position];
         }
         
         @Override
@@ -578,12 +620,51 @@ private void station_dialog()
 
     });
 
+    Button search = (Button) dialog.findViewById(R.id.weather_do_search);
+    search.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String name = tv_find.getText().toString();
+            String state = weather_state.equals(states[0]) ? null : weather_state;
+            String key = tv_key_city.getText().toString();
+            int idx = name.indexOf(",");
+            if (idx >= 0)
+                name = name.substring(0, idx) + ",," + name.substring(idx + 1);
+            else
+                name += "," + state + ",US";
+Log.d("DDD", "weather: search for " + name + ", key " + key);
+            act.weather_search(name, key, new DoitCallback() {
+                @Override
+                public void doit(int res, Object obj) {
+                    JSONObject json = (JSONObject)obj;
+                    if (obj == null)
+                        Toast.makeText(act.getApplicationContext(), "city not found", Toast.LENGTH_LONG).show();
+                    else {
+                        tv_name.setText(json.optString("name"));
+                        tv_id.setText(json.optString("id"));
+                    }
+                }
+            });
+        }
+    });
+
     Button ok = (Button) dialog.findViewById(R.id.ok);
     ok.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-Log.d("DDD", "weather new station = " + tv_name.getText().toString() + ", " + sv_type.getSelectedItemId());
-            end_dialog(dialog, true);
+            int type = (rg.getCheckedRadioButtonId() == R.id.weather_under) ? WeatherStation.UNDER :
+                                                                              WeatherStation.OPEN;
+            String name = tv_name.getText().toString();
+            String id = tv_id.getText().toString();
+            String key = (type == WeatherStation.UNDER) ? tv_key_pws.getText().toString() :
+                                                          tv_key_city.getText().toString();
+            if (name.isEmpty() || id.isEmpty()) {
+                Toast.makeText(act.getApplicationContext(), "no name, no id, forget it", Toast.LENGTH_LONG).show();
+                end_dialog(dialog, false);
+            } else {
+                act.weather.add(type, name, id, key);
+                end_dialog(dialog, true);
+            }
         }
     });
 }
@@ -686,7 +767,7 @@ private void weather_dialog()
         @Override
         public void onClick(View v) {
             end_dialog(dialog, false);
-            station_dialog();
+            station_add_dialog();
         }
     });
 
