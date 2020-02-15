@@ -9,13 +9,14 @@
         android:layout_height="0dp"
         android:layout_weight="1" >
 
-        <TextView
+        <EditText
             android:id="@+id/config_table"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:textColor="@color/dialog_fore"
             android:inputType="textMultiLine" >
 
-            </TextView>
+            </EditText>
 
         </ScrollView>
 
@@ -77,6 +78,14 @@
             android:layout_height="wrap_content"
             android:paddingRight="30dp"
             android:text="Save"
+            android:textColor="@color/dialog_fore"
+            android:background="@color/dialog_back" />
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="30dp"
+            android:text="Cancel"
             android:textColor="@color/dialog_fore"
             android:background="@color/dialog_back" />
         <Button

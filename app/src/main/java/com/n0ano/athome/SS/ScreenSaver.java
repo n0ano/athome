@@ -93,6 +93,11 @@ public ScreenSaver(View first, View v1, View v2, Activity act, final SS_Callback
     P.init(act.getSharedPreferences(P.PREF_NAME, Context.MODE_PRIVATE));
 
     ss_info = new ScreenInfo(act);
+    //
+    //  Remove stale persistent data if there's no server defined
+    //
+    if (ss_info.host.isEmpty())
+        ss_rmkeys();
 
     finder = new ImageFind(act, null);
 
@@ -196,13 +201,19 @@ public void saver_fade(int delta)
     show_image(img_lists.next_image(delta), ss_views[old], ss_views[ss_viewid]);
 }
 
-public void ss_reset()
+public void ss_rmkeys()
 {
 
     P.rm_key("images:" + "");
     P.rm_key("image_last:" + "");
     P.rm_key("images:" + ss_info.list);
     P.rm_key("image_last:" + ss_info.list);
+}
+
+public void ss_reset()
+{
+
+    ss_rmkeys();
     redo_lists();
 }
 
@@ -323,13 +334,15 @@ void do_toast(final String msg)
 public void upd_list(final int gen)
 {
     String from;
+    String image_list;
     String name = "unknown";
 
     Log.d("DDD-SS", "update list, gen - " + gen);
+    image_list = P.get("images:" + img_lists.get_name(), "");
     int count = img_lists.get_size();
     do_toast("Get new images, gen - " + Integer.valueOf(gen) + " > " + Integer.valueOf(img_lists.get_generation()));
 
-    HashMap<String, String> map = C.parse_names(P.get("images:" + img_lists.get_name(), ""));
+    HashMap<String, String> map = C.parse_names(image_list);
     img_lists.scan(map, ss_info, false);
 
     if (img_lists.get_size() > count) {
@@ -346,7 +359,7 @@ public void upd_list(final int gen)
     Log.d("DDD-SS", "new menu - " + menu_title);
 
     img_lists.set_generation((img_lists.get_size() > 0) ? img_lists.get_image(0).get_generation() : gen);
-    String image_list = img_lists.list2str();
+    image_list = img_lists.list2str();
     P.put("images:" + img_lists.get_name(), image_list);
     P.put("image_last:" + img_lists.get_name(), img_lists.get_size());
     new_gen = 0;

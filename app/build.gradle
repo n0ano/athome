@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "com.n0ano.athome"
-        minSdkVersion 28
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode versionMajor * 1000 +
 		    versionMinor

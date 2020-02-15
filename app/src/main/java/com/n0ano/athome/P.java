@@ -120,6 +120,11 @@ public static void new_cfg(String cfg)
         Log.d("bad config string(" + cfg + ") - " + e);
         return;
     }
+    P_SS.put("ss:host", get_string("ss:host"));
+    P_SS.put("ss:list", get_string("ss:list"));
+    P_SS.put("ss:server", get_string("ss:server"));
+    P_SS.put("ss:user", get_string("ss:user"));
+    P_SS.put("ss:pwd", get_string("ss:pwd"));
     Log.d("new config loaded");
 	SharedPreferences.Editor editor = pref.edit();
 	editor.putString("config", C.json2str(json_cfg));

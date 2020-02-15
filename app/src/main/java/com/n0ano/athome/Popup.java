@@ -244,7 +244,7 @@ private void config_dialog()
 
     final Dialog dialog = start_dialog(R.layout.bar_config);
 
-    final TextView tv = (TextView) dialog.findViewById(R.id.config_table);
+    final EditText tv = (EditText) dialog.findViewById(R.id.config_table);
     tv.setText(C.get_cfg(2));
 
     final TextView cfg_url = (TextView) dialog.findViewById(R.id.config_url);
@@ -277,7 +277,8 @@ private void config_dialog()
         @Override
         public void onClick(View v) {
             P.put("general:config_url", cfg_url.getText().toString());
-            end_dialog(dialog, false);
+            C.new_cfg(tv.getText().toString());
+            end_dialog(dialog, true);
         }
     });
 }
@@ -1094,16 +1095,21 @@ private void screen_dialog()
         @Override
         public void onClick(View v) {
             act.ss_info.enable = cb_enable.isChecked();
-            P_SS.put("ss_enable", act.ss_info.enable);
+            P_SS.put("ss:enable", act.ss_info.enable);
+            P.put("ss_enable", act.ss_info.enable);
             act.ss_info.host = et_host.getText().toString();
             P_SS.put("ss_host", act.ss_info.host);
+            P.put("ss:host", act.ss_info.host);
             act.ss_info.list = C.suffix(act.ss_info.host);
             act.ss_info.server = et_server.getText().toString();
             P_SS.put("ss_server", act.ss_info.server);
+            P.put("ss:server", act.ss_info.server);
             act.ss_info.user = et_user.getText().toString();
             P_SS.put("ss_user", act.ss_info.user);
+            P.put("ss:user", act.ss_info.user);
             act.ss_info.pwd = et_pwd.getText().toString();
             P_SS.put("ss_pwd", act.ss_info.pwd);
+            P.put("ss:pwd", act.ss_info.pwd);
 
             try {
                 act.ss_info.start = C.a2i(ss_start.getText().toString());
@@ -1118,9 +1124,11 @@ private void screen_dialog()
                 act.ss_info.delay = SS_DELAY;
             }
             P_SS.put("ss_delay", act.ss_info.delay);
+            P.put("ss:delay", act.ss_info.delay);
 
             act.ss_info.fade = type_pos;
             P_SS.put("ss_fade", act.ss_info.fade);
+            P.put("ss:fade", act.ss_info.fade);
 
             if (cb.isChecked() && act.ss_saver != null)
                 act.ss_saver.ss_reset();
